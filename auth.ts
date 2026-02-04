@@ -3,11 +3,11 @@ import Google from "next-auth/providers/google"
 import Resend from "next-auth/providers/resend"
 import Spotify from "next-auth/providers/spotify"
 import { DynamoDBAdapter } from "@auth/dynamodb-adapter"
-import { dynamoDocumentClient } from "@/lib/dynamodb"
+import { dynamoDocumentClient, TABLE_NAME } from "@/lib/dynamodb"
 import { storeSpotifyTokens } from "@/lib/spotify"
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
-  adapter: DynamoDBAdapter(dynamoDocumentClient),
+  adapter: DynamoDBAdapter(dynamoDocumentClient, { tableName: TABLE_NAME }),
   // Database session strategy required for magic links and "sign out everywhere"
   session: { strategy: "database" },
   providers: [
