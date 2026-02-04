@@ -16,7 +16,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
     }),
     Resend({
-      from: "noreply@anchor.band",
+      from: "onboarding@resend.dev",
       apiKey: process.env.AUTH_RESEND_KEY,
     }),
     Spotify({
