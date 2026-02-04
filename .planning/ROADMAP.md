@@ -6,7 +6,7 @@ Anchor.band is a tasteful music profile platform where users claim handles, conn
 
 ## Phases
 
-- [ ] **Phase 1: Foundation** - Authentication, profiles, and secure token storage
+- [x] **Phase 1: Foundation** - Authentication, profiles, and secure token storage
 - [ ] **Phase 2: Content Pipeline** - Spotify data fetching and AI content generation
 - [ ] **Phase 3: Publishing** - Public pages with SSR and social metadata
 - [ ] **Phase 4: Landing Experience** - Marketing site and onboarding
@@ -26,9 +26,9 @@ Anchor.band is a tasteful music profile platform where users claim handles, conn
 **Plans**: 3 plans
 
 Plans:
-- [ ] 01-01-PLAN.md — Infrastructure setup (Next.js 15, DynamoDB, KMS)
-- [ ] 01-02-PLAN.md — Auth system (NextAuth v5 with Google, Resend, Spotify)
-- [ ] 01-03-PLAN.md — Profile system (handle claiming, profile management)
+- [x] 01-01-PLAN.md — Infrastructure setup (Next.js 15, DynamoDB, KMS)
+- [x] 01-02-PLAN.md — Auth system (NextAuth v5 with Google, Resend, Spotify)
+- [x] 01-03-PLAN.md — Profile system (handle claiming, profile management)
 
 ### Phase 2: Content Pipeline
 **Goal**: System generates tasteful music content from Spotify data
@@ -77,7 +77,7 @@ Plans:
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation | 0/3 | Planned | - |
+| 1. Foundation | 3/3 | Complete | 2026-02-04 |
 | 2. Content Pipeline | 0/TBD | Not started | - |
 | 3. Publishing | 0/TBD | Not started | - |
 | 4. Landing Experience | 0/TBD | Not started | - |
