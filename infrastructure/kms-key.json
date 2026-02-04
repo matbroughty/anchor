@@ -1,0 +1,98 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "KMS encryption key for Anchor.band Spotify OAuth tokens",
+  "Resources": {
+    "SpotifyTokenEncryptionKey": {
+      "Type": "AWS::KMS::Key",
+      "Properties": {
+        "Description": "Encryption key for Anchor.band Spotify OAuth tokens",
+        "EnableKeyRotation": true,
+        "KeyPolicy": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Sid": "Enable IAM User Permissions",
+              "Effect": "Allow",
+              "Principal": {
+                "AWS": {
+                  "Fn::Sub": "arn:aws:iam::${AWS::AccountId}:root"
+                }
+              },
+              "Action": "kms:*",
+              "Resource": "*"
+            },
+            {
+              "Sid": "Allow use of the key for encryption and decryption",
+              "Effect": "Allow",
+              "Principal": {
+                "AWS": {
+                  "Fn::Sub": "arn:aws:iam::${AWS::AccountId}:root"
+                }
+              },
+              "Action": [
+                "kms:Encrypt",
+                "kms:Decrypt",
+                "kms:ReEncrypt*",
+                "kms:GenerateDataKey*",
+                "kms:DescribeKey"
+              ],
+              "Resource": "*"
+            }
+          ]
+        },
+        "Tags": [
+          {
+            "Key": "Application",
+            "Value": "Anchor.band"
+          },
+          {
+            "Key": "Purpose",
+            "Value": "Spotify Token Encryption"
+          }
+        ]
+      }
+    },
+    "SpotifyTokenEncryptionKeyAlias": {
+      "Type": "AWS::KMS::Alias",
+      "Properties": {
+        "AliasName": "alias/anchor-spotify-tokens",
+        "TargetKeyId": {
+          "Ref": "SpotifyTokenEncryptionKey"
+        }
+      }
+    }
+  },
+  "Outputs": {
+    "KeyId": {
+      "Description": "Key ID of the KMS encryption key",
+      "Value": {
+        "Ref": "SpotifyTokenEncryptionKey"
+      },
+      "Export": {
+        "Name": {
+          "Fn::Sub": "${AWS::StackName}-KeyId"
+        }
+      }
+    },
+    "KeyArn": {
+      "Description": "ARN of the KMS encryption key",
+      "Value": {
+        "Fn::GetAtt": [
+          "SpotifyTokenEncryptionKey",
+          "Arn"
+        ]
+      },
+      "Export": {
+        "Name": {
+          "Fn::Sub": "${AWS::StackName}-KeyArn"
+        }
+      }
+    },
+    "KeyAlias": {
+      "Description": "Alias of the KMS encryption key",
+      "Value": {
+        "Ref": "SpotifyTokenEncryptionKeyAlias"
+      }
+    }
+  }
+}
