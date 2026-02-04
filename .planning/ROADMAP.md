@@ -23,10 +23,12 @@ Anchor.band is a tasteful music profile platform where users claim handles, conn
   3. User can connect Spotify account and tokens are encrypted at rest with KMS
   4. User can claim unique handle and it appears in URL format (anchor.band/handle)
   5. User can set and edit display name and profile information
-**Plans**: TBD
+**Plans**: 3 plans
 
 Plans:
-- [ ] TBD (defined during /gsd:plan-phase)
+- [ ] 01-01-PLAN.md — Infrastructure setup (Next.js 15, DynamoDB, KMS)
+- [ ] 01-02-PLAN.md — Auth system (NextAuth v5 with Google, Resend, Spotify)
+- [ ] 01-03-PLAN.md — Profile system (handle claiming, profile management)
 
 ### Phase 2: Content Pipeline
 **Goal**: System generates tasteful music content from Spotify data
@@ -75,7 +77,7 @@ Plans:
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation | 0/TBD | Not started | - |
+| 1. Foundation | 0/3 | Planned | - |
 | 2. Content Pipeline | 0/TBD | Not started | - |
 | 3. Publishing | 0/TBD | Not started | - |
 | 4. Landing Experience | 0/TBD | Not started | - |
