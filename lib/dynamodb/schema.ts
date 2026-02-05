@@ -1,0 +1,28 @@
+/**
+ * Sort-key constants for music data items in the single DynamoDB table.
+ *
+ * Single-table design: all user data lives under pk = USER#{userId}.
+ * Each music entity gets its own sort key so we can batch-fetch or
+ * independently update them.
+ */
+export const MUSIC_SK = {
+  ARTISTS: "MUSIC#ARTISTS",
+  ALBUMS: "MUSIC#ALBUMS",
+  TRACKS: "MUSIC#TRACKS",
+} as const;
+
+/**
+ * Sort key for the user's profile-level metadata record.
+ * We store lastRefresh here so cooldown checks only need one GetCommand.
+ */
+export const METADATA_SK = "PROFILE#METADATA";
+
+/**
+ * Builds the partition key for a given user.
+ *
+ * Consistent with the pattern used in lib/spotify.ts (USER#{id})
+ * and lib/handle.ts for the single-table layout.
+ */
+export function userPK(userId: string): string {
+  return `USER#${userId}`;
+}
