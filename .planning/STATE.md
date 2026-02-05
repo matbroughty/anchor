@@ -5,33 +5,34 @@
 See: .planning/PROJECT.md (updated 2026-02-04)
 
 **Core value:** Non-cringe, tasteful representation of your music taste that you can confidently share anywhere
-**Current focus:** Phase 1: Foundation
+**Current focus:** Phase 2: Content Pipeline
 
 ## Current Position
 
-Phase: 1 of 4 (Foundation)
-Plan: 3 of 3
-Status: Complete
-Last activity: 2026-02-04 — Completed 01-03-PLAN.md (Profile management)
+Phase: 2 of 4 (Content Pipeline)
+Plan: 1 of 3 in current phase
+Status: In progress
+Last activity: 2026-02-05 — Completed 02-01-PLAN.md (Spotify data fetching and caching)
 
-Progress: [███░░░░░░░] 100% (Phase 1: 3/3 plans)
+Progress: [████░░░░░░] 44% (4/9 known plans complete)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 3
-- Average duration: 5.7 min
-- Total execution time: 0.28 hours
+- Total plans completed: 4
+- Average duration: 5.0 min
+- Total execution time: 0.33 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 1. Foundation | 3 | 17 min | 5.7 min |
+| 2. Content Pipeline | 1 | 3 min | 3 min |
 
 **Recent Trend:**
-- Last 5 plans: 01-01 (5 min), 01-02 (4 min), 01-03 (8 min)
-- Trend: Consistent velocity with slight increase for UI-heavy plans
+- Last 5 plans: 01-01 (5 min), 01-02 (4 min), 01-03 (8 min), 02-01 (3 min)
+- Trend: API/data plans execute faster than UI-heavy plans
 
 *Updated after each plan completion*
 
@@ -70,6 +71,12 @@ Recent decisions affecting current work:
 - Debounced availability check (500ms) to reduce API calls during typing
 - Protected route group redirects to /signin if not authenticated
 
+**From Plan 02-01:**
+- Store full 50-track pool in DynamoDB but return only top 3 to the UI (preserves data for album re-derivation)
+- lastRefresh on PROFILE#METADATA sort key -- cooldown check is a single GetCommand
+- lib/dynamodb/ subdirectory coexists with lib/dynamodb.ts (bundler resolution: file wins for @/lib/dynamodb)
+- Server actions use typed response objects that never throw -- errors returned as { data: null, error: string }
+
 ### Pending Todos
 
 **From Plan 01-01:**
@@ -90,12 +97,12 @@ None. External service configuration (Google OAuth, Resend, Spotify, AWS infrast
 
 ## Session Continuity
 
-Last session: 2026-02-04T21:35:00Z
-Stopped at: Completed Phase 1 (Foundation) - All 3 plans complete
+Last session: 2026-02-05T06:59:12Z
+Stopped at: Completed 02-01-PLAN.md (Spotify data fetching and DynamoDB caching)
 Resume file: None
 
-**Next action:** Plan Phase 2 (Content Pipeline) - Spotify data fetching and AI content generation
+**Next action:** Execute 02-02-PLAN.md (AI content generation with Bedrock Claude)
 
 ---
 *State initialized: 2026-02-04*
-*Last updated: 2026-02-04*
+*Last updated: 2026-02-05*

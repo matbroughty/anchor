@@ -43,7 +43,7 @@ Plans:
 **Plans**: 3 plans
 
 Plans:
-- [ ] 02-01-PLAN.md — Spotify data fetching and DynamoDB caching
+- [x] 02-01-PLAN.md — Spotify data fetching and DynamoDB caching
 - [ ] 02-02-PLAN.md — AI content generation with Bedrock Claude
 - [ ] 02-03-PLAN.md — Content management dashboard UI
 
@@ -80,7 +80,7 @@ Plans:
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation | 3/3 | Complete | 2026-02-04 |
-| 2. Content Pipeline | 0/3 | Not started | - |
+| 2. Content Pipeline | 1/3 | In progress | - |
 | 3. Publishing | 0/TBD | Not started | - |
 | 4. Landing Experience | 0/TBD | Not started | - |
 
