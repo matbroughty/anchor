@@ -40,10 +40,12 @@ Plans:
   3. User can regenerate AI content if unsatisfied with initial output
   4. User can manually edit bio and captions before publishing
   5. User can manually refresh Spotify data with cooldown enforcement
-**Plans**: TBD
+**Plans**: 3 plans
 
 Plans:
-- [ ] TBD (defined during /gsd:plan-phase)
+- [ ] 02-01-PLAN.md — Spotify data fetching and DynamoDB caching
+- [ ] 02-02-PLAN.md — AI content generation with Bedrock Claude
+- [ ] 02-03-PLAN.md — Content management dashboard UI
 
 ### Phase 3: Publishing
 **Goal**: Public pages render with proper social sharing metadata
@@ -78,10 +80,10 @@ Plans:
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation | 3/3 | Complete | 2026-02-04 |
-| 2. Content Pipeline | 0/TBD | Not started | - |
+| 2. Content Pipeline | 0/3 | Not started | - |
 | 3. Publishing | 0/TBD | Not started | - |
 | 4. Landing Experience | 0/TBD | Not started | - |
 
 ---
 *Roadmap created: 2026-02-04*
-*Last updated: 2026-02-04*
+*Last updated: 2026-02-05*
