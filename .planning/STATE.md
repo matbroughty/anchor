@@ -10,28 +10,28 @@ See: .planning/PROJECT.md (updated 2026-02-04)
 ## Current Position
 
 Phase: 2 of 4 (Content Pipeline)
-Plan: 1 of 3 in current phase
+Plan: 2 of 3 in current phase
 Status: In progress
-Last activity: 2026-02-05 — Completed 02-01-PLAN.md (Spotify data fetching and caching)
+Last activity: 2026-02-05 — Completed 02-02-PLAN.md (AI content generation with Bedrock Claude)
 
-Progress: [████░░░░░░] 44% (4/9 known plans complete)
+Progress: [█████░░░░░] 55% (5/9 known plans complete)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 4
-- Average duration: 5.0 min
-- Total execution time: 0.33 hours
+- Total plans completed: 5
+- Average duration: 4.6 min
+- Total execution time: 0.38 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 1. Foundation | 3 | 17 min | 5.7 min |
-| 2. Content Pipeline | 1 | 3 min | 3 min |
+| 2. Content Pipeline | 2 | 6 min | 3 min |
 
 **Recent Trend:**
-- Last 5 plans: 01-01 (5 min), 01-02 (4 min), 01-03 (8 min), 02-01 (3 min)
+- Last 5 plans: 01-02 (4 min), 01-03 (8 min), 02-01 (3 min), 02-02 (3 min)
 - Trend: API/data plans execute faster than UI-heavy plans
 
 *Updated after each plan completion*
@@ -77,12 +77,20 @@ Recent decisions affecting current work:
 - lib/dynamodb/ subdirectory coexists with lib/dynamodb.ts (bundler resolution: file wins for @/lib/dynamodb)
 - Server actions use typed response objects that never throw -- errors returned as { data: null, error: string }
 
+**From Plan 02-02:**
+- Bedrock client reuses AUTH_DYNAMODB_ID/SECRET/REGION (single IAM user for all AWS services)
+- Bio temperature 0.6, caption temperature 0.5 for consistent but not robotic tone
+- Sequential album caption generation to respect Bedrock per-account rate limits
+- CONTENT#BIO / CONTENT#CAPTION#{albumId} sort-key namespace in single table
+- ANTI_CRINGE_RULES exported standalone for reuse in tests/linting
+- IAM user will need Bedrock InvokeModel permission added (pending Todos updated)
+
 ### Pending Todos
 
 **From Plan 01-01:**
 - Deploy DynamoDB table using CloudFormation template (infrastructure/dynamodb-table.json)
 - Deploy KMS encryption key using CloudFormation template (infrastructure/kms-key.json)
-- Create IAM user with DynamoDB and KMS permissions
+- Create IAM user with DynamoDB, KMS, and Bedrock permissions
 - Configure environment variables in .env.local (AUTH_DYNAMODB_*, KMS_KEY_ID)
 
 **From Plan 01-02:**
@@ -97,11 +105,11 @@ None. External service configuration (Google OAuth, Resend, Spotify, AWS infrast
 
 ## Session Continuity
 
-Last session: 2026-02-05T06:59:12Z
-Stopped at: Completed 02-01-PLAN.md (Spotify data fetching and DynamoDB caching)
+Last session: 2026-02-05T07:05:40Z
+Stopped at: Completed 02-02-PLAN.md (AI content generation with Bedrock Claude)
 Resume file: None
 
-**Next action:** Execute 02-02-PLAN.md (AI content generation with Bedrock Claude)
+**Next action:** Execute 02-03-PLAN.md (Content management dashboard UI)
 
 ---
 *State initialized: 2026-02-04*
