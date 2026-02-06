@@ -7,6 +7,7 @@ import { dynamoDocumentClient, TABLE_NAME } from "@/lib/dynamodb"
 import { storeSpotifyTokens } from "@/lib/spotify"
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
+  trustHost: true,
   adapter: DynamoDBAdapter(dynamoDocumentClient, { tableName: TABLE_NAME }),
   // Database session strategy required for magic links and "sign out everywhere"
   session: { strategy: "database" },
@@ -23,6 +24,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       clientId: process.env.SPOTIFY_CLIENT_ID!,
       clientSecret: process.env.SPOTIFY_CLIENT_SECRET!,
       authorization: {
+        url: "https://accounts.spotify.com/authorize",
         params: {
           scope: "user-read-email user-top-read user-read-recently-played",
         },
