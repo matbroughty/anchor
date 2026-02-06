@@ -7,7 +7,7 @@ Anchor.band is a tasteful music profile platform where users claim handles, conn
 ## Phases
 
 - [x] **Phase 1: Foundation** - Authentication, profiles, and secure token storage
-- [ ] **Phase 2: Content Pipeline** - Spotify data fetching and AI content generation
+- [x] **Phase 2: Content Pipeline** - Spotify data fetching and AI content generation
 - [ ] **Phase 3: Publishing** - Public pages with SSR and social metadata
 - [ ] **Phase 4: Landing Experience** - Marketing site and onboarding
 
@@ -45,7 +45,7 @@ Plans:
 Plans:
 - [x] 02-01-PLAN.md — Spotify data fetching and DynamoDB caching
 - [x] 02-02-PLAN.md — AI content generation with Bedrock Claude
-- [ ] 02-03-PLAN.md — Content management dashboard UI
+- [x] 02-03-PLAN.md — Content management dashboard UI
 
 ### Phase 3: Publishing
 **Goal**: Public pages render with proper social sharing metadata
@@ -57,10 +57,12 @@ Plans:
   3. Page shows rich preview when shared on WhatsApp, Twitter, or LinkedIn (Open Graph metadata)
   4. Public page loads from cached data without calling Spotify API
   5. User can toggle page between published (public) and unpublished (private) states
-**Plans**: TBD
+**Plans**: 3 plans
 
 Plans:
-- [ ] TBD (defined during /gsd:plan-phase)
+- [ ] 03-01-PLAN.md — Data layer and publish/unpublish actions
+- [ ] 03-02-PLAN.md — Public profile page with ISR and OG metadata
+- [ ] 03-03-PLAN.md — Dashboard publish controls and verification
 
 ### Phase 4: Landing Experience
 **Goal**: New users understand Anchor and can start signup flow
@@ -80,10 +82,10 @@ Plans:
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation | 3/3 | Complete | 2026-02-04 |
-| 2. Content Pipeline | 2/3 | In progress | - |
-| 3. Publishing | 0/TBD | Not started | - |
+| 2. Content Pipeline | 3/3 | Complete | 2026-02-06 |
+| 3. Publishing | 0/3 | Not started | - |
 | 4. Landing Experience | 0/TBD | Not started | - |
 
 ---
 *Roadmap created: 2026-02-04*
-*Last updated: 2026-02-05*
+*Last updated: 2026-02-06*
