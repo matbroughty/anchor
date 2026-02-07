@@ -59,10 +59,24 @@ export function PublicProfile({
 }: PublicProfileProps) {
   return (
     <div className="min-h-screen bg-neutral-50 dark:bg-neutral-950">
-      {/* Owner navigation bar */}
-      {isOwner && (
-        <div className="bg-white dark:bg-neutral-900 border-b border-neutral-200 dark:border-neutral-800">
-          <div className="max-w-3xl mx-auto px-4 sm:px-6 py-3 flex justify-end gap-4">
+      {/* Navigation bar - always visible */}
+      <div className="bg-white dark:bg-neutral-900 border-b border-neutral-200 dark:border-neutral-800">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 py-3 flex justify-between items-center">
+          {/* Back to home button - always visible */}
+          <a
+            href="/"
+            className="flex items-center gap-2 text-sm text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100 transition-colors"
+            title="Back to Anchor.band"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+            <span>Back</span>
+          </a>
+
+          {/* Owner navigation - only visible to owner */}
+          {isOwner && (
+            <div className="flex gap-4">
             <a
               href="/profile"
               className="flex items-center gap-2 text-sm text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100 transition-colors"
@@ -83,9 +97,10 @@ export function PublicProfile({
               </svg>
               <span>Dashboard</span>
             </a>
-          </div>
+            </div>
+          )}
         </div>
-      )}
+      </div>
       <main className="max-w-3xl mx-auto px-4 sm:px-6 py-12 sm:py-16">
         {/* Header section */}
         <header className="mb-12 text-center">
