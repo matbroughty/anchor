@@ -89,14 +89,70 @@ export function PublicProfile({
       <main className="max-w-3xl mx-auto px-4 sm:px-6 py-12 sm:py-16">
         {/* Header section */}
         <header className="mb-12 text-center">
-          <h1 className="text-3xl sm:text-4xl font-bold text-neutral-900 dark:text-neutral-100 mb-3">
-            {displayName}
-          </h1>
-          {bio && (
-            <p className="text-neutral-600 dark:text-neutral-400 max-w-xl mx-auto leading-relaxed">
-              {bio}
-            </p>
-          )}
+          {/* Musical Anchor Icon + Name */}
+          <div className="flex items-center justify-center gap-3 mb-3">
+            {/* Musical Anchor Icon - combines music note and anchor */}
+            <div className="relative flex-shrink-0">
+              <svg
+                className="w-10 h-10 sm:w-12 sm:h-12 text-neutral-700 dark:text-neutral-300"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                {/* Anchor symbol */}
+                <circle cx="12" cy="5" r="3"/>
+                <line x1="12" y1="8" x2="12" y2="16"/>
+                <path d="M5 16a7 7 0 0 0 14 0"/>
+                <line x1="5" y1="16" x2="5" y2="18"/>
+                <line x1="19" y1="16" x2="19" y2="18"/>
+              </svg>
+              {/* Small music note overlay */}
+              <svg
+                className="absolute -top-1 -right-1 w-4 h-4 text-blue-500 dark:text-blue-400"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+              >
+                <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/>
+              </svg>
+            </div>
+
+            <h1 className="text-3xl sm:text-4xl font-bold text-neutral-900 dark:text-neutral-100">
+              {displayName}
+            </h1>
+
+            {/* Bio tooltip trigger */}
+            {bio && (
+              <div className="group relative flex-shrink-0">
+                <button
+                  type="button"
+                  className="w-8 h-8 rounded-full bg-neutral-200 dark:bg-neutral-800 hover:bg-neutral-300 dark:hover:bg-neutral-700 flex items-center justify-center text-neutral-600 dark:text-neutral-400 transition-colors cursor-help"
+                  aria-label="Show bio"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </button>
+                {/* Bio popup - shows on hover */}
+                <div className="absolute left-1/2 -translate-x-1/2 top-full mt-2 w-80 max-w-[calc(100vw-2rem)] opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-10">
+                  <div className="bg-white dark:bg-neutral-800 rounded-lg shadow-lg border border-neutral-200 dark:border-neutral-700 p-4">
+                    <div className="text-sm text-neutral-700 dark:text-neutral-300 leading-relaxed">
+                      {bio}
+                    </div>
+                    {/* Arrow pointer */}
+                    <div className="absolute bottom-full left-1/2 -translate-x-1/2 border-8 border-transparent border-b-white dark:border-b-neutral-800"></div>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Subtle tagline */}
+          <p className="text-xs text-neutral-500 dark:text-neutral-500 uppercase tracking-wide">
+            Musical Anchor
+          </p>
         </header>
 
         {/* Top Artists section */}
