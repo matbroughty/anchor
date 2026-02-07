@@ -168,12 +168,12 @@ export function FeaturedArtistsEditor({
             </div>
           ))}
           <p className="text-xs text-gray-500">
-            {featured.length}/3 featured artists
+            {featured.length}/3 favourite artists
           </p>
         </div>
       ) : (
         <p className="text-sm text-gray-500 italic">
-          Add up to 3 artists to feature on your profile
+          Add up to 3 artists as favourites on your profile
         </p>
       )}
 
@@ -198,7 +198,7 @@ export function FeaturedArtistsEditor({
               d="M12 4v16m8-8H4"
             />
           </svg>
-          Add Featured Artist
+          Add Favourite Artist
         </button>
       )}
 

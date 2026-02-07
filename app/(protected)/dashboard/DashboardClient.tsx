@@ -127,8 +127,8 @@ export function DashboardClient({
               <a href="#your-page" className="text-xs font-medium text-gray-600 hover:text-gray-900 whitespace-nowrap px-3 py-1 rounded-md hover:bg-gray-100 transition-colors">
                 Your Page
               </a>
-              <a href="#featured-artists" className="text-xs font-medium text-gray-600 hover:text-gray-900 whitespace-nowrap px-3 py-1 rounded-md hover:bg-gray-100 transition-colors">
-                Featured Artists
+              <a href="#favourite-artists" className="text-xs font-medium text-gray-600 hover:text-gray-900 whitespace-nowrap px-3 py-1 rounded-md hover:bg-gray-100 transition-colors">
+                Favourite Artists
               </a>
               <a href="#bio" className="text-xs font-medium text-gray-600 hover:text-gray-900 whitespace-nowrap px-3 py-1 rounded-md hover:bg-gray-100 transition-colors">
                 Bio
@@ -199,12 +199,12 @@ export function DashboardClient({
           </div>
         ) : (
           <>
-            {/* Featured Artists */}
-            <div id="featured-artists" className="bg-white shadow sm:rounded-lg px-4 py-5 sm:p-6 scroll-mt-20">
-              <h2 className="text-lg font-semibold text-gray-900 mb-4">Featured Artists</h2>
+            {/* Favourite Artists */}
+            <div id="favourite-artists" className="bg-white shadow sm:rounded-lg px-4 py-5 sm:p-6 scroll-mt-20">
+              <h2 className="text-lg font-semibold text-gray-900 mb-4">Favourite Artists</h2>
               <p className="text-sm text-gray-600 mb-4">
                 Highlight up to 3 artists on your profile (optional).
-                These will appear above your top artists.
+                These will appear above your top recent artists.
               </p>
               <FeaturedArtistsEditor
                 initialFeatured={featuredArtists}

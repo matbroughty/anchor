@@ -184,13 +184,33 @@ export function PublicProfile({
           </p>
         </header>
 
-        {/* Featured Artists section */}
+        {/* Favourite Artists section */}
         {featuredArtists.length > 0 && (
           <section className="mb-12">
-            <h2 className="text-sm font-medium text-neutral-500 dark:text-neutral-500 uppercase tracking-wide mb-4">
-              Featured Artists
-            </h2>
-            <div className="flex gap-4 overflow-x-auto pb-2 -mx-4 px-4 sm:mx-0 sm:px-0 sm:justify-center">
+            <div className="flex items-center gap-2 mb-4">
+              <h2 className="text-sm font-medium text-neutral-500 dark:text-neutral-500 uppercase tracking-wide">
+                Favourite Artists
+              </h2>
+              <div className="group relative">
+                <button
+                  type="button"
+                  className="w-4 h-4 rounded-full bg-neutral-200 dark:bg-neutral-800 hover:bg-neutral-300 dark:hover:bg-neutral-700 flex items-center justify-center text-neutral-600 dark:text-neutral-400 transition-colors cursor-help"
+                  aria-label="How these are chosen"
+                >
+                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </button>
+                <div className="absolute left-0 top-full mt-2 w-64 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-10">
+                  <div className="bg-white dark:bg-neutral-800 rounded-lg shadow-lg border border-neutral-200 dark:border-neutral-700 p-3">
+                    <p className="text-xs text-neutral-700 dark:text-neutral-300">
+                      Artists you've personally selected to highlight on your profile (up to 3).
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className="flex gap-6 overflow-x-auto pb-4 pt-2 -mx-4 px-4 sm:mx-0 sm:px-0 sm:justify-center">
               {featuredArtists.map((artist) => {
                 const imgUrl = pickImage(artist.images);
                 return (
@@ -199,10 +219,10 @@ export function PublicProfile({
                     href={spotifyUrl(artist.id, 'artist')}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex-none flex flex-col items-center gap-2 hover:opacity-80 transition-opacity"
-                    style={{ minWidth: 96 }}
+                    className="flex-none flex flex-col items-center gap-3 hover:opacity-80 transition-opacity"
+                    style={{ minWidth: 112 }}
                   >
-                    <div className="relative w-20 h-20 sm:w-24 sm:h-24 flex-shrink-0">
+                    <div className="relative w-28 h-28 flex-shrink-0">
                       <div className="absolute inset-0 rounded-full ring-2 ring-blue-500 pointer-events-none" />
                       <div className="w-full h-full aspect-square rounded-full overflow-hidden bg-neutral-200 dark:bg-neutral-800">
                         {imgUrl ? (
@@ -213,14 +233,14 @@ export function PublicProfile({
                           />
                         ) : (
                           <div className="w-full h-full flex items-center justify-center">
-                            <span className="text-neutral-500 text-2xl font-medium">
+                            <span className="text-neutral-500 text-3xl font-medium">
                               {artist.name.charAt(0).toUpperCase()}
                             </span>
                           </div>
                         )}
                       </div>
                     </div>
-                    <span className="text-xs text-neutral-600 dark:text-neutral-400 text-center truncate w-24">
+                    <span className="text-xs text-neutral-600 dark:text-neutral-400 text-center truncate w-28">
                       {artist.name}
                     </span>
                   </a>
@@ -230,12 +250,32 @@ export function PublicProfile({
           </section>
         )}
 
-        {/* Top Artists section */}
+        {/* Top Recent Artists section */}
         {artists.length > 0 && (
           <section className="mb-12">
-            <h2 className="text-sm font-medium text-neutral-500 dark:text-neutral-500 uppercase tracking-wide mb-4">
-              Top Artists
-            </h2>
+            <div className="flex items-center gap-2 mb-4">
+              <h2 className="text-sm font-medium text-neutral-500 dark:text-neutral-500 uppercase tracking-wide">
+                Top Recent Artists
+              </h2>
+              <div className="group relative">
+                <button
+                  type="button"
+                  className="w-4 h-4 rounded-full bg-neutral-200 dark:bg-neutral-800 hover:bg-neutral-300 dark:hover:bg-neutral-700 flex items-center justify-center text-neutral-600 dark:text-neutral-400 transition-colors cursor-help"
+                  aria-label="How these are chosen"
+                >
+                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </button>
+                <div className="absolute left-0 top-full mt-2 w-64 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-10">
+                  <div className="bg-white dark:bg-neutral-800 rounded-lg shadow-lg border border-neutral-200 dark:border-neutral-700 p-3">
+                    <p className="text-xs text-neutral-700 dark:text-neutral-300">
+                      Your most played artists from Spotify over the past 6 months.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
             <div className="flex gap-4 overflow-x-auto pb-2 -mx-4 px-4 sm:mx-0 sm:px-0">
               {artists.slice(0, 6).map((artist) => {
                 const imgUrl = pickImage(artist.images);
