@@ -5,6 +5,7 @@ import { MusicDataSection } from "@/app/components/MusicDataSection";
 import { BioEditor } from "@/app/components/BioEditor";
 import { AlbumCaptions } from "@/app/components/AlbumCaptions";
 import { RefreshButton } from "@/app/components/RefreshButton";
+import { PublishToggle } from "@/app/components/PublishToggle";
 import { refreshSpotifyData } from "@/app/actions/spotify";
 import { generateBio, generateAlbumCaptions, regenerateBio, regenerateCaption } from "@/app/actions/ai-content";
 import type { MusicData } from "@/types/music";
@@ -18,6 +19,8 @@ interface DashboardClientProps {
   initialMusicData: MusicData | null;
   initialContent: ContentData;
   userId: string;
+  handle: string | null;
+  isPublished: boolean;
 }
 
 // ---------------------------------------------------------------------------
@@ -27,9 +30,12 @@ interface DashboardClientProps {
 export function DashboardClient({
   initialMusicData,
   initialContent,
+  handle,
+  isPublished: initialIsPublished,
 }: DashboardClientProps) {
   const [musicData, setMusicData] = useState<MusicData | null>(initialMusicData);
   const [content, setContent] = useState<ContentData>(initialContent);
+  const [published, setPublished] = useState(initialIsPublished);
   const [isPending, startTransition] = useTransition();
 
   // -----------------------------------------------------------------------
@@ -97,6 +103,18 @@ export function DashboardClient({
           <h1 className="text-2xl font-bold text-gray-900">Your Music Profile</h1>
           <RefreshButton onRefresh={handleRefresh} disabled={isPending} />
         </div>
+
+        {/* Publish controls — always visible */}
+        {handle && (
+          <div className="bg-white shadow sm:rounded-lg px-4 py-5 sm:p-6">
+            <h2 className="text-lg font-semibold text-gray-900 mb-4">Your Page</h2>
+            <PublishToggle
+              isPublished={published}
+              handle={handle}
+              onStatusChange={setPublished}
+            />
+          </div>
+        )}
 
         {/* No data state */}
         {!musicData ? (
