@@ -5,7 +5,7 @@ import { dynamoDocumentClient, TABLE_NAME } from "@/lib/dynamodb";
 import { userPK } from "@/lib/dynamodb/schema";
 import { getMusicData } from "@/lib/dynamodb/music-data";
 import { getFeaturedArtists } from "@/lib/dynamodb/featured-artists";
-import { getContent } from "@/lib/dynamodb/content";
+import { getContent, getTasteAnalysis } from "@/lib/dynamodb/content";
 import { DashboardClient } from "./DashboardClient";
 
 // ---------------------------------------------------------------------------
@@ -52,18 +52,21 @@ export default async function DashboardPage() {
 
   const userId = session.user.id;
 
-  const [musicData, contentData, featuredArtists, userStatus] = await Promise.all([
-    getMusicData(userId),
-    getContent(userId),
-    getFeaturedArtists(userId),
-    getUserStatus(userId),
-  ]);
+  const [musicData, contentData, featuredArtists, tasteAnalysis, userStatus] =
+    await Promise.all([
+      getMusicData(userId),
+      getContent(userId),
+      getFeaturedArtists(userId),
+      getTasteAnalysis(userId),
+      getUserStatus(userId),
+    ]);
 
   return (
     <DashboardClient
       initialMusicData={musicData}
       initialContent={contentData}
       initialFeaturedArtists={featuredArtists}
+      initialTasteAnalysis={tasteAnalysis}
       userId={userId}
       handle={userStatus.handle}
       isPublished={userStatus.isPublic}

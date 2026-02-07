@@ -1,7 +1,7 @@
 import { GetCommand, PutCommand, QueryCommand } from "@aws-sdk/lib-dynamodb";
 import { dynamoDocumentClient, TABLE_NAME } from "@/lib/dynamodb";
 import { userPK } from "@/lib/dynamodb/schema";
-import type { Bio, Caption, ContentData } from "@/types/content";
+import type { Bio, Caption, ContentData, TasteAnalysis } from "@/types/content";
 
 // ---------------------------------------------------------------------------
 // Sort-key constants (content lives in the same single table)
@@ -10,6 +10,7 @@ import type { Bio, Caption, ContentData } from "@/types/content";
 const CONTENT_SK = {
   BIO: "CONTENT#BIO",
   CAPTION_PREFIX: "CONTENT#CAPTION#", // Append albumId
+  TASTE_ANALYSIS: "CONTENT#TASTE_ANALYSIS",
 } as const;
 
 // ---------------------------------------------------------------------------
@@ -127,6 +128,45 @@ export async function getAllCaptions(userId: string): Promise<Caption[]> {
     generatedAt: item.generatedAt as number,
     editedAt: item.editedAt as number | undefined,
   }));
+}
+
+// ---------------------------------------------------------------------------
+// Taste Analysis operations
+// ---------------------------------------------------------------------------
+
+export async function getTasteAnalysis(
+  userId: string
+): Promise<TasteAnalysis | null> {
+  const result = await dynamoDocumentClient.send(
+    new GetCommand({
+      TableName: TABLE_NAME,
+      Key: {
+        pk: userPK(userId),
+        sk: CONTENT_SK.TASTE_ANALYSIS,
+      },
+    })
+  );
+
+  if (!result.Item) return null;
+
+  return result.Item.data as TasteAnalysis;
+}
+
+export async function putTasteAnalysis(
+  userId: string,
+  analysis: TasteAnalysis
+): Promise<void> {
+  await dynamoDocumentClient.send(
+    new PutCommand({
+      TableName: TABLE_NAME,
+      Item: {
+        pk: userPK(userId),
+        sk: CONTENT_SK.TASTE_ANALYSIS,
+        data: analysis,
+        generatedAt: analysis.generatedAt,
+      },
+    })
+  );
 }
 
 // ---------------------------------------------------------------------------

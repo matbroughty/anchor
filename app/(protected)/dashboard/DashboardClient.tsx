@@ -5,12 +5,13 @@ import { MusicDataSection } from "@/app/components/MusicDataSection";
 import { BioEditor } from "@/app/components/BioEditor";
 import { FeaturedArtistsEditor } from "@/app/components/FeaturedArtistsEditor";
 import { AlbumCaptions } from "@/app/components/AlbumCaptions";
+import { TasteAnalysis } from "@/app/components/TasteAnalysis";
 import { RefreshButton } from "@/app/components/RefreshButton";
 import { PublishToggle } from "@/app/components/PublishToggle";
 import { refreshSpotifyData } from "@/app/actions/spotify";
 import { generateBio, generateAlbumCaptions, regenerateBio, regenerateCaption } from "@/app/actions/ai-content";
 import type { MusicData, Artist } from "@/types/music";
-import type { ContentData, Bio, Caption } from "@/types/content";
+import type { ContentData, Bio, Caption, TasteAnalysis as TasteAnalysisType } from "@/types/content";
 
 // ---------------------------------------------------------------------------
 // Props
@@ -20,6 +21,7 @@ interface DashboardClientProps {
   initialMusicData: MusicData | null;
   initialContent: ContentData;
   initialFeaturedArtists: Artist[];
+  initialTasteAnalysis: TasteAnalysisType | null;
   userId: string;
   handle: string | null;
   isPublished: boolean;
@@ -33,6 +35,7 @@ export function DashboardClient({
   initialMusicData,
   initialContent,
   initialFeaturedArtists,
+  initialTasteAnalysis,
   handle,
   isPublished: initialIsPublished,
 }: DashboardClientProps) {
@@ -215,6 +218,12 @@ export function DashboardClient({
                 disabled={isPending}
               />
             </div>
+
+            {/* Taste Analysis */}
+            <TasteAnalysis
+              initialAnalysis={initialTasteAnalysis}
+              hasMusicData={!!musicData}
+            />
           </>
         )}
       </div>
