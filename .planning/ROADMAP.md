@@ -8,7 +8,7 @@ Anchor.band is a tasteful music profile platform where users claim handles, conn
 
 - [x] **Phase 1: Foundation** - Authentication, profiles, and secure token storage
 - [x] **Phase 2: Content Pipeline** - Spotify data fetching and AI content generation
-- [ ] **Phase 3: Publishing** - Public pages with SSR and social metadata
+- [x] **Phase 3: Publishing** - Public pages with SSR and social metadata
 - [ ] **Phase 4: Landing Experience** - Marketing site and onboarding
 
 ## Phase Details
@@ -60,9 +60,9 @@ Plans:
 **Plans**: 3 plans
 
 Plans:
-- [ ] 03-01-PLAN.md — Data layer and publish/unpublish actions
-- [ ] 03-02-PLAN.md — Public profile page with ISR and OG metadata
-- [ ] 03-03-PLAN.md — Dashboard publish controls and verification
+- [x] 03-01-PLAN.md — Data layer and publish/unpublish actions
+- [x] 03-02-PLAN.md — Public profile page with ISR and OG metadata
+- [x] 03-03-PLAN.md — Dashboard publish controls and verification
 
 ### Phase 4: Landing Experience
 **Goal**: New users understand Anchor and can start signup flow
@@ -72,10 +72,11 @@ Plans:
   1. Landing page at anchor.band clearly explains what Anchor is and why it exists
   2. Landing page shows 2-3 example profile pages demonstrating the experience
   3. "Get Started" button leads to signup flow from Phase 1
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] TBD (defined during /gsd:plan-phase)
+- [ ] 04-01-PLAN.md — Landing page components and assembly
+- [ ] 04-02-PLAN.md — Example screenshots and visual verification
 
 ## Progress
 
@@ -83,9 +84,9 @@ Plans:
 |-------|----------------|--------|-----------|
 | 1. Foundation | 3/3 | Complete | 2026-02-04 |
 | 2. Content Pipeline | 3/3 | Complete | 2026-02-06 |
-| 3. Publishing | 0/3 | Not started | - |
-| 4. Landing Experience | 0/TBD | Not started | - |
+| 3. Publishing | 3/3 | Complete | 2026-02-07 |
+| 4. Landing Experience | 0/2 | Not started | - |
 
 ---
 *Roadmap created: 2026-02-04*
-*Last updated: 2026-02-06*
+*Last updated: 2026-02-07*
