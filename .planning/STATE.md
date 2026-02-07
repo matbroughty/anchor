@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-02-04)
 
 **Core value:** Non-cringe, tasteful representation of your music taste that you can confidently share anywhere
-**Current focus:** Phase 2: Content Pipeline
+**Current focus:** Phase 3: Publishing
 
 ## Current Position
 
-Phase: 2 of 4 (Content Pipeline)
-Plan: 3 of 3 in current phase
-Status: Phase complete
-Last activity: 2026-02-06 — Completed 02-03-PLAN.md (Content management dashboard UI)
+Phase: 3 of 4 (Publishing)
+Plan: 1 of 3 in current phase
+Status: In progress
+Last activity: 2026-02-07 — Completed 03-01-PLAN.md (Publish Data Layer)
 
-Progress: [██████░░░░] 67% (6/9 known plans complete)
+Progress: [███████░░░] 78% (7/9 known plans complete)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 6
-- Average duration: 4.2 min
-- Total execution time: 0.42 hours
+- Total plans completed: 7
+- Average duration: 4.1 min
+- Total execution time: 0.49 hours
 
 **By Phase:**
 
@@ -29,10 +29,11 @@ Progress: [██████░░░░] 67% (6/9 known plans complete)
 |-------|-------|-------|----------|
 | 1. Foundation | 3 | 17 min | 5.7 min |
 | 2. Content Pipeline | 3 | 9 min | 3 min |
+| 3. Publishing | 1 | 4 min | 4 min |
 
 **Recent Trend:**
-- Last 5 plans: 01-03 (8 min), 02-01 (3 min), 02-02 (3 min), 02-03 (3 min)
-- Trend: Phase 2 plans consistently fast (3 min average)
+- Last 5 plans: 02-01 (3 min), 02-02 (3 min), 02-03 (3 min), 03-01 (4 min)
+- Trend: Consistent execution speed
 
 *Updated after each plan completion*
 
@@ -92,6 +93,11 @@ Recent decisions affecting current work:
 - Loading states on all async operations (regenerate, save, refresh)
 - Responsive album grid: 3 columns → 2 columns → 1 column
 
+**From Plan 03-01:**
+- Store isPublic directly on USER#{userId} record (no separate sort key)
+- React cache() from 'react' (not next/cache) for request-level deduplication
+- Path revalidation after publish/unpublish to bust ISR cache
+
 ### Pending Todos
 
 **From Plan 01-01:**
@@ -112,12 +118,12 @@ None. External service configuration (Google OAuth, Resend, Spotify, AWS infrast
 
 ## Session Continuity
 
-Last session: 2026-02-06T08:46:04Z
-Stopped at: Completed 02-03-PLAN.md (Content management dashboard UI)
+Last session: 2026-02-07T09:20:00Z
+Stopped at: Completed 03-01-PLAN.md (Publish Data Layer)
 Resume file: None
 
-**Next action:** Phase 2 complete. Run `/gsd:plan-phase` for Phase 3 (Publishing)
+**Next action:** Continue with 03-02-PLAN.md (Public Page Route)
 
 ---
 *State initialized: 2026-02-04*
-*Last updated: 2026-02-06*
+*Last updated: 2026-02-07*
