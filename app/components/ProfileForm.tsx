@@ -40,7 +40,7 @@ export function ProfileForm({ initialDisplayName, onSave }: ProfileFormProps) {
       <div>
         <label
           htmlFor="displayName"
-          className="block text-sm font-medium text-gray-700"
+          className="block text-base font-semibold text-gray-900"
         >
           Display Name
         </label>

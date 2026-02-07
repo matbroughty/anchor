@@ -130,7 +130,7 @@ export default function ProfilePageClient({
             <div className="space-y-6">
               {/* Handle (Read-only) */}
               <div>
-                <label className="block text-sm font-medium text-gray-700">
+                <label className="block text-base font-semibold text-gray-900">
                   Handle
                 </label>
                 <div className="mt-1 flex items-center justify-between">
@@ -170,7 +170,7 @@ export default function ProfilePageClient({
 
               {/* Email (Read-only) */}
               <div>
-                <label className="block text-sm font-medium text-gray-700">
+                <label className="block text-base font-semibold text-gray-900">
                   Email
                 </label>
                 <p className="mt-1 text-sm text-gray-900">{profile.email}</p>
@@ -178,7 +178,7 @@ export default function ProfilePageClient({
 
               {/* Spotify Connection */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-base font-semibold text-gray-900 mb-2">
                   Spotify Connection
                 </label>
                 {profile.spotifyConnected ? (

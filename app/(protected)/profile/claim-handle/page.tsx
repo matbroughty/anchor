@@ -48,11 +48,11 @@ export default function ClaimHandlePage() {
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
-      <div className="sm:mx-auto sm:w-full sm:max-w-md">
+      <div className="sm:mx-auto sm:w-full sm:max-w-md px-4">
         <h2 className="text-center text-3xl font-bold tracking-tight text-gray-900">
           Claim your handle
         </h2>
-        <p className="mt-2 text-center text-sm text-gray-600">
+        <p className="mt-2 text-center text-base text-gray-800">
           Choose a unique handle for your Anchor page
         </p>
       </div>
