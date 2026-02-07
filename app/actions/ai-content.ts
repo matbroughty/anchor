@@ -152,7 +152,7 @@ export async function generateAlbumCaptions(): Promise<GenerateCaptionsResult> {
     const captions: Caption[] = [];
 
     // Sequential generation to respect Bedrock rate limits
-    for (const album of musicData.albums.slice(0, 5)) {
+    for (const album of musicData.albums.slice(0, 6)) {
       const text = await callBedrock(
         CAPTION_SYSTEM_PROMPT,
         buildCaptionUserMessage(album, musicData.artists, musicData.tracks),

@@ -1,5 +1,5 @@
 import { LandingHero } from "@/app/components/LandingHero";
-import { ExampleShowcase } from "@/app/components/ExampleShowcase";
+import { RecentProfiles } from "@/app/components/RecentProfiles";
 import { LandingCTA } from "@/app/components/LandingCTA";
 import { LandingFooter } from "@/app/components/LandingFooter";
 import type { Metadata } from "next";
@@ -26,7 +26,7 @@ export default function LandingPage() {
   return (
     <>
       <LandingHero />
-      <ExampleShowcase />
+      <RecentProfiles />
       <LandingCTA />
       <LandingFooter />
     </>
