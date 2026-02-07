@@ -1,9 +1,9 @@
 ---
-status: complete
+status: diagnosed
 phase: 01-foundation
 source: 01-01-SUMMARY.md, 01-02-SUMMARY.md, 01-03-SUMMARY.md
 started: 2026-02-07T20:45:00Z
-updated: 2026-02-07T20:59:00Z
+updated: 2026-02-07T21:00:00Z
 ---
 
 ## Current Test
@@ -71,17 +71,29 @@ skipped: 0
   reason: "User reported: OAuthAccountNotLinked error: Another account already exists with the same e-mail address. Signin fails and redirects to /signin?error=OAuthAccountNotLinked"
   severity: blocker
   test: 1
-  root_cause: ""
-  artifacts: []
-  missing: []
-  debug_session: ""
+  root_cause: "NextAuth v5 configuration missing allowDangerousEmailAccountLinking flag on OAuth providers. When user signs in with magic link email then tries Google OAuth with same email, NextAuth blocks automatic account linking as security measure."
+  artifacts:
+    - path: "auth.ts"
+      issue: "Missing allowDangerousEmailAccountLinking: true in Google provider (lines 15-18) and Spotify provider (lines 23-32)"
+  missing:
+    - "Add allowDangerousEmailAccountLinking: true to Google provider configuration"
+    - "Add allowDangerousEmailAccountLinking: true to Spotify provider configuration"
+  debug_session: ".planning/debug/oauth-account-not-linked.md"
 
 - truth: "User can explicitly sign out to end session"
   status: failed
   reason: "User reported: is sign out an option? cant see it?"
   severity: major
   test: 9
-  root_cause: ""
-  artifacts: []
-  missing: []
-  debug_session: ""
+  root_cause: "Sign out functionality never implemented in UI. While auth.ts exports signOut function, no protected pages import or use it. No navigation component exists to provide sign out access across routes."
+  artifacts:
+    - path: "app/(protected)/layout.tsx"
+      issue: "Protected routes layout only handles auth check, no UI navigation or sign out button"
+    - path: "app/(protected)/profile/ProfilePageClient.tsx"
+      issue: "Profile page has no sign out import or button"
+    - path: "app/(protected)/dashboard/DashboardClient.tsx"
+      issue: "Dashboard page has no sign out import or button"
+  missing:
+    - "Import signOut from 'next-auth/react' in protected layout or page components"
+    - "Add sign out button that calls signOut({ callbackUrl: '/' })"
+  debug_session: ".planning/debug/missing-sign-out-functionality.md"
