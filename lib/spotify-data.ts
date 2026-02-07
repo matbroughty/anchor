@@ -99,10 +99,10 @@ export async function getTopTracks(
  *   4. Sort descending by score, take top N
  *
  * @param tracks - The full set of top tracks (output of getTopTracks)
- * @param limit  - Number of albums to return (default 5)
+ * @param limit  - Number of albums to return (default 6)
  * @returns Album array sorted by score, with score included for transparency
  */
-export function deriveTopAlbums(tracks: Track[], limit: number = 5): Album[] {
+export function deriveTopAlbums(tracks: Track[], limit: number = 6): Album[] {
   // Group tracks by album id
   const albumMap = new Map<
     string,
