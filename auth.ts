@@ -8,6 +8,7 @@ import { storeSpotifyTokens } from "@/lib/spotify"
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   trustHost: true,
+  secret: process.env.AUTH_SECRET,
   adapter: DynamoDBAdapter(dynamoDocumentClient, { tableName: TABLE_NAME }),
   // Database session strategy required for magic links and "sign out everywhere"
   session: { strategy: "database" },
