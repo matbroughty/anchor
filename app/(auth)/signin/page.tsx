@@ -85,11 +85,7 @@ export default function SignInPage() {
           </button>
         </form>
 
-        <p className="text-xs text-slate-500 text-center mt-6">
-          By signing in, you agree to Anchor&apos;s terms of service and privacy
-          policy.
-        </p>
-        <p className="text-xs text-slate-400 text-center mt-2">
+        <p className="text-xs text-slate-400 text-center mt-6">
           You&apos;ll connect Spotify after creating your account.
         </p>
       </div>
