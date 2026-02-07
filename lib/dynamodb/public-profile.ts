@@ -5,6 +5,10 @@ import { userPK } from "@/lib/dynamodb/schema";
 import { getMusicData } from "@/lib/dynamodb/music-data";
 import { getFeaturedArtists } from "@/lib/dynamodb/featured-artists";
 import { getContent } from "@/lib/dynamodb/content";
+import {
+  incrementViewCount,
+  getViewCount,
+} from "@/lib/dynamodb/view-counter";
 import type { Artist, Album, Track } from "@/types/music";
 import type { Caption } from "@/types/content";
 
@@ -26,6 +30,7 @@ export interface PublicProfile {
   albums: Album[];
   tracks: Track[];
   captions: Caption[];
+  viewCount?: number;
 }
 
 // ---------------------------------------------------------------------------
@@ -44,9 +49,15 @@ export interface PublicProfile {
  * - User is not published (isPublic is false or undefined)
  *
  * Returns complete profile data for published users.
+ *
+ * @param viewerHandle - The handle of the viewer (null if not logged in).
+ *   Used to exclude owner views from the counter and to fetch the count for the owner.
  */
 export const getPublicProfile = cache(
-  async (handle: string): Promise<PublicProfile | null> => {
+  async (
+    handle: string,
+    viewerHandle?: string | null
+  ): Promise<PublicProfile | null> => {
     const normalizedHandle = handle.toLowerCase();
     const handleKey = `HANDLE#${normalizedHandle}`;
 
@@ -97,6 +108,20 @@ export const getPublicProfile = cache(
       getContent(userId),
     ]);
 
+    // Step 4: Increment view count if viewer is not the owner
+    // Fire-and-forget operation (non-blocking)
+    if (viewerHandle !== normalizedHandle) {
+      incrementViewCount(userId).catch((error) => {
+        console.error("Failed to increment view count:", error);
+      });
+    }
+
+    // Step 5: Fetch view count for owner (only if viewer is owner)
+    let viewCount: number | undefined = undefined;
+    if (viewerHandle === normalizedHandle) {
+      viewCount = await getViewCount(userId);
+    }
+
     return {
       displayName: (user.displayName as string) ?? null,
       handle: normalizedHandle,
@@ -107,6 +132,7 @@ export const getPublicProfile = cache(
       albums: musicData?.albums ?? [],
       tracks: musicData?.tracks?.slice(0, 10) ?? [], // UI shows top 10 tracks
       captions: contentData.captions,
+      viewCount,
     };
   }
 );

@@ -21,6 +21,7 @@ export const MUSIC_SK = {
 /**
  * Sort key for the user's profile-level metadata record.
  * We store lastRefresh here so cooldown checks only need one GetCommand.
+ * Also stores viewCount for analytics.
  */
 export const METADATA_SK = "PROFILE#METADATA";
 

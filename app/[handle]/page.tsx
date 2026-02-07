@@ -69,10 +69,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function HandlePage({ params }: Props) {
   const { handle } = await params;
-  const [profile, session] = await Promise.all([
-    getPublicProfile(handle),
-    auth(),
-  ]);
+
+  // Get session first to extract viewerHandle
+  const session = await auth();
+  const viewerHandle = session?.user?.handle ?? null;
+
+  // Fetch profile with viewer information
+  const profile = await getPublicProfile(handle, viewerHandle);
 
   if (!profile) {
     notFound();
@@ -91,6 +94,7 @@ export default async function HandlePage({ params }: Props) {
       tracks={profile.tracks}
       captions={profile.captions}
       isOwner={isOwner}
+      viewCount={profile.viewCount}
     />
   );
 }
