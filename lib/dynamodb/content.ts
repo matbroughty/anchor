@@ -1,7 +1,7 @@
 import { GetCommand, PutCommand, QueryCommand } from "@aws-sdk/lib-dynamodb";
 import { dynamoDocumentClient, TABLE_NAME } from "@/lib/dynamodb";
 import { userPK } from "@/lib/dynamodb/schema";
-import type { Bio, Caption, ContentData, TasteAnalysis } from "@/types/content";
+import type { Bio, Caption, ContentData, TasteAnalysis, AgeGuess } from "@/types/content";
 
 // ---------------------------------------------------------------------------
 // Sort-key constants (content lives in the same single table)
@@ -11,6 +11,7 @@ const CONTENT_SK = {
   BIO: "CONTENT#BIO",
   CAPTION_PREFIX: "CONTENT#CAPTION#", // Append albumId
   TASTE_ANALYSIS: "CONTENT#TASTE_ANALYSIS",
+  AGE_GUESS: "CONTENT#AGE_GUESS",
 } as const;
 
 // ---------------------------------------------------------------------------
@@ -164,6 +165,43 @@ export async function putTasteAnalysis(
         sk: CONTENT_SK.TASTE_ANALYSIS,
         data: analysis,
         generatedAt: analysis.generatedAt,
+      },
+    })
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Age Guess operations
+// ---------------------------------------------------------------------------
+
+export async function getAgeGuess(userId: string): Promise<AgeGuess | null> {
+  const result = await dynamoDocumentClient.send(
+    new GetCommand({
+      TableName: TABLE_NAME,
+      Key: {
+        pk: userPK(userId),
+        sk: CONTENT_SK.AGE_GUESS,
+      },
+    })
+  );
+
+  if (!result.Item) return null;
+
+  return result.Item.data as AgeGuess;
+}
+
+export async function putAgeGuess(
+  userId: string,
+  ageGuess: AgeGuess
+): Promise<void> {
+  await dynamoDocumentClient.send(
+    new PutCommand({
+      TableName: TABLE_NAME,
+      Item: {
+        pk: userPK(userId),
+        sk: CONTENT_SK.AGE_GUESS,
+        data: ageGuess,
+        generatedAt: ageGuess.generatedAt,
       },
     })
   );

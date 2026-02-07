@@ -6,12 +6,13 @@ import { BioEditor } from "@/app/components/BioEditor";
 import { FeaturedArtistsEditor } from "@/app/components/FeaturedArtistsEditor";
 import { AlbumCaptions } from "@/app/components/AlbumCaptions";
 import { TasteAnalysis } from "@/app/components/TasteAnalysis";
+import { AgeGuess } from "@/app/components/AgeGuess";
 import { RefreshButton } from "@/app/components/RefreshButton";
 import { PublishToggle } from "@/app/components/PublishToggle";
 import { refreshSpotifyData } from "@/app/actions/spotify";
 import { generateBio, generateAlbumCaptions, regenerateBio, regenerateCaption } from "@/app/actions/ai-content";
 import type { MusicData, Artist } from "@/types/music";
-import type { ContentData, Bio, Caption, TasteAnalysis as TasteAnalysisType } from "@/types/content";
+import type { ContentData, Bio, Caption, TasteAnalysis as TasteAnalysisType, AgeGuess as AgeGuessType } from "@/types/content";
 
 // ---------------------------------------------------------------------------
 // Props
@@ -22,6 +23,7 @@ interface DashboardClientProps {
   initialContent: ContentData;
   initialFeaturedArtists: Artist[];
   initialTasteAnalysis: TasteAnalysisType | null;
+  initialAgeGuess: AgeGuessType | null;
   userId: string;
   handle: string | null;
   isPublished: boolean;
@@ -36,6 +38,7 @@ export function DashboardClient({
   initialContent,
   initialFeaturedArtists,
   initialTasteAnalysis,
+  initialAgeGuess,
   handle,
   isPublished: initialIsPublished,
 }: DashboardClientProps) {
@@ -136,6 +139,9 @@ export function DashboardClient({
               <a href="#taste-analysis" className="text-xs font-medium text-gray-600 hover:text-gray-900 whitespace-nowrap px-3 py-1 rounded-md hover:bg-gray-100 transition-colors">
                 Taste Analysis
               </a>
+              <a href="#age-guess" className="text-xs font-medium text-gray-600 hover:text-gray-900 whitespace-nowrap px-3 py-1 rounded-md hover:bg-gray-100 transition-colors">
+                Guess My Age
+              </a>
               <a href="#album-captions" className="text-xs font-medium text-gray-600 hover:text-gray-900 whitespace-nowrap px-3 py-1 rounded-md hover:bg-gray-100 transition-colors">
                 Album Captions
               </a>
@@ -228,6 +234,14 @@ export function DashboardClient({
             <div id="taste-analysis" className="scroll-mt-20">
               <TasteAnalysis
                 initialAnalysis={initialTasteAnalysis}
+                hasMusicData={!!musicData}
+              />
+            </div>
+
+            {/* Age Guess */}
+            <div id="age-guess" className="scroll-mt-20">
+              <AgeGuess
+                initialAgeGuess={initialAgeGuess}
                 hasMusicData={!!musicData}
               />
             </div>
