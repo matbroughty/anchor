@@ -135,7 +135,7 @@ async function _doRefresh(userId: string): Promise<RefreshSpotifyDataResult> {
   const musicData: MusicData = {
     artists,
     albums,
-    tracks: allTracks.slice(0, 3), // UI shows top 3 tracks
+    tracks: allTracks.slice(0, 10), // UI shows top 10 tracks
     cachedAt: Date.now(),
   };
 

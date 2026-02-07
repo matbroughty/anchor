@@ -278,7 +278,7 @@ export function PublicProfile({
               Top Tracks
             </h2>
             <ol className="space-y-3">
-              {tracks.slice(0, 3).map((track, i) => (
+              {tracks.slice(0, 10).map((track, i) => (
                 <li key={track.id} className="flex items-center gap-3">
                   <span className="text-neutral-400 dark:text-neutral-600 text-sm w-5 text-right flex-shrink-0">
                     {i + 1}.

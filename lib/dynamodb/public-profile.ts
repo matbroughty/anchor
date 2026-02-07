@@ -101,7 +101,7 @@ export const getPublicProfile = cache(
       bio: contentData.bio?.text ?? null,
       artists: musicData?.artists ?? [],
       albums: musicData?.albums ?? [],
-      tracks: musicData?.tracks?.slice(0, 3) ?? [], // UI shows top 3 tracks
+      tracks: musicData?.tracks?.slice(0, 10) ?? [], // UI shows top 10 tracks
       captions: contentData.captions,
     };
   }

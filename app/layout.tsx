@@ -17,6 +17,9 @@ export const metadata: Metadata = {
   metadataBase: new URL(process.env.AUTH_URL || "http://localhost:3000"),
   title: "Anchor.band",
   description: "Your music taste, beautifully presented",
+  icons: {
+    icon: '/favicon.svg',
+  },
 };
 
 export default function RootLayout({
