@@ -24,6 +24,13 @@
         "kms:DescribeKey"
       ],
       "Resource": "arn:aws:kms:eu-west-2:343893643132:key/8c0d78e9-eb61-4985-8b58-ac71ca850730"
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "bedrock:InvokeModel"
+      ],
+      "Resource": "arn:aws:bedrock:eu-west-2::foundation-model/anthropic.claude-3-haiku-20240307-v1:0"
     }
   ]
 }
