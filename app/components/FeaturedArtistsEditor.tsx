@@ -85,7 +85,7 @@ export function FeaturedArtistsEditor({
     setError(null);
   };
 
-  const canAddMore = featured.length < 3;
+  const canAddMore = featured.length < 4;
 
   // ---------------------------------------------------------------------------
   // Render — search mode
@@ -168,12 +168,12 @@ export function FeaturedArtistsEditor({
             </div>
           ))}
           <p className="text-xs text-gray-500">
-            {featured.length}/3 favourite artists
+            {featured.length}/4 favourite artists
           </p>
         </div>
       ) : (
         <p className="text-sm text-gray-500 italic">
-          Add up to 3 artists as favourites on your profile
+          Add up to 4 artists as favourites on your profile
         </p>
       )}
 

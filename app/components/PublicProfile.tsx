@@ -204,7 +204,7 @@ export function PublicProfile({
                 <div className="absolute left-0 top-full mt-2 w-64 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-10">
                   <div className="bg-white dark:bg-neutral-800 rounded-lg shadow-lg border border-neutral-200 dark:border-neutral-700 p-3">
                     <p className="text-xs text-neutral-700 dark:text-neutral-300">
-                      Artists you've personally selected to highlight on your profile (up to 3).
+                      Artists you've personally selected to highlight on your profile (up to 4).
                     </p>
                   </div>
                 </div>
@@ -276,7 +276,7 @@ export function PublicProfile({
                 </div>
               </div>
             </div>
-            <div className="flex gap-4 overflow-x-auto pb-2 -mx-4 px-4 sm:mx-0 sm:px-0">
+            <div className="flex gap-4 overflow-x-auto pb-2 -mx-4 px-4 sm:mx-0 sm:px-0 sm:justify-center">
               {artists.slice(0, 6).map((artist) => {
                 const imgUrl = pickImage(artist.images);
                 return (

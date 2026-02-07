@@ -11,7 +11,7 @@ Anchor.band is like Letterboxd for music - a place to share your music taste in 
 **Features:**
 - 🎵 Connect Spotify and showcase your top artists, albums, and tracks
 - 🤖 AI-generated bios and album captions (powered by Claude)
-- ⭐ Highlight up to 3 featured artists on your profile
+- ⭐ Highlight up to 4 favourite artists on your profile
 - 📊 Fun music taste analysis with critic-informed insights
 - 👁️ View counter to see how many people visit your page
 - 🔗 Shareable public profile at your unique handle
@@ -153,9 +153,9 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 ### Music Profile
 - **Spotify Integration**: Connect your Spotify account to automatically fetch your top artists, albums, and tracks
 - **Public Profile Pages**: Clean, shareable pages at `anchor.band/yourhandle`
-- **Featured Artists**: Highlight up to 3 favorite artists with circular profile images and blue ring highlighting
+- **Favourite Artists**: Highlight up to 4 favourite artists with circular profile images and blue ring highlighting
 - **Album-First Design**: Prominent album artwork display with captions
-- **Top Artists & Tracks**: Scrollable sections showcasing your music taste
+- **Top Recent Artists & Tracks**: Scrollable sections showcasing your music taste
 
 ### AI-Powered Content
 - **Smart Bio Generation**: AI writes a tasteful, non-cringe bio based on your listening patterns
@@ -247,7 +247,7 @@ anchor/
 5. **Generate Content**: AI generates bio and album captions based on music taste
 6. **Customize Profile**: User can:
    - Edit bio and captions
-   - Select up to 3 featured artists
+   - Select up to 4 favourite artists
    - Generate music taste analysis
 7. **Publish**: User toggles profile to public, making it visible at `anchor.band/handle`
 8. **Share**: Profile URL can be shared on social media

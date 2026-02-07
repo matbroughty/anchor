@@ -38,19 +38,19 @@ export async function getFeaturedArtists(userId: string): Promise<Artist[]> {
 /**
  * Stores the user's featured artists in DynamoDB.
  *
- * Validates that the array contains 0-3 artists. Stores full Artist objects
+ * Validates that the array contains 0-4 artists. Stores full Artist objects
  * so profile views don't require Spotify API calls and remain functional even
  * if an artist is deleted from Spotify.
  *
- * @throws Error if artists array contains more than 3 items
+ * @throws Error if artists array contains more than 4 items
  */
 export async function putFeaturedArtists(
   userId: string,
   artists: Artist[]
 ): Promise<void> {
   // Validate array length
-  if (artists.length > 3) {
-    throw new Error("Cannot feature more than 3 artists");
+  if (artists.length > 4) {
+    throw new Error("Cannot feature more than 4 artists");
   }
 
   const now = Date.now();

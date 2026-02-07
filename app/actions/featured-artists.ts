@@ -83,7 +83,7 @@ export async function searchArtistsAction(
 
 /**
  * Updates the user's featured artists.
- * Validates that 0-3 artists are provided and revalidates relevant pages.
+ * Validates that 0-4 artists are provided and revalidates relevant pages.
  */
 export async function updateFeaturedArtists(
   artists: Artist[]
@@ -94,9 +94,9 @@ export async function updateFeaturedArtists(
       return { success: false, error: "Not authenticated" };
     }
 
-    // Validate artist count (0-3)
-    if (artists.length > 3) {
-      return { success: false, error: "Cannot feature more than 3 artists" };
+    // Validate artist count (0-4)
+    if (artists.length > 4) {
+      return { success: false, error: "Cannot feature more than 4 artists" };
     }
 
     // Save to database

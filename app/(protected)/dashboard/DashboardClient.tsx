@@ -203,7 +203,7 @@ export function DashboardClient({
             <div id="favourite-artists" className="bg-white shadow sm:rounded-lg px-4 py-5 sm:p-6 scroll-mt-20">
               <h2 className="text-lg font-semibold text-gray-900 mb-4">Favourite Artists</h2>
               <p className="text-sm text-gray-600 mb-4">
-                Highlight up to 3 artists on your profile (optional).
+                Highlight up to 4 artists on your profile (optional).
                 These will appear above your top recent artists.
               </p>
               <FeaturedArtistsEditor
