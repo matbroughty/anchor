@@ -120,9 +120,35 @@ export function DashboardClient({
           <RefreshButton onRefresh={handleRefresh} disabled={isPending} />
         </div>
 
+        {/* Quick Navigation Menu */}
+        {musicData && (
+          <nav className="bg-white shadow sm:rounded-lg px-4 py-3 sticky top-4 z-10">
+            <div className="flex gap-3 overflow-x-auto">
+              <a href="#your-page" className="text-xs font-medium text-gray-600 hover:text-gray-900 whitespace-nowrap px-3 py-1 rounded-md hover:bg-gray-100 transition-colors">
+                Your Page
+              </a>
+              <a href="#featured-artists" className="text-xs font-medium text-gray-600 hover:text-gray-900 whitespace-nowrap px-3 py-1 rounded-md hover:bg-gray-100 transition-colors">
+                Featured Artists
+              </a>
+              <a href="#bio" className="text-xs font-medium text-gray-600 hover:text-gray-900 whitespace-nowrap px-3 py-1 rounded-md hover:bg-gray-100 transition-colors">
+                Bio
+              </a>
+              <a href="#taste-analysis" className="text-xs font-medium text-gray-600 hover:text-gray-900 whitespace-nowrap px-3 py-1 rounded-md hover:bg-gray-100 transition-colors">
+                Taste Analysis
+              </a>
+              <a href="#album-captions" className="text-xs font-medium text-gray-600 hover:text-gray-900 whitespace-nowrap px-3 py-1 rounded-md hover:bg-gray-100 transition-colors">
+                Album Captions
+              </a>
+              <a href="#your-music" className="text-xs font-medium text-gray-600 hover:text-gray-900 whitespace-nowrap px-3 py-1 rounded-md hover:bg-gray-100 transition-colors">
+                Your Music
+              </a>
+            </div>
+          </nav>
+        )}
+
         {/* Publish controls + Bio generation — always visible */}
         {handle && (
-          <div className="bg-white shadow sm:rounded-lg px-4 py-5 sm:p-6">
+          <div id="your-page" className="bg-white shadow sm:rounded-lg px-4 py-5 sm:p-6 scroll-mt-20">
             <h2 className="text-lg font-semibold text-gray-900 mb-4">Your Page</h2>
 
             {/* Generate bio button if no bio exists and music data is present */}
@@ -173,29 +199,8 @@ export function DashboardClient({
           </div>
         ) : (
           <>
-            {/* Music data section — artists & tracks */}
-            <div className="bg-white shadow sm:rounded-lg px-4 py-5 sm:p-6">
-              <h2 className="text-lg font-semibold text-gray-900 mb-4">Your Music</h2>
-              <MusicDataSection
-                artists={musicData.artists}
-                tracks={musicData.tracks}
-                cachedAt={musicData.cachedAt}
-              />
-            </div>
-
-            {/* Bio editor */}
-            <div className="bg-white shadow sm:rounded-lg px-4 py-5 sm:p-6">
-              <h2 className="text-lg font-semibold text-gray-900 mb-4">Bio</h2>
-              <BioEditor
-                bio={content.bio}
-                onUpdate={handleBioUpdate}
-                onRegenerate={handleBioRegenerate}
-                disabled={isPending}
-              />
-            </div>
-
             {/* Featured Artists */}
-            <div className="bg-white shadow sm:rounded-lg px-4 py-5 sm:p-6">
+            <div id="featured-artists" className="bg-white shadow sm:rounded-lg px-4 py-5 sm:p-6 scroll-mt-20">
               <h2 className="text-lg font-semibold text-gray-900 mb-4">Featured Artists</h2>
               <p className="text-sm text-gray-600 mb-4">
                 Highlight up to 3 artists on your profile (optional).
@@ -208,8 +213,27 @@ export function DashboardClient({
               />
             </div>
 
+            {/* Bio editor */}
+            <div id="bio" className="bg-white shadow sm:rounded-lg px-4 py-5 sm:p-6 scroll-mt-20">
+              <h2 className="text-lg font-semibold text-gray-900 mb-4">Bio</h2>
+              <BioEditor
+                bio={content.bio}
+                onUpdate={handleBioUpdate}
+                onRegenerate={handleBioRegenerate}
+                disabled={isPending}
+              />
+            </div>
+
+            {/* Taste Analysis */}
+            <div id="taste-analysis" className="scroll-mt-20">
+              <TasteAnalysis
+                initialAnalysis={initialTasteAnalysis}
+                hasMusicData={!!musicData}
+              />
+            </div>
+
             {/* Album captions */}
-            <div className="bg-white shadow sm:rounded-lg px-4 py-5 sm:p-6">
+            <div id="album-captions" className="bg-white shadow sm:rounded-lg px-4 py-5 sm:p-6 scroll-mt-20">
               <h2 className="text-lg font-semibold text-gray-900 mb-4">Album Captions</h2>
               <AlbumCaptions
                 albums={musicData.albums}
@@ -219,11 +243,15 @@ export function DashboardClient({
               />
             </div>
 
-            {/* Taste Analysis */}
-            <TasteAnalysis
-              initialAnalysis={initialTasteAnalysis}
-              hasMusicData={!!musicData}
-            />
+            {/* Music data section — artists & tracks */}
+            <div id="your-music" className="bg-white shadow sm:rounded-lg px-4 py-5 sm:p-6 scroll-mt-20">
+              <h2 className="text-lg font-semibold text-gray-900 mb-4">Your Music</h2>
+              <MusicDataSection
+                artists={musicData.artists}
+                tracks={musicData.tracks}
+                cachedAt={musicData.cachedAt}
+              />
+            </div>
           </>
         )}
       </div>
