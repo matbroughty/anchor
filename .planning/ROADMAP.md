@@ -6,7 +6,7 @@ Anchor.band is a tasteful music profile platform where users claim handles, conn
 
 ## Phases
 
-- [ ] **Phase 1: Foundation** - Authentication, profiles, and secure token storage (UAT gap closure)
+- [x] **Phase 1: Foundation** - Authentication, profiles, and secure token storage
 - [x] **Phase 2: Content Pipeline** - Spotify data fetching and AI content generation
 - [x] **Phase 3: Publishing** - Public pages with SSR and social metadata
 - [x] **Phase 4: Landing Experience** - Marketing site and onboarding
@@ -29,7 +29,7 @@ Plans:
 - [x] 01-01-PLAN.md — Infrastructure setup (Next.js 15, DynamoDB, KMS)
 - [x] 01-02-PLAN.md — Auth system (NextAuth v5 with Google, Resend, Spotify)
 - [x] 01-03-PLAN.md — Profile system (handle claiming, profile management)
-- [ ] 01-04-PLAN.md — UAT gap closure (OAuth account linking, sign out button)
+- [x] 01-04-PLAN.md — UAT gap closure (OAuth account linking, sign out button)
 
 ### Phase 2: Content Pipeline
 **Goal**: System generates tasteful music content from Spotify data
@@ -83,7 +83,7 @@ Plans:
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation | 3/4 | UAT Gap Closure | - |
+| 1. Foundation | 4/4 | Complete | 2026-02-07 |
 | 2. Content Pipeline | 3/3 | Complete | 2026-02-06 |
 | 3. Publishing | 3/3 | Complete | 2026-02-07 |
 | 4. Landing Experience | 2/2 | Complete | 2026-02-07 |

@@ -9,46 +9,46 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Authentication
 
-- [ ] **AUTH-01**: User can sign in with Google
-- [ ] **AUTH-02**: User can sign in with magic link email (passwordless)
-- [ ] **AUTH-03**: User can connect Spotify account via OAuth
-- [ ] **AUTH-04**: Spotify tokens are encrypted at rest with KMS
-- [ ] **AUTH-05**: Spotify tokens automatically refresh when expired
+- [x] **AUTH-01**: User can sign in with Google
+- [x] **AUTH-02**: User can sign in with magic link email (passwordless)
+- [x] **AUTH-03**: User can connect Spotify account via OAuth
+- [x] **AUTH-04**: Spotify tokens are encrypted at rest with KMS
+- [x] **AUTH-05**: Spotify tokens automatically refresh when expired
 
 ### Profile
 
-- [ ] **PROF-01**: User can claim unique handle (anchor.band/username)
-- [ ] **PROF-02**: User can set display name
-- [ ] **PROF-03**: User can edit profile information
+- [x] **PROF-01**: User can claim unique handle (anchor.band/username)
+- [x] **PROF-02**: User can set display name
+- [x] **PROF-03**: User can edit profile information
 
 ### Spotify Data
 
-- [ ] **DATA-01**: System fetches top artists (5-6) from Spotify
-- [ ] **DATA-02**: System fetches top albums (3-5) derived from top tracks
-- [ ] **DATA-03**: System fetches top tracks (3) from Spotify
-- [ ] **DATA-04**: System caches all Spotify data in DynamoDB
-- [ ] **DATA-05**: User can manually refresh Spotify data with cooldown
+- [x] **DATA-01**: System fetches top artists (5-6) from Spotify
+- [x] **DATA-02**: System fetches top albums (3-5) derived from top tracks
+- [x] **DATA-03**: System fetches top tracks (3) from Spotify
+- [x] **DATA-04**: System caches all Spotify data in DynamoDB
+- [x] **DATA-05**: User can manually refresh Spotify data with cooldown
 
 ### AI Content
 
-- [ ] **AI-01**: System generates tasteful bio using Bedrock (anti-cringe rules)
-- [ ] **AI-02**: System generates album captions using Bedrock (anti-cringe rules)
-- [ ] **AI-03**: User can regenerate AI content if unsatisfied
-- [ ] **AI-04**: User can manually edit bio and captions before publishing
+- [x] **AI-01**: System generates tasteful bio using Bedrock (anti-cringe rules)
+- [x] **AI-02**: System generates album captions using Bedrock (anti-cringe rules)
+- [x] **AI-03**: User can regenerate AI content if unsatisfied
+- [x] **AI-04**: User can manually edit bio and captions before publishing
 
 ### Public Pages
 
-- [ ] **PAGE-01**: Public page displays at anchor.band/handle when published
-- [ ] **PAGE-02**: Page shows bio, top artists (circular images), albums (square covers with captions), tracks (text list)
-- [ ] **PAGE-03**: Page is mobile-responsive
-- [ ] **PAGE-04**: Page uses SSR for proper social preview metadata (OG tags)
-- [ ] **PAGE-05**: Page uses generic Anchor.band OG image for all shares
-- [ ] **PAGE-06**: Public pages never call Spotify API (read from cached data)
+- [x] **PAGE-01**: Public page displays at anchor.band/handle when published
+- [x] **PAGE-02**: Page shows bio, top artists (circular images), albums (square covers with captions), tracks (text list)
+- [x] **PAGE-03**: Page is mobile-responsive
+- [x] **PAGE-04**: Page uses SSR for proper social preview metadata (OG tags)
+- [x] **PAGE-05**: Page uses generic Anchor.band OG image for all shares
+- [x] **PAGE-06**: Public pages never call Spotify API (read from cached data)
 
 ### Publishing
 
-- [ ] **PUB-01**: User can publish page (make public)
-- [ ] **PUB-02**: User can unpublish page (make private)
+- [x] **PUB-01**: User can publish page (make public)
+- [x] **PUB-02**: User can unpublish page (make private)
 
 ### Landing Page
 
@@ -110,31 +110,31 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| AUTH-01 | Phase 1 | Pending |
-| AUTH-02 | Phase 1 | Pending |
-| AUTH-03 | Phase 1 | Pending |
-| AUTH-04 | Phase 1 | Pending |
-| AUTH-05 | Phase 1 | Pending |
-| PROF-01 | Phase 1 | Pending |
-| PROF-02 | Phase 1 | Pending |
-| PROF-03 | Phase 1 | Pending |
-| DATA-01 | Phase 2 | Pending |
-| DATA-02 | Phase 2 | Pending |
-| DATA-03 | Phase 2 | Pending |
-| DATA-04 | Phase 2 | Pending |
-| DATA-05 | Phase 2 | Pending |
-| AI-01 | Phase 2 | Pending |
-| AI-02 | Phase 2 | Pending |
-| AI-03 | Phase 2 | Pending |
-| AI-04 | Phase 2 | Pending |
-| PAGE-01 | Phase 3 | Pending |
-| PAGE-02 | Phase 3 | Pending |
-| PAGE-03 | Phase 3 | Pending |
-| PAGE-04 | Phase 3 | Pending |
-| PAGE-05 | Phase 3 | Pending |
-| PAGE-06 | Phase 3 | Pending |
-| PUB-01 | Phase 3 | Pending |
-| PUB-02 | Phase 3 | Pending |
+| AUTH-01 | Phase 1 | Complete |
+| AUTH-02 | Phase 1 | Complete |
+| AUTH-03 | Phase 1 | Complete |
+| AUTH-04 | Phase 1 | Complete |
+| AUTH-05 | Phase 1 | Complete |
+| PROF-01 | Phase 1 | Complete |
+| PROF-02 | Phase 1 | Complete |
+| PROF-03 | Phase 1 | Complete |
+| DATA-01 | Phase 2 | Complete |
+| DATA-02 | Phase 2 | Complete |
+| DATA-03 | Phase 2 | Complete |
+| DATA-04 | Phase 2 | Complete |
+| DATA-05 | Phase 2 | Complete |
+| AI-01 | Phase 2 | Complete |
+| AI-02 | Phase 2 | Complete |
+| AI-03 | Phase 2 | Complete |
+| AI-04 | Phase 2 | Complete |
+| PAGE-01 | Phase 3 | Complete |
+| PAGE-02 | Phase 3 | Complete |
+| PAGE-03 | Phase 3 | Complete |
+| PAGE-04 | Phase 3 | Complete |
+| PAGE-05 | Phase 3 | Complete |
+| PAGE-06 | Phase 3 | Complete |
+| PUB-01 | Phase 3 | Complete |
+| PUB-02 | Phase 3 | Complete |
 | LAND-01 | Phase 4 | Complete |
 | LAND-02 | Phase 4 | Complete |
 | LAND-03 | Phase 4 | Complete |
