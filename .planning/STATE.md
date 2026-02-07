@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-02-04)
 ## Current Position
 
 Phase: 3 of 4 (Publishing)
-Plan: 1 of 3 in current phase
+Plan: 2 of 3 in current phase
 Status: In progress
-Last activity: 2026-02-07 — Completed 03-01-PLAN.md (Publish Data Layer)
+Last activity: 2026-02-07 — Completed 03-02-PLAN.md (Public Page Route)
 
-Progress: [███████░░░] 78% (7/9 known plans complete)
+Progress: [████████░░] 89% (8/9 known plans complete)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 7
-- Average duration: 4.1 min
-- Total execution time: 0.49 hours
+- Total plans completed: 8
+- Average duration: 4.0 min
+- Total execution time: 0.53 hours
 
 **By Phase:**
 
@@ -29,10 +29,10 @@ Progress: [███████░░░] 78% (7/9 known plans complete)
 |-------|-------|-------|----------|
 | 1. Foundation | 3 | 17 min | 5.7 min |
 | 2. Content Pipeline | 3 | 9 min | 3 min |
-| 3. Publishing | 1 | 4 min | 4 min |
+| 3. Publishing | 2 | 9 min | 4.5 min |
 
 **Recent Trend:**
-- Last 5 plans: 02-01 (3 min), 02-02 (3 min), 02-03 (3 min), 03-01 (4 min)
+- Last 5 plans: 02-02 (3 min), 02-03 (3 min), 03-01 (4 min), 03-02 (5 min)
 - Trend: Consistent execution speed
 
 *Updated after each plan completion*
@@ -98,6 +98,12 @@ Recent decisions affecting current work:
 - React cache() from 'react' (not next/cache) for request-level deduplication
 - Path revalidation after publish/unpublish to bust ISR cache
 
+**From Plan 03-02:**
+- 1-hour ISR revalidation (3600s) balances freshness vs performance
+- Generic OG image sufficient for v1 (per-handle images deferred)
+- Next.js 15 params must be awaited (breaking change from v14)
+- Album-first layout with horizontal artist scroll, responsive album grid
+
 ### Pending Todos
 
 **From Plan 01-01:**
@@ -118,11 +124,11 @@ None. External service configuration (Google OAuth, Resend, Spotify, AWS infrast
 
 ## Session Continuity
 
-Last session: 2026-02-07T09:20:00Z
-Stopped at: Completed 03-01-PLAN.md (Publish Data Layer)
+Last session: 2026-02-07T09:30:00Z
+Stopped at: Completed 03-02-PLAN.md (Public Page Route)
 Resume file: None
 
-**Next action:** Continue with 03-02-PLAN.md (Public Page Route)
+**Next action:** Continue with 03-03-PLAN.md (Publish Toggle)
 
 ---
 *State initialized: 2026-02-04*
