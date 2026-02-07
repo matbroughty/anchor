@@ -5,9 +5,10 @@ frontend:
       commands:
         - npm ci --cache .npm --prefer-offline
         # Create .env.production with environment variables for build time
+        # Note: AWS Amplify filters AUTH_URL and NEXTAUTH_URL, so we use APP_DOMAIN instead
         - echo "AUTH_SECRET=$AUTH_SECRET" >> .env.production
-        - echo "AUTH_URL=${NEXTAUTH_URL:-$AUTH_URL}" >> .env.production
-        - echo "NEXTAUTH_URL=${NEXTAUTH_URL:-$AUTH_URL}" >> .env.production
+        - echo "AUTH_URL=https://$APP_DOMAIN" >> .env.production
+        - echo "NEXTAUTH_URL=https://$APP_DOMAIN" >> .env.production
         - echo "AUTH_TRUST_HOST=$AUTH_TRUST_HOST" >> .env.production
         - echo "AUTH_DYNAMODB_ID=$AUTH_DYNAMODB_ID" >> .env.production
         - echo "AUTH_DYNAMODB_SECRET=$AUTH_DYNAMODB_SECRET" >> .env.production
@@ -18,7 +19,8 @@ frontend:
         - echo "AUTH_RESEND_KEY=$AUTH_RESEND_KEY" >> .env.production
         - echo "SPOTIFY_CLIENT_ID=$SPOTIFY_CLIENT_ID" >> .env.production
         - echo "SPOTIFY_CLIENT_SECRET=$SPOTIFY_CLIENT_SECRET" >> .env.production
-        # Debug: Print what AUTH_URL actually contains
+        # Debug: Print what variables actually contain
+        - echo "DEBUG - APP_DOMAIN from env:" "$APP_DOMAIN"
         - echo "DEBUG - AUTH_URL from env:" "$AUTH_URL"
         - echo "DEBUG - Contents of .env.production:"
         - cat .env.production
