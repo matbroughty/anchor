@@ -23,8 +23,7 @@
         "kms:Decrypt",
         "kms:DescribeKey"
       ],
-      "Resource": "arn:aws:kms:eu-west-2:343893643132:key/8c0d78e9-eb61-4985-8b58-ac71ca850730"
-    },
+      "Resource": "arn:aws:kms:eu-west-2:343893643132:key/8c0d78e9-eb61-4985-8b58-ac71ca850730"},
     {
       "Effect": "Allow",
       "Action": [

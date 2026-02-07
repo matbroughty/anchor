@@ -6,6 +6,16 @@ import { DynamoDBAdapter } from "@auth/dynamodb-adapter"
 import { dynamoDocumentClient, TABLE_NAME } from "@/lib/dynamodb"
 import { storeSpotifyTokens } from "@/lib/spotify"
 
+// Ensure AUTH_SECRET is set (required for NextAuth v5)
+// In production (AWS Amplify), ensure AUTH_URL is also set to your domain
+if (!process.env.AUTH_SECRET) {
+  throw new Error(
+    "AUTH_SECRET environment variable is not set. " +
+    "Generate one with: openssl rand -base64 32\n" +
+    "In AWS Amplify, also set AUTH_URL to your production domain (e.g., https://anchor.band)"
+  )
+}
+
 export const { handlers, auth, signIn, signOut } = NextAuth({
   trustHost: true,
   secret: process.env.AUTH_SECRET,
