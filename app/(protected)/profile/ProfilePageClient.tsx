@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { ProfileForm } from "@/app/components/ProfileForm";
+import { disconnectSpotify } from "@/app/actions/disconnect-spotify";
 
 interface Profile {
   handle: string;
@@ -24,6 +25,10 @@ export default function ProfilePageClient({
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [deleteError, setDeleteError] = useState<string | null>(null);
+  const [alsoDisconnectSpotify, setAlsoDisconnectSpotify] = useState(false);
+  const [showDisconnectConfirm, setShowDisconnectConfirm] = useState(false);
+  const [isDisconnecting, setIsDisconnecting] = useState(false);
+  const [disconnectError, setDisconnectError] = useState<string | null>(null);
 
   const handleSave = async (displayName: string) => {
     const response = await fetch("/api/profile", {
@@ -45,6 +50,14 @@ export default function ProfilePageClient({
     setDeleteError(null);
 
     try {
+      // Optionally disconnect Spotify first
+      if (alsoDisconnectSpotify && profile.spotifyConnected) {
+        const disconnectResult = await disconnectSpotify();
+        if (!disconnectResult.success) {
+          throw new Error(disconnectResult.error || "Failed to disconnect Spotify");
+        }
+      }
+
       const response = await fetch("/api/profile/handle/delete", {
         method: "DELETE",
       });
@@ -60,6 +73,26 @@ export default function ProfilePageClient({
     } catch (error) {
       setDeleteError(error instanceof Error ? error.message : "Failed to delete handle");
       setIsDeleting(false);
+    }
+  };
+
+  const handleDisconnectSpotify = async () => {
+    setIsDisconnecting(true);
+    setDisconnectError(null);
+
+    try {
+      const result = await disconnectSpotify();
+
+      if (!result.success) {
+        throw new Error(result.error || "Failed to disconnect Spotify");
+      }
+
+      // Refresh page to show updated state
+      router.refresh();
+      setShowDisconnectConfirm(false);
+    } catch (error) {
+      setDisconnectError(error instanceof Error ? error.message : "Failed to disconnect Spotify");
+      setIsDisconnecting(false);
     }
   };
 
@@ -149,19 +182,28 @@ export default function ProfilePageClient({
                   Spotify Connection
                 </label>
                 {profile.spotifyConnected ? (
-                  <div className="flex items-center">
-                    <svg
-                      className="h-5 w-5 text-green-500 mr-2"
-                      fill="currentColor"
-                      viewBox="0 0 20 20"
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center">
+                      <svg
+                        className="h-5 w-5 text-green-500 mr-2"
+                        fill="currentColor"
+                        viewBox="0 0 20 20"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                      <span className="text-sm text-green-700">Connected</span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setShowDisconnectConfirm(true)}
+                      className="text-xs text-red-600 hover:text-red-800 hover:underline"
                     >
-                      <path
-                        fillRule="evenodd"
-                        d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                        clipRule="evenodd"
-                      />
-                    </svg>
-                    <span className="text-sm text-green-700">Connected</span>
+                      Disconnect
+                    </button>
                   </div>
                 ) : (
                   <form action={spotifyAction}>
@@ -173,11 +215,65 @@ export default function ProfilePageClient({
                     </button>
                   </form>
                 )}
+                <p className="mt-1 text-xs text-gray-500">
+                  {profile.spotifyConnected
+                    ? "Disconnecting will remove all your music data and unpublish your page"
+                    : "Connect to fetch your top artists, albums, and tracks"}
+                </p>
               </div>
             </div>
           </div>
         </div>
       </div>
+
+      {/* Disconnect Spotify Confirmation Dialog */}
+      {showDisconnectConfirm && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-lg max-w-md w-full p-6">
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">
+              Disconnect Spotify?
+            </h3>
+            <p className="text-sm text-gray-600 mb-4">
+              This will permanently delete:
+            </p>
+            <ul className="text-sm text-gray-600 mb-4 list-disc list-inside space-y-1">
+              <li>Your Spotify connection and tokens</li>
+              <li>All music data (artists, albums, tracks)</li>
+              <li>AI-generated bio and captions</li>
+              <li>Your page will be unpublished</li>
+            </ul>
+            <p className="text-sm text-gray-600 mb-4">
+              You can reconnect Spotify later, but you&apos;ll need to regenerate all content.
+            </p>
+            {disconnectError && (
+              <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded text-sm text-red-800">
+                {disconnectError}
+              </div>
+            )}
+            <div className="flex gap-3 justify-end">
+              <button
+                type="button"
+                onClick={() => {
+                  setShowDisconnectConfirm(false);
+                  setDisconnectError(null);
+                }}
+                disabled={isDisconnecting}
+                className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleDisconnectSpotify}
+                disabled={isDisconnecting}
+                className="px-4 py-2 text-sm font-medium text-white bg-red-600 border border-transparent rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50"
+              >
+                {isDisconnecting ? "Disconnecting..." : "Disconnect Spotify"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Delete Handle Confirmation Dialog */}
       {showDeleteConfirm && (
@@ -189,6 +285,21 @@ export default function ProfilePageClient({
             <p className="text-sm text-gray-600 mb-4">
               This will permanently delete your handle <strong>{profile.handle}</strong> and unpublish your page. You&apos;ll be able to claim a new handle, but this one will become available for others to claim.
             </p>
+            {profile.spotifyConnected && (
+              <div className="mb-4">
+                <label className="flex items-start gap-2 text-sm text-gray-600 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={alsoDisconnectSpotify}
+                    onChange={(e) => setAlsoDisconnectSpotify(e.target.checked)}
+                    className="mt-0.5"
+                  />
+                  <span>
+                    Also disconnect Spotify (this will delete all music data and content)
+                  </span>
+                </label>
+              </div>
+            )}
             {deleteError && (
               <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded text-sm text-red-800">
                 {deleteError}
@@ -200,6 +311,7 @@ export default function ProfilePageClient({
                 onClick={() => {
                   setShowDeleteConfirm(false);
                   setDeleteError(null);
+                  setAlsoDisconnectSpotify(false);
                 }}
                 disabled={isDeleting}
                 className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
