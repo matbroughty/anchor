@@ -19,6 +19,8 @@ Write 2-3 sentences maximum. Focus on:
 - Connections between artists they listen to
 - Specific details rather than generic statements
 
+CRITICAL: Output ONLY the bio text itself. No preamble, no introduction like "Here is a bio...", no meta commentary. Start directly with the bio content.
+
 Examples of GOOD bios:
 - "Gravitates toward atmospheric production and introspective lyrics. The overlap between indie folk and electronic suggests an appreciation for textured soundscapes."
 - "A clear throughline of 90s alternative runs through this collection, balanced with contemporary artists working in similar sonic territory."
@@ -36,6 +38,8 @@ Maximum 15 words. Focus on:
 - Observable facts about the album or artist
 - How this album relates to the user's overall listening patterns
 - Specific musical qualities (production style, instrumentation, era)
+
+CRITICAL: Output ONLY the caption text itself. No preamble, no introduction like "Here is a caption...", no meta commentary. Start directly with the caption content.
 
 Examples of GOOD captions:
 - "This album's layered production aligns with your preference for dense, atmospheric records."
