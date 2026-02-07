@@ -29,7 +29,8 @@ function buildTasteAnalysisInput(input: {
   albums: Array<{ artist: string; title: string }>;
   tracks: Array<{ name: string; artists: string[] }>;
 }): string {
-  return JSON.stringify(input, null, 2);
+  const inputJson = JSON.stringify(input, null, 2);
+  return `${inputJson}\n\nAnalyze this music taste and respond with ONLY the JSON object (no markdown, no code fences, no extra text).`;
 }
 
 async function callBedrockForAnalysis(
@@ -49,7 +50,11 @@ async function callBedrockForAnalysis(
     throw new Error("Empty response from Bedrock");
   }
 
-  const responseText = (content[0] as { text: string }).text.trim();
+  let responseText = (content[0] as { text: string }).text.trim();
+
+  // Strip markdown code fences if present
+  responseText = responseText.replace(/^```json\s*/i, "").replace(/^```\s*/, "").replace(/```\s*$/, "");
+  responseText = responseText.trim();
 
   // Parse JSON response
   try {
@@ -57,8 +62,9 @@ async function callBedrockForAnalysis(
     analysis.generatedAt = Date.now();
     return analysis;
   } catch (error) {
-    console.error("Failed to parse Bedrock JSON response:", responseText);
-    throw new Error("Invalid JSON response from AI");
+    console.error("Failed to parse Bedrock JSON response. Raw response:", responseText);
+    console.error("Parse error:", error);
+    throw new Error(`Invalid JSON response from AI: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
 }
 
