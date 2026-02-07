@@ -6,7 +6,7 @@ STRICT RULES - NEVER VIOLATE:
 - NO superlatives: best, greatest, favorite, most
 - NO marketing language: must-listen, essential, groundbreaking
 - NO generic praise: talented, genius, masterpiece
-- Use factual, conversational language only
+- Use factual, conversational language only with a touch of humour
 - Be specific about what you observe, not how you feel about it
 `;
 

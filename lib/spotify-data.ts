@@ -4,6 +4,7 @@ import type {
   Album,
   SpotifyTopArtistsResponse,
   SpotifyTopTracksResponse,
+  SpotifySearchArtistsResponse,
 } from "@/types/music";
 
 // ---------------------------------------------------------------------------
@@ -86,6 +87,31 @@ export async function getTopTracks(
     artists: item.artists,
     album: item.album,
     popularity: item.popularity,
+  }));
+}
+
+/**
+ * Searches for artists on Spotify by name.
+ *
+ * @param accessToken - Decrypted Spotify OAuth access token
+ * @param query       - Search query string
+ * @param limit       - Number of results to return (default 10)
+ * @returns Normalised Artist array containing only the fields we need
+ */
+export async function searchArtists(
+  accessToken: string,
+  query: string,
+  limit: number = 10
+): Promise<Artist[]> {
+  const encodedQuery = encodeURIComponent(query);
+  const url = `https://api.spotify.com/v1/search?q=${encodedQuery}&type=artist&limit=${limit}`;
+  const data = await spotifyGet<SpotifySearchArtistsResponse>(url, accessToken);
+
+  return data.artists.items.map((item) => ({
+    id: item.id,
+    name: item.name,
+    images: item.images,
+    genres: item.genres,
   }));
 }
 

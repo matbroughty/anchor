@@ -3,12 +3,13 @@
 import { useState, useTransition } from "react";
 import { MusicDataSection } from "@/app/components/MusicDataSection";
 import { BioEditor } from "@/app/components/BioEditor";
+import { FeaturedArtistsEditor } from "@/app/components/FeaturedArtistsEditor";
 import { AlbumCaptions } from "@/app/components/AlbumCaptions";
 import { RefreshButton } from "@/app/components/RefreshButton";
 import { PublishToggle } from "@/app/components/PublishToggle";
 import { refreshSpotifyData } from "@/app/actions/spotify";
 import { generateBio, generateAlbumCaptions, regenerateBio, regenerateCaption } from "@/app/actions/ai-content";
-import type { MusicData } from "@/types/music";
+import type { MusicData, Artist } from "@/types/music";
 import type { ContentData, Bio, Caption } from "@/types/content";
 
 // ---------------------------------------------------------------------------
@@ -18,6 +19,7 @@ import type { ContentData, Bio, Caption } from "@/types/content";
 interface DashboardClientProps {
   initialMusicData: MusicData | null;
   initialContent: ContentData;
+  initialFeaturedArtists: Artist[];
   userId: string;
   handle: string | null;
   isPublished: boolean;
@@ -30,11 +32,13 @@ interface DashboardClientProps {
 export function DashboardClient({
   initialMusicData,
   initialContent,
+  initialFeaturedArtists,
   handle,
   isPublished: initialIsPublished,
 }: DashboardClientProps) {
   const [musicData, setMusicData] = useState<MusicData | null>(initialMusicData);
   const [content, setContent] = useState<ContentData>(initialContent);
+  const [featuredArtists, setFeaturedArtists] = useState<Artist[]>(initialFeaturedArtists);
   const [published, setPublished] = useState(initialIsPublished);
   const [isPending, startTransition] = useTransition();
 
@@ -183,6 +187,20 @@ export function DashboardClient({
                 bio={content.bio}
                 onUpdate={handleBioUpdate}
                 onRegenerate={handleBioRegenerate}
+                disabled={isPending}
+              />
+            </div>
+
+            {/* Featured Artists */}
+            <div className="bg-white shadow sm:rounded-lg px-4 py-5 sm:p-6">
+              <h2 className="text-lg font-semibold text-gray-900 mb-4">Featured Artists</h2>
+              <p className="text-sm text-gray-600 mb-4">
+                Highlight up to 3 artists on your profile (optional).
+                These will appear above your top artists.
+              </p>
+              <FeaturedArtistsEditor
+                initialFeatured={featuredArtists}
+                onUpdate={setFeaturedArtists}
                 disabled={isPending}
               />
             </div>

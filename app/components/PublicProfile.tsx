@@ -8,6 +8,7 @@ import type { Caption } from "@/types/content";
 interface PublicProfileProps {
   displayName: string;
   bio: string | null;
+  featuredArtists: Artist[];
   artists: Artist[];
   albums: Album[];
   tracks: Track[];
@@ -51,6 +52,7 @@ function spotifyUrl(id: string, type: 'artist' | 'album' | 'track'): string {
 export function PublicProfile({
   displayName,
   bio,
+  featuredArtists,
   artists,
   albums,
   tracks,
@@ -169,6 +171,47 @@ export function PublicProfile({
             Musical Anchor
           </p>
         </header>
+
+        {/* Featured Artists section */}
+        {featuredArtists.length > 0 && (
+          <section className="mb-12">
+            <h2 className="text-sm font-medium text-neutral-500 dark:text-neutral-500 uppercase tracking-wide mb-4">
+              Featured Artists
+            </h2>
+            <div className="flex gap-4 overflow-x-auto pb-2 -mx-4 px-4 sm:mx-0 sm:px-0">
+              {featuredArtists.map((artist) => {
+                const imgUrl = pickImage(artist.images);
+                return (
+                  <a
+                    key={artist.id}
+                    href={spotifyUrl(artist.id, 'artist')}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex-none flex flex-col items-center gap-2 hover:opacity-80 transition-opacity"
+                    style={{ minWidth: 96 }}
+                  >
+                    {imgUrl ? (
+                      <img
+                        src={imgUrl}
+                        alt={artist.name}
+                        className="w-20 h-20 sm:w-24 sm:h-24 rounded-full object-cover ring-2 ring-blue-500"
+                      />
+                    ) : (
+                      <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-neutral-200 dark:bg-neutral-800 ring-2 ring-blue-500 flex items-center justify-center">
+                        <span className="text-neutral-500 text-2xl font-medium">
+                          {artist.name.charAt(0).toUpperCase()}
+                        </span>
+                      </div>
+                    )}
+                    <span className="text-xs text-neutral-600 dark:text-neutral-400 text-center truncate w-24">
+                      {artist.name}
+                    </span>
+                  </a>
+                );
+              })}
+            </div>
+          </section>
+        )}
 
         {/* Top Artists section */}
         {artists.length > 0 && (

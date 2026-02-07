@@ -3,6 +3,7 @@ import { GetCommand } from "@aws-sdk/lib-dynamodb";
 import { dynamoDocumentClient, TABLE_NAME } from "@/lib/dynamodb";
 import { userPK } from "@/lib/dynamodb/schema";
 import { getMusicData } from "@/lib/dynamodb/music-data";
+import { getFeaturedArtists } from "@/lib/dynamodb/featured-artists";
 import { getContent } from "@/lib/dynamodb/content";
 import type { Artist, Album, Track } from "@/types/music";
 import type { Caption } from "@/types/content";
@@ -20,6 +21,7 @@ export interface PublicProfile {
   handle: string;
   isPublic: boolean;
   bio: string | null;
+  featuredArtists: Artist[];
   artists: Artist[];
   albums: Album[];
   tracks: Track[];
@@ -88,9 +90,10 @@ export const getPublicProfile = cache(
       return null;
     }
 
-    // Step 3: Fetch music data and content in parallel
-    const [musicData, contentData] = await Promise.all([
+    // Step 3: Fetch music data, featured artists, and content in parallel
+    const [musicData, featuredArtists, contentData] = await Promise.all([
       getMusicData(userId),
+      getFeaturedArtists(userId),
       getContent(userId),
     ]);
 
@@ -99,6 +102,7 @@ export const getPublicProfile = cache(
       handle: normalizedHandle,
       isPublic: true,
       bio: contentData.bio?.text ?? null,
+      featuredArtists,
       artists: musicData?.artists ?? [],
       albums: musicData?.albums ?? [],
       tracks: musicData?.tracks?.slice(0, 10) ?? [], // UI shows top 10 tracks

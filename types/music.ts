@@ -96,3 +96,14 @@ export interface SpotifyTopTracksResponse {
   next: string | null;
   total: number;
 }
+
+export interface SpotifySearchArtistsResponse {
+  artists: {
+    items: Array<{
+      id: string;
+      name: string;
+      images: SpotifyImage[];
+      genres: string[];
+    }>;
+  };
+}

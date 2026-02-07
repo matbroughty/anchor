@@ -85,6 +85,7 @@ export default async function HandlePage({ params }: Props) {
     <PublicProfile
       displayName={profile.displayName ?? handle}
       bio={profile.bio}
+      featuredArtists={profile.featuredArtists}
       artists={profile.artists}
       albums={profile.albums}
       tracks={profile.tracks}
