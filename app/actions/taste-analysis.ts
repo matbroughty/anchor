@@ -37,7 +37,7 @@ async function callBedrockForAnalysis(
 ): Promise<TasteAnalysis> {
   const response = await bedrockClient.send(
     new ConverseCommand({
-      modelId: "anthropic.claude-3-5-sonnet-20241022-v2:0",
+      modelId: "anthropic.claude-3-5-sonnet-20240620-v1:0",
       system: [{ text: TASTE_ANALYSIS_SYSTEM_PROMPT }],
       messages: [{ role: "user", content: [{ text: userMessage }] }],
       inferenceConfig: { maxTokens: 4000, temperature: 0.7 },
