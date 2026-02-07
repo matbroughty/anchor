@@ -1,7 +1,9 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  images: {
+    unoptimized: true, // Required for AWS Amplify static export compatibility
+  },
 };
 
 export default nextConfig;
