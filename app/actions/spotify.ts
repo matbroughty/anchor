@@ -121,8 +121,8 @@ async function _doRefresh(userId: string): Promise<RefreshSpotifyDataResult> {
     getTopTracks(tokens.accessToken, 50),
   ]);
 
-  // Derive top albums from the full track pool
-  const albums = deriveTopAlbums(allTracks, 5);
+  // Derive top albums from the full track pool (6 for symmetrical 3x2 grid)
+  const albums = deriveTopAlbums(allTracks, 6);
 
   // Persist to DynamoDB (atomic transaction)
   // We store the full track list so future album derivation can re-run if needed,

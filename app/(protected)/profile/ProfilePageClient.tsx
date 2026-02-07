@@ -1,5 +1,7 @@
 "use client";
 
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { ProfileForm } from "@/app/components/ProfileForm";
 
 interface Profile {
@@ -18,6 +20,11 @@ export default function ProfilePageClient({
   profile,
   spotifyAction,
 }: ProfilePageClientProps) {
+  const router = useRouter();
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
+
   const handleSave = async (displayName: string) => {
     const response = await fetch("/api/profile", {
       method: "PATCH",
@@ -30,6 +37,29 @@ export default function ProfilePageClient({
     if (!response.ok) {
       const data = await response.json();
       throw new Error(data.error || "Failed to update profile");
+    }
+  };
+
+  const handleDeleteHandle = async () => {
+    setIsDeleting(true);
+    setDeleteError(null);
+
+    try {
+      const response = await fetch("/api/profile/handle/delete", {
+        method: "DELETE",
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || "Failed to delete handle");
+      }
+
+      // Redirect to claim handle page
+      router.push("/profile/claim-handle");
+      router.refresh();
+    } catch (error) {
+      setDeleteError(error instanceof Error ? error.message : "Failed to delete handle");
+      setIsDeleting(false);
     }
   };
 
@@ -70,21 +100,30 @@ export default function ProfilePageClient({
                 <label className="block text-sm font-medium text-gray-700">
                   Handle
                 </label>
-                <div className="mt-1 flex items-center">
-                  <span className="text-sm text-gray-500 mr-1">
-                    anchor.band/
-                  </span>
-                  <a
-                    href={`/${profile.handle}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-sm font-medium text-blue-600 hover:text-blue-800 hover:underline"
+                <div className="mt-1 flex items-center justify-between">
+                  <div className="flex items-center">
+                    <span className="text-sm text-gray-500 mr-1">
+                      anchor.band/
+                    </span>
+                    <a
+                      href={`/${profile.handle}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-sm font-medium text-blue-600 hover:text-blue-800 hover:underline"
+                    >
+                      {profile.handle}
+                    </a>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setShowDeleteConfirm(true)}
+                    className="text-xs text-red-600 hover:text-red-800 hover:underline"
                   >
-                    {profile.handle}
-                  </a>
+                    Delete handle
+                  </button>
                 </div>
                 <p className="mt-1 text-xs text-gray-500">
-                  Your handle cannot be changed
+                  Deleting your handle will unpublish your page and allow you to claim a new handle
                 </p>
               </div>
 
@@ -139,6 +178,46 @@ export default function ProfilePageClient({
           </div>
         </div>
       </div>
+
+      {/* Delete Handle Confirmation Dialog */}
+      {showDeleteConfirm && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-lg max-w-md w-full p-6">
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">
+              Delete Handle?
+            </h3>
+            <p className="text-sm text-gray-600 mb-4">
+              This will permanently delete your handle <strong>{profile.handle}</strong> and unpublish your page. You&apos;ll be able to claim a new handle, but this one will become available for others to claim.
+            </p>
+            {deleteError && (
+              <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded text-sm text-red-800">
+                {deleteError}
+              </div>
+            )}
+            <div className="flex gap-3 justify-end">
+              <button
+                type="button"
+                onClick={() => {
+                  setShowDeleteConfirm(false);
+                  setDeleteError(null);
+                }}
+                disabled={isDeleting}
+                className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleDeleteHandle}
+                disabled={isDeleting}
+                className="px-4 py-2 text-sm font-medium text-white bg-red-600 border border-transparent rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50"
+              >
+                {isDeleting ? "Deleting..." : "Delete Handle"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
