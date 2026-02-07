@@ -31,6 +31,13 @@ function pickImage(images: { url: string; width: number }[]): string | null {
   return sorted[0].url;
 }
 
+/**
+ * Constructs a Spotify URL from an ID and type.
+ */
+function spotifyUrl(id: string, type: 'artist' | 'album' | 'track'): string {
+  return `https://open.spotify.com/${type}/${id}`;
+}
+
 // ---------------------------------------------------------------------------
 // Component
 // ---------------------------------------------------------------------------
@@ -104,7 +111,7 @@ export function PublicProfile({
                 return (
                   <a
                     key={artist.id}
-                    href={artist.externalUrl}
+                    href={spotifyUrl(artist.id, 'artist')}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex-none flex flex-col items-center gap-2 hover:opacity-80 transition-opacity"
@@ -147,7 +154,7 @@ export function PublicProfile({
                   <div key={album.id} className="group">
                     {/* Album artwork - clickable */}
                     <a
-                      href={album.externalUrl}
+                      href={spotifyUrl(album.id, 'album')}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="block aspect-square w-full mb-3 rounded-lg overflow-hidden bg-neutral-200 dark:bg-neutral-800 hover:opacity-80 transition-opacity"
@@ -168,7 +175,7 @@ export function PublicProfile({
                     </a>
                     {/* Album info - clickable */}
                     <a
-                      href={album.externalUrl}
+                      href={spotifyUrl(album.id, 'album')}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="block hover:underline"
@@ -206,7 +213,7 @@ export function PublicProfile({
                     {i + 1}.
                   </span>
                   <a
-                    href={track.externalUrl}
+                    href={spotifyUrl(track.id, 'track')}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="min-w-0 hover:underline"
