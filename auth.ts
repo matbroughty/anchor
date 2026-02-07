@@ -16,9 +16,15 @@ if (!process.env.AUTH_SECRET) {
   )
 }
 
+// Debug: Log AUTH_URL to verify it's set correctly
+console.log("[Auth Config] AUTH_URL:", process.env.AUTH_URL || "NOT SET")
+console.log("[Auth Config] NODE_ENV:", process.env.NODE_ENV)
+
 export const { handlers, auth, signIn, signOut } = NextAuth({
   trustHost: true,
   secret: process.env.AUTH_SECRET,
+  // Explicitly set base URL for OAuth redirects in production
+  basePath: "/api/auth",
   adapter: DynamoDBAdapter(dynamoDocumentClient, { tableName: TABLE_NAME }),
   // Database session strategy required for magic links and "sign out everywhere"
   session: { strategy: "database" },
