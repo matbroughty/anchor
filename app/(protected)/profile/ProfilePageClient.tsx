@@ -42,6 +42,28 @@ export default function ProfilePageClient({
               Your Profile
             </h1>
 
+            {/* Dashboard CTA if Spotify is connected */}
+            {profile.spotifyConnected && (
+              <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="text-sm font-medium text-blue-900">
+                      Ready to manage your music?
+                    </h3>
+                    <p className="mt-1 text-sm text-blue-700">
+                      Go to your dashboard to refresh Spotify data, edit content, and publish your page.
+                    </p>
+                  </div>
+                  <a
+                    href="/dashboard"
+                    className="ml-4 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 whitespace-nowrap"
+                  >
+                    Go to Dashboard
+                  </a>
+                </div>
+              </div>
+            )}
+
             <div className="space-y-6">
               {/* Handle (Read-only) */}
               <div>
@@ -52,9 +74,14 @@ export default function ProfilePageClient({
                   <span className="text-sm text-gray-500 mr-1">
                     anchor.band/
                   </span>
-                  <span className="text-sm font-medium text-gray-900">
+                  <a
+                    href={`/${profile.handle}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-sm font-medium text-blue-600 hover:text-blue-800 hover:underline"
+                  >
                     {profile.handle}
-                  </span>
+                  </a>
                 </div>
                 <p className="mt-1 text-xs text-gray-500">
                   Your handle cannot be changed
