@@ -202,9 +202,9 @@ export function PublicProfile({
                     className="flex-none flex flex-col items-center gap-2 hover:opacity-80 transition-opacity"
                     style={{ minWidth: 96 }}
                   >
-                    <div className="relative w-20 h-20 sm:w-24 sm:h-24">
-                      <div className="absolute inset-0 rounded-full ring-2 ring-blue-500" />
-                      <div className="w-full h-full rounded-full overflow-hidden bg-neutral-200 dark:bg-neutral-800 flex items-center justify-center">
+                    <div className="relative w-20 h-20 sm:w-24 sm:h-24 flex-shrink-0">
+                      <div className="absolute inset-0 rounded-full ring-2 ring-blue-500 pointer-events-none" />
+                      <div className="w-full h-full aspect-square rounded-full overflow-hidden bg-neutral-200 dark:bg-neutral-800">
                         {imgUrl ? (
                           <img
                             src={imgUrl}
@@ -212,9 +212,11 @@ export function PublicProfile({
                             className="w-full h-full object-cover"
                           />
                         ) : (
-                          <span className="text-neutral-500 text-2xl font-medium">
-                            {artist.name.charAt(0).toUpperCase()}
-                          </span>
+                          <div className="w-full h-full flex items-center justify-center">
+                            <span className="text-neutral-500 text-2xl font-medium">
+                              {artist.name.charAt(0).toUpperCase()}
+                            </span>
+                          </div>
                         )}
                       </div>
                     </div>
