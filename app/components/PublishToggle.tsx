@@ -11,6 +11,7 @@ type PublishToggleProps = {
   isPublished: boolean;
   handle: string;
   onStatusChange: (newStatus: boolean) => void;
+  hasBio: boolean;
 };
 
 // ---------------------------------------------------------------------------
@@ -21,11 +22,24 @@ export function PublishToggle({
   isPublished,
   handle,
   onStatusChange,
+  hasBio,
 }: PublishToggleProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showConfirm, setShowConfirm] = useState(false);
 
   const handleToggle = async () => {
+    // If publishing without a bio, show confirmation
+    if (!isPublished && !hasBio) {
+      setShowConfirm(true);
+      return;
+    }
+
+    await doPublishToggle();
+  };
+
+  const doPublishToggle = async () => {
+    setShowConfirm(false);
     setIsLoading(true);
     setError(null);
 
@@ -124,6 +138,36 @@ export function PublishToggle({
 
       {/* Error message */}
       {error && <p className="text-sm text-red-600">{error}</p>}
+
+      {/* Confirmation dialog for publishing without bio */}
+      {showConfirm && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-lg max-w-md w-full p-6">
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">
+              Publish without bio?
+            </h3>
+            <p className="text-sm text-gray-600 mb-4">
+              Your bio is generated to add personality and context to your page. Publishing without it means visitors won&apos;t see an introduction. Are you sure you want to publish without a bio?
+            </p>
+            <div className="flex gap-3 justify-end">
+              <button
+                type="button"
+                onClick={() => setShowConfirm(false)}
+                className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={doPublishToggle}
+                className="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+              >
+                Publish Anyway
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

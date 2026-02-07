@@ -80,6 +80,15 @@ export function DashboardClient({
     throw new Error(result.error ?? "Regeneration failed");
   };
 
+  const handleGenerateBio = async () => {
+    startTransition(async () => {
+      const bioResult = await generateBio();
+      if (bioResult.bio) {
+        setContent((prev) => ({ ...prev, bio: bioResult.bio }));
+      }
+    });
+  };
+
   // -----------------------------------------------------------------------
   // Caption callbacks
   // -----------------------------------------------------------------------
@@ -104,14 +113,40 @@ export function DashboardClient({
           <RefreshButton onRefresh={handleRefresh} disabled={isPending} />
         </div>
 
-        {/* Publish controls — always visible */}
+        {/* Publish controls + Bio generation — always visible */}
         {handle && (
           <div className="bg-white shadow sm:rounded-lg px-4 py-5 sm:p-6">
             <h2 className="text-lg font-semibold text-gray-900 mb-4">Your Page</h2>
+
+            {/* Generate bio button if no bio exists and music data is present */}
+            {musicData && !content.bio && (
+              <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                <div className="flex items-start justify-between gap-4">
+                  <div>
+                    <h3 className="text-sm font-medium text-blue-900 mb-1">
+                      Generate your bio
+                    </h3>
+                    <p className="text-sm text-blue-700">
+                      Let AI create a fun bio based on your music taste. You can edit it afterwards.
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={handleGenerateBio}
+                    disabled={isPending}
+                    className="flex-shrink-0 px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
+                  >
+                    {isPending ? "Generating..." : "Generate Bio"}
+                  </button>
+                </div>
+              </div>
+            )}
+
             <PublishToggle
               isPublished={published}
               handle={handle}
               onStatusChange={setPublished}
+              hasBio={!!content.bio}
             />
           </div>
         )}

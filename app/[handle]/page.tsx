@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getPublicProfile } from "@/lib/dynamodb/public-profile";
 import { PublicProfile } from "@/app/components/PublicProfile";
+import { auth } from "@/auth";
 
 // ---------------------------------------------------------------------------
 // ISR Configuration
@@ -68,11 +69,17 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function HandlePage({ params }: Props) {
   const { handle } = await params;
-  const profile = await getPublicProfile(handle);
+  const [profile, session] = await Promise.all([
+    getPublicProfile(handle),
+    auth(),
+  ]);
 
   if (!profile) {
     notFound();
   }
+
+  // Check if the logged-in user owns this profile
+  const isOwner = !!(session?.user?.handle && session.user.handle === handle);
 
   return (
     <PublicProfile
@@ -82,6 +89,7 @@ export default async function HandlePage({ params }: Props) {
       albums={profile.albums}
       tracks={profile.tracks}
       captions={profile.captions}
+      isOwner={isOwner}
     />
   );
 }

@@ -12,6 +12,7 @@ interface PublicProfileProps {
   albums: Album[];
   tracks: Track[];
   captions: Caption[];
+  isOwner?: boolean;
 }
 
 // ---------------------------------------------------------------------------
@@ -47,9 +48,37 @@ export function PublicProfile({
   albums,
   tracks,
   captions,
+  isOwner = false,
 }: PublicProfileProps) {
   return (
     <div className="min-h-screen bg-neutral-50 dark:bg-neutral-950">
+      {/* Owner navigation bar */}
+      {isOwner && (
+        <div className="bg-white dark:bg-neutral-900 border-b border-neutral-200 dark:border-neutral-800">
+          <div className="max-w-3xl mx-auto px-4 sm:px-6 py-3 flex justify-end gap-4">
+            <a
+              href="/profile"
+              className="flex items-center gap-2 text-sm text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100 transition-colors"
+              title="Profile Settings"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+              </svg>
+              <span>Profile</span>
+            </a>
+            <a
+              href="/dashboard"
+              className="flex items-center gap-2 text-sm text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100 transition-colors"
+              title="Dashboard"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 5a1 1 0 011-1h4a1 1 0 011 1v7a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM14 5a1 1 0 011-1h4a1 1 0 011 1v7a1 1 0 01-1 1h-4a1 1 0 01-1-1V5zM4 16a1 1 0 011-1h4a1 1 0 011 1v3a1 1 0 01-1 1H5a1 1 0 01-1-1v-3zM14 16a1 1 0 011-1h4a1 1 0 011 1v3a1 1 0 01-1 1h-4a1 1 0 01-1-1v-3z" />
+              </svg>
+              <span>Dashboard</span>
+            </a>
+          </div>
+        </div>
+      )}
       <main className="max-w-3xl mx-auto px-4 sm:px-6 py-12 sm:py-16">
         {/* Header section */}
         <header className="mb-12 text-center">
@@ -73,9 +102,12 @@ export function PublicProfile({
               {artists.slice(0, 6).map((artist) => {
                 const imgUrl = pickImage(artist.images);
                 return (
-                  <div
+                  <a
                     key={artist.id}
-                    className="flex-none flex flex-col items-center gap-2"
+                    href={artist.externalUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex-none flex flex-col items-center gap-2 hover:opacity-80 transition-opacity"
                     style={{ minWidth: 80 }}
                   >
                     {imgUrl ? (
@@ -94,7 +126,7 @@ export function PublicProfile({
                     <span className="text-xs text-neutral-600 dark:text-neutral-400 text-center truncate w-20">
                       {artist.name}
                     </span>
-                  </div>
+                  </a>
                 );
               })}
             </div>
@@ -113,8 +145,13 @@ export function PublicProfile({
                 const caption = captions.find((c) => c.albumId === album.id);
                 return (
                   <div key={album.id} className="group">
-                    {/* Album artwork */}
-                    <div className="aspect-square w-full mb-3 rounded-lg overflow-hidden bg-neutral-200 dark:bg-neutral-800">
+                    {/* Album artwork - clickable */}
+                    <a
+                      href={album.externalUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="block aspect-square w-full mb-3 rounded-lg overflow-hidden bg-neutral-200 dark:bg-neutral-800 hover:opacity-80 transition-opacity"
+                    >
                       {imgUrl ? (
                         <img
                           src={imgUrl}
@@ -128,14 +165,21 @@ export function PublicProfile({
                           </span>
                         </div>
                       )}
-                    </div>
-                    {/* Album info */}
-                    <h3 className="text-sm font-medium text-neutral-900 dark:text-neutral-100 truncate">
-                      {album.name}
-                    </h3>
-                    <p className="text-xs text-neutral-500 dark:text-neutral-500 truncate mb-2">
-                      {album.artists.map((a) => a.name).join(", ")}
-                    </p>
+                    </a>
+                    {/* Album info - clickable */}
+                    <a
+                      href={album.externalUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="block hover:underline"
+                    >
+                      <h3 className="text-sm font-medium text-neutral-900 dark:text-neutral-100 truncate">
+                        {album.name}
+                      </h3>
+                      <p className="text-xs text-neutral-500 dark:text-neutral-500 truncate mb-2">
+                        {album.artists.map((a) => a.name).join(", ")}
+                      </p>
+                    </a>
                     {/* Caption */}
                     {caption && (
                       <p className="text-sm text-neutral-600 dark:text-neutral-400 leading-relaxed">
@@ -161,14 +205,19 @@ export function PublicProfile({
                   <span className="text-neutral-400 dark:text-neutral-600 text-sm w-5 text-right flex-shrink-0">
                     {i + 1}.
                   </span>
-                  <div className="min-w-0">
+                  <a
+                    href={track.externalUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="min-w-0 hover:underline"
+                  >
                     <p className="text-sm font-medium text-neutral-900 dark:text-neutral-100 truncate">
                       {track.name}
                     </p>
                     <p className="text-xs text-neutral-500 dark:text-neutral-500 truncate">
                       {track.artists.map((a) => a.name).join(", ")}
                     </p>
-                  </div>
+                  </a>
                 </li>
               ))}
             </ol>
