@@ -21,20 +21,13 @@ export function ExampleShowcase() {
               </p>
               {/* Profile preview image */}
               <div className="aspect-[3/4] w-full rounded-lg overflow-hidden bg-neutral-200 dark:bg-neutral-800 shadow-sm">
-                {/* Placeholder for profile screenshot */}
-                <div className="w-full h-full flex items-center justify-center p-8">
-                  <div className="text-center">
-                    <div className="text-6xl font-bold text-neutral-400 dark:text-neutral-600 mb-4">
-                      {example.displayName.charAt(0)}
-                    </div>
-                    <p className="text-sm text-neutral-500 dark:text-neutral-500">
-                      {example.displayName}'s profile
-                    </p>
-                    <p className="text-xs text-neutral-400 dark:text-neutral-600 mt-2">
-                      @{example.handle}
-                    </p>
-                  </div>
-                </div>
+                <Image
+                  src={example.imagePath}
+                  alt={`${example.label} example profile`}
+                  width={400}
+                  height={600}
+                  className="w-full h-full object-cover"
+                />
               </div>
             </div>
           ))}

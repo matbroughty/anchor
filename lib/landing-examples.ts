@@ -229,7 +229,7 @@ export const LANDING_EXAMPLES: LandingExample[] = [
         popularity: 88,
       },
     ],
-    imagePath: "/examples/classic-profile.png",
+    imagePath: "/examples/classic-rock-profile.png",
   },
   {
     id: "modern",
@@ -441,7 +441,7 @@ export const LANDING_EXAMPLES: LandingExample[] = [
         popularity: 85,
       },
     ],
-    imagePath: "/examples/modern-profile.png",
+    imagePath: "/examples/modern-pop-profile.png",
   },
   {
     id: "underground",
