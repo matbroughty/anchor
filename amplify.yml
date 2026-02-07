@@ -1,0 +1,30 @@
+version: 1
+frontend:
+  phases:
+    preBuild:
+      commands:
+        - npm ci --cache .npm --prefer-offline
+        # Create .env.production with environment variables for build time
+        - echo "AUTH_SECRET=$AUTH_SECRET" >> .env.production
+        - echo "AUTH_URL=$AUTH_URL" >> .env.production
+        - echo "AUTH_TRUST_HOST=$AUTH_TRUST_HOST" >> .env.production
+        - echo "AUTH_DYNAMODB_ID=$AUTH_DYNAMODB_ID" >> .env.production
+        - echo "AUTH_DYNAMODB_SECRET=$AUTH_DYNAMODB_SECRET" >> .env.production
+        - echo "AUTH_DYNAMODB_REGION=$AUTH_DYNAMODB_REGION" >> .env.production
+        - echo "KMS_KEY_ID=$KMS_KEY_ID" >> .env.production
+        - echo "GOOGLE_CLIENT_ID=$GOOGLE_CLIENT_ID" >> .env.production
+        - echo "GOOGLE_CLIENT_SECRET=$GOOGLE_CLIENT_SECRET" >> .env.production
+        - echo "AUTH_RESEND_KEY=$AUTH_RESEND_KEY" >> .env.production
+        - echo "SPOTIFY_CLIENT_ID=$SPOTIFY_CLIENT_ID" >> .env.production
+        - echo "SPOTIFY_CLIENT_SECRET=$SPOTIFY_CLIENT_SECRET" >> .env.production
+    build:
+      commands:
+        - npm run build
+  artifacts:
+    baseDirectory: .next
+    files:
+      - '**/*'
+  cache:
+    paths:
+      - .next/cache/**/*
+      - .npm/**/*
