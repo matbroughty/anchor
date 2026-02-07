@@ -190,7 +190,7 @@ export function PublicProfile({
             <h2 className="text-sm font-medium text-neutral-500 dark:text-neutral-500 uppercase tracking-wide mb-4">
               Featured Artists
             </h2>
-            <div className="flex gap-4 overflow-x-auto pb-2 -mx-4 px-4 sm:mx-0 sm:px-0">
+            <div className="flex gap-4 overflow-x-auto pb-2 -mx-4 px-4 sm:mx-0 sm:px-0 sm:justify-center">
               {featuredArtists.map((artist) => {
                 const imgUrl = pickImage(artist.images);
                 return (
@@ -202,19 +202,19 @@ export function PublicProfile({
                     className="flex-none flex flex-col items-center gap-2 hover:opacity-80 transition-opacity"
                     style={{ minWidth: 96 }}
                   >
-                    {imgUrl ? (
-                      <img
-                        src={imgUrl}
-                        alt={artist.name}
-                        className="w-20 h-20 sm:w-24 sm:h-24 rounded-full object-cover ring-2 ring-blue-500"
-                      />
-                    ) : (
-                      <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-neutral-200 dark:bg-neutral-800 ring-2 ring-blue-500 flex items-center justify-center">
+                    <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full ring-2 ring-blue-500 overflow-hidden flex items-center justify-center bg-neutral-200 dark:bg-neutral-800">
+                      {imgUrl ? (
+                        <img
+                          src={imgUrl}
+                          alt={artist.name}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
                         <span className="text-neutral-500 text-2xl font-medium">
                           {artist.name.charAt(0).toUpperCase()}
                         </span>
-                      </div>
-                    )}
+                      )}
+                    </div>
                     <span className="text-xs text-neutral-600 dark:text-neutral-400 text-center truncate w-24">
                       {artist.name}
                     </span>
