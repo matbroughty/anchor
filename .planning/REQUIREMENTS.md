@@ -52,9 +52,9 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Landing Page
 
-- [ ] **LAND-01**: Landing page at anchor.band explains what Anchor is
-- [ ] **LAND-02**: Landing page shows 2-3 example profile pages
-- [ ] **LAND-03**: Landing page has "Get Started" button leading to signup
+- [x] **LAND-01**: Landing page at anchor.band explains what Anchor is
+- [x] **LAND-02**: Landing page shows 2-3 example profile pages
+- [x] **LAND-03**: Landing page has "Get Started" button leading to signup
 
 ## v2 Requirements
 
@@ -135,9 +135,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 | PAGE-06 | Phase 3 | Pending |
 | PUB-01 | Phase 3 | Pending |
 | PUB-02 | Phase 3 | Pending |
-| LAND-01 | Phase 4 | Pending |
-| LAND-02 | Phase 4 | Pending |
-| LAND-03 | Phase 4 | Pending |
+| LAND-01 | Phase 4 | Complete |
+| LAND-02 | Phase 4 | Complete |
+| LAND-03 | Phase 4 | Complete |
 
 **Coverage:**
 - v1 requirements: 28 total

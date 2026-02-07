@@ -9,7 +9,7 @@ Anchor.band is a tasteful music profile platform where users claim handles, conn
 - [x] **Phase 1: Foundation** - Authentication, profiles, and secure token storage
 - [x] **Phase 2: Content Pipeline** - Spotify data fetching and AI content generation
 - [x] **Phase 3: Publishing** - Public pages with SSR and social metadata
-- [ ] **Phase 4: Landing Experience** - Marketing site and onboarding
+- [x] **Phase 4: Landing Experience** - Marketing site and onboarding
 
 ## Phase Details
 
@@ -75,8 +75,8 @@ Plans:
 **Plans**: 2 plans
 
 Plans:
-- [ ] 04-01-PLAN.md — Landing page components and assembly
-- [ ] 04-02-PLAN.md — Example screenshots and visual verification
+- [x] 04-01-PLAN.md — Landing page components and assembly
+- [x] 04-02-PLAN.md — Example screenshots and visual verification
 
 ## Progress
 
@@ -85,7 +85,7 @@ Plans:
 | 1. Foundation | 3/3 | Complete | 2026-02-04 |
 | 2. Content Pipeline | 3/3 | Complete | 2026-02-06 |
 | 3. Publishing | 3/3 | Complete | 2026-02-07 |
-| 4. Landing Experience | 0/2 | Not started | - |
+| 4. Landing Experience | 2/2 | Complete | 2026-02-07 |
 
 ---
 *Roadmap created: 2026-02-04*

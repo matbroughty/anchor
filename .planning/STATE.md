@@ -118,6 +118,11 @@ Recent decisions affecting current work:
 - All landing page components are server components (no client-side JS) for optimal performance
 
 **From Plan 04-02:**
+- Removed "Show your taste without the cringe" subheading per user feedback for cleaner, more minimal hero section
+- Example profile placeholders (400x600 PNG) sufficient for landing page - real screenshots optional
+- Landing page verified by user: responsive layout, both CTAs working, SEO metadata present, visual differentiation confirmed
+
+**From Plan 04-02:**
 - Placeholder profile images (400x600px) created using ImageMagick for example showcase until real profiles exist
 - Landing hero subheading removed per user feedback for cleaner aesthetic
 - Visual verification confirmed landing page production-ready (responsive, CTAs working, SEO metadata present)
