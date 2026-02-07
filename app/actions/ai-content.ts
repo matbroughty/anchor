@@ -10,6 +10,7 @@ import {
 } from "@/lib/bedrock/prompts";
 import { putBio, putCaption } from "@/lib/dynamodb/content";
 import { getMusicData } from "@/lib/dynamodb/music-data";
+import { getFeaturedArtists } from "@/lib/dynamodb/featured-artists";
 import type { Bio, Caption } from "@/types/content";
 import type { Artist, Track, Album } from "@/types/music";
 
@@ -36,20 +37,32 @@ export interface RegenerateCaptionResult {
 // Helpers
 // ---------------------------------------------------------------------------
 
-function buildBioUserMessage(artists: Artist[], tracks: Track[]): string {
+function buildBioUserMessage(
+  artists: Artist[],
+  tracks: Track[],
+  featuredArtists: Artist[]
+): string {
   const artistNames = artists.map((a) => a.name).join(", ");
   const trackLines = tracks
     .slice(0, 10)
     .map((t) => `- ${t.name} by ${t.artists.map((a) => a.name).join(" & ")}`)
     .join("\n");
 
-  return `Here are my top artists and tracks. Write a bio about my music taste.\n\nTop artists: ${artistNames}\n\nTop tracks:\n${trackLines}`;
+  let message = `Here are my top artists and tracks. Write a bio about my music taste.\n\nTop artists: ${artistNames}\n\nTop tracks:\n${trackLines}`;
+
+  if (featuredArtists.length > 0) {
+    const featuredNames = featuredArtists.map((a) => a.name).join(", ");
+    message += `\n\nI've especially highlighted these artists on my profile: ${featuredNames}`;
+  }
+
+  return message;
 }
 
 function buildCaptionUserMessage(
   album: Album,
   artists: Artist[],
-  tracks: Track[]
+  tracks: Track[],
+  featuredArtists: Artist[]
 ): string {
   const artistNames = artists.map((a) => a.name).join(", ");
   const albumArtist = album.artists.map((a) => a.name).join(" & ");
@@ -58,6 +71,14 @@ function buildCaptionUserMessage(
   let context = `Album: "${album.name}" by ${albumArtist}\nMy overall top artists: ${artistNames}`;
   if (albumTracks.length > 0) {
     context += `\nTracks from this album in my top tracks: ${albumTracks.map((t) => t.name).join(", ")}`;
+  }
+
+  // Check if this album is by a featured artist
+  const isFeaturedArtist = featuredArtists.some((fa) =>
+    album.artists.some((aa) => aa.id === fa.id)
+  );
+  if (isFeaturedArtist) {
+    context += `\n(This is one of my especially highlighted artists)`;
   }
 
   return `${context}\n\nWrite a one-sentence caption for this album on my profile.`;
@@ -101,7 +122,11 @@ export async function generateBio(): Promise<GenerateBioResult> {
       return { bio: null, error: "Not authenticated" };
     }
 
-    const musicData = await getMusicData(session.user.id);
+    const [musicData, featuredArtists] = await Promise.all([
+      getMusicData(session.user.id),
+      getFeaturedArtists(session.user.id),
+    ]);
+
     if (!musicData) {
       return {
         bio: null,
@@ -111,7 +136,7 @@ export async function generateBio(): Promise<GenerateBioResult> {
 
     const text = await callBedrock(
       BIO_SYSTEM_PROMPT,
-      buildBioUserMessage(musicData.artists, musicData.tracks),
+      buildBioUserMessage(musicData.artists, musicData.tracks, featuredArtists),
       0.6
     );
 
@@ -141,7 +166,11 @@ export async function generateAlbumCaptions(): Promise<GenerateCaptionsResult> {
       return { captions: [], error: "Not authenticated" };
     }
 
-    const musicData = await getMusicData(session.user.id);
+    const [musicData, featuredArtists] = await Promise.all([
+      getMusicData(session.user.id),
+      getFeaturedArtists(session.user.id),
+    ]);
+
     if (!musicData) {
       return {
         captions: [],
@@ -155,7 +184,12 @@ export async function generateAlbumCaptions(): Promise<GenerateCaptionsResult> {
     for (const album of musicData.albums.slice(0, 6)) {
       const text = await callBedrock(
         CAPTION_SYSTEM_PROMPT,
-        buildCaptionUserMessage(album, musicData.artists, musicData.tracks),
+        buildCaptionUserMessage(
+          album,
+          musicData.artists,
+          musicData.tracks,
+          featuredArtists
+        ),
         0.5,
         100
       );
@@ -201,7 +235,11 @@ export async function regenerateCaption(
       return { caption: null, error: "Not authenticated" };
     }
 
-    const musicData = await getMusicData(session.user.id);
+    const [musicData, featuredArtists] = await Promise.all([
+      getMusicData(session.user.id),
+      getFeaturedArtists(session.user.id),
+    ]);
+
     if (!musicData) {
       return {
         caption: null,
@@ -216,7 +254,12 @@ export async function regenerateCaption(
 
     const text = await callBedrock(
       CAPTION_SYSTEM_PROMPT,
-      buildCaptionUserMessage(album, musicData.artists, musicData.tracks),
+      buildCaptionUserMessage(
+        album,
+        musicData.artists,
+        musicData.tracks,
+        featuredArtists
+      ),
       0.5,
       100
     );
