@@ -17,6 +17,10 @@ frontend:
         - echo "AUTH_RESEND_KEY=$AUTH_RESEND_KEY" >> .env.production
         - echo "SPOTIFY_CLIENT_ID=$SPOTIFY_CLIENT_ID" >> .env.production
         - echo "SPOTIFY_CLIENT_SECRET=$SPOTIFY_CLIENT_SECRET" >> .env.production
+        # Debug: Print what AUTH_URL actually contains
+        - echo "DEBUG - AUTH_URL from env:" "$AUTH_URL"
+        - echo "DEBUG - Contents of .env.production:"
+        - cat .env.production
     build:
       commands:
         - npm run build
