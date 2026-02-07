@@ -4,6 +4,12 @@
  * Single-table design: all user data lives under pk = USER#{userId}.
  * Each music entity gets its own sort key so we can batch-fetch or
  * independently update them.
+ *
+ * User record fields (pk = USER#{userId}, sk = USER#{userId}):
+ * - handle: string (the user's claimed handle)
+ * - displayName: string | null (user's display name)
+ * - isPublic: boolean (default false, controls public page visibility)
+ * - updatedAt: string (ISO timestamp of last update)
  */
 export const MUSIC_SK = {
   ARTISTS: "MUSIC#ARTISTS",
