@@ -86,6 +86,29 @@ const profile1 = {
       albumType: "album",
     },
   ],
+  tracks: [
+    {
+      id: "alison-1",
+      name: "Alison",
+      artists: [{ id: "slowdive-1", name: "Slowdive" }],
+      album: { id: "souvlaki-1", name: "Souvlaki", images: [], album_type: "album" },
+      popularity: 75,
+    },
+    {
+      id: "kyoto-1",
+      name: "Kyoto",
+      artists: [{ id: "phoebe-1", name: "Phoebe Bridgers" }],
+      album: { id: "punisher-1", name: "Punisher", images: [], album_type: "album" },
+      popularity: 80,
+    },
+    {
+      id: "silver-soul-1",
+      name: "Silver Soul",
+      artists: [{ id: "beach-house-1", name: "Beach House" }],
+      album: { id: "teen-dream-1", name: "Teen Dream", images: [], album_type: "album" },
+      popularity: 70,
+    },
+  ],
 };
 
 // Example profile 2: Hip-hop/R&B connoisseur
@@ -155,6 +178,29 @@ const profile2 = {
       albumType: "album",
     },
   ],
+  tracks: [
+    {
+      id: "maad-city-1",
+      name: "m.A.A.d city",
+      artists: [{ id: "kendrick-1", name: "Kendrick Lamar" }],
+      album: { id: "gkmc-1", name: "good kid, m.A.A.d city", images: [], album_type: "album" },
+      popularity: 85,
+    },
+    {
+      id: "earfquake-1",
+      name: "EARFQUAKE",
+      artists: [{ id: "tyler-1", name: "Tyler, The Creator" }],
+      album: { id: "cmiygl-1", name: "Call Me If You Get Lost", images: [], album_type: "album" },
+      popularity: 88,
+    },
+    {
+      id: "come-down-1",
+      name: "Come Down",
+      artists: [{ id: "paak-1", name: "Anderson .Paak" }],
+      album: { id: "malibu-1", name: "Malibu", images: [], album_type: "album" },
+      popularity: 75,
+    },
+  ],
 };
 
 // Example profile 3: Classic rock/psychedelic fan
@@ -218,6 +264,29 @@ const profile3 = {
       albumType: "album",
     },
   ],
+  tracks: [
+    {
+      id: "time-1",
+      name: "Time",
+      artists: [{ id: "floyd-1", name: "Pink Floyd" }],
+      album: { id: "dsotm-1", name: "The Dark Side of the Moon", images: [], album_type: "album" },
+      popularity: 82,
+    },
+    {
+      id: "let-it-happen-1",
+      name: "Let It Happen",
+      artists: [{ id: "tame-1", name: "Tame Impala" }],
+      album: { id: "currents-1", name: "Currents", images: [], album_type: "album" },
+      popularity: 85,
+    },
+    {
+      id: "come-together-1",
+      name: "Come Together",
+      artists: [{ id: "beatles-1", name: "The Beatles" }],
+      album: { id: "abbey-1", name: "Abbey Road", images: [], album_type: "album" },
+      popularity: 90,
+    },
+  ],
 };
 
 async function seedProfile(profile: typeof profile1) {
@@ -274,41 +343,66 @@ async function seedProfile(profile: typeof profile1) {
     })
   );
 
-  // Create featured artists
+  // Create featured artists (stored in 'data' field)
   await dynamoDocumentClient.send(
     new UpdateCommand({
       TableName: TABLE_NAME,
       Key: { pk, sk: "MUSIC#FEATURED_ARTISTS" },
-      UpdateExpression: "SET artists = :artists, updatedAt = :updatedAt",
+      UpdateExpression: "SET #data = :data, updatedAt = :updatedAt",
+      ExpressionAttributeNames: {
+        "#data": "data",
+      },
       ExpressionAttributeValues: {
-        ":artists": profile.featuredArtists,
-        ":updatedAt": new Date().toISOString(),
+        ":data": profile.featuredArtists,
+        ":updatedAt": Date.now(),
       },
     })
   );
 
-  // Create music data (artists)
+  // Create music data (artists) - stored in 'data' field with cachedAt
   await dynamoDocumentClient.send(
     new UpdateCommand({
       TableName: TABLE_NAME,
       Key: { pk, sk: "MUSIC#ARTISTS" },
-      UpdateExpression: "SET artists = :artists, updatedAt = :updatedAt",
+      UpdateExpression: "SET #data = :data, cachedAt = :cachedAt",
+      ExpressionAttributeNames: {
+        "#data": "data",
+      },
       ExpressionAttributeValues: {
-        ":artists": profile.artists,
-        ":updatedAt": new Date().toISOString(),
+        ":data": profile.artists,
+        ":cachedAt": Date.now(),
       },
     })
   );
 
-  // Create music data (albums)
+  // Create music data (albums) - stored in 'data' field with cachedAt
   await dynamoDocumentClient.send(
     new UpdateCommand({
       TableName: TABLE_NAME,
       Key: { pk, sk: "MUSIC#ALBUMS" },
-      UpdateExpression: "SET albums = :albums, updatedAt = :updatedAt",
+      UpdateExpression: "SET #data = :data, cachedAt = :cachedAt",
+      ExpressionAttributeNames: {
+        "#data": "data",
+      },
       ExpressionAttributeValues: {
-        ":albums": profile.albums,
-        ":updatedAt": new Date().toISOString(),
+        ":data": profile.albums,
+        ":cachedAt": Date.now(),
+      },
+    })
+  );
+
+  // Create music data (tracks) - stored in 'data' field with cachedAt
+  await dynamoDocumentClient.send(
+    new UpdateCommand({
+      TableName: TABLE_NAME,
+      Key: { pk, sk: "MUSIC#TRACKS" },
+      UpdateExpression: "SET #data = :data, cachedAt = :cachedAt",
+      ExpressionAttributeNames: {
+        "#data": "data",
+      },
+      ExpressionAttributeValues: {
+        ":data": profile.tracks,
+        ":cachedAt": Date.now(),
       },
     })
   );
