@@ -26,6 +26,7 @@ interface ProfileData {
   artistCount: number;
   albumCount: number;
   trackCount: number;
+  hasHandleRecord: boolean;
 }
 
 async function getAllProfiles(): Promise<ProfileData[]> {
@@ -41,6 +42,41 @@ async function getAllProfiles(): Promise<ProfileData[]> {
   );
 
   const users = scanResult.Items || [];
+
+  // Check which handles actually have HANDLE records
+  const handleKeys = users
+    .filter(user => user.handle)
+    .map(user => {
+      const handle = (user.handle as string).toLowerCase();
+      return { pk: `HANDLE#${handle}`, sk: `HANDLE#${handle}` };
+    });
+
+  const handleRecordsExist = new Set<string>();
+
+  if (handleKeys.length > 0) {
+    // Batch check HANDLE records (chunk if needed)
+    const chunks: typeof handleKeys[] = [];
+    for (let i = 0; i < handleKeys.length; i += 100) {
+      chunks.push(handleKeys.slice(i, i + 100));
+    }
+
+    for (const chunk of chunks) {
+      const handleResult = await dynamoDocumentClient.send(
+        new BatchGetCommand({
+          RequestItems: {
+            [TABLE_NAME]: {
+              Keys: chunk,
+            },
+          },
+        })
+      );
+
+      (handleResult.Responses?.[TABLE_NAME] || []).forEach((item) => {
+        const handle = (item.pk as string).replace("HANDLE#", "");
+        handleRecordsExist.add(handle);
+      });
+    }
+  }
 
   // Batch fetch music data for all users
   const musicKeys = users.flatMap((user) => {
@@ -100,6 +136,7 @@ async function getAllProfiles(): Promise<ProfileData[]> {
     const pk = user.pk as string;
     const userId = pk.replace("USER#", "");
     const musicData = musicDataMap.get(userId) || {};
+    const handle = ((user.handle as string) || "N/A").toLowerCase();
 
     return {
       handle: (user.handle as string) || "N/A",
@@ -114,6 +151,7 @@ async function getAllProfiles(): Promise<ProfileData[]> {
       artistCount: musicData.artists || 0,
       albumCount: musicData.albums || 0,
       trackCount: musicData.tracks || 0,
+      hasHandleRecord: handleRecordsExist.has(handle),
     };
   });
 
@@ -138,6 +176,7 @@ export default async function AdminProfilesPage() {
   const profiles = await getAllProfiles();
   const publishedCount = profiles.filter(p => p.isPublic).length;
   const withMusicData = profiles.filter(p => p.hasArtists && p.hasTracks).length;
+  const brokenHandles = profiles.filter(p => p.isPublic && !p.hasHandleRecord).length;
 
   return (
     <div className="min-h-screen bg-gray-50 py-8 px-4">
@@ -149,6 +188,11 @@ export default async function AdminProfilesPage() {
           <p className="text-sm text-gray-600">
             Total: {profiles.length} profiles | Published: {publishedCount} | With music data: {withMusicData}
           </p>
+          {brokenHandles > 0 && (
+            <p className="text-sm text-red-600 font-semibold mt-1">
+              ⚠️ {brokenHandles} published profile(s) missing HANDLE records (won't be accessible)
+            </p>
+          )}
         </div>
 
         <div className="bg-white shadow rounded-lg overflow-hidden">
@@ -179,6 +223,9 @@ export default async function AdminProfilesPage() {
                   </th>
                   <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Tracks
+                  </th>
+                  <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Handle OK
                   </th>
                   <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Actions
@@ -258,12 +305,21 @@ export default async function AdminProfilesPage() {
                           <span className="text-gray-400">0</span>
                         )}
                       </td>
+                      <td className="px-4 py-3 whitespace-nowrap text-center">
+                        {profile.hasHandleRecord ? (
+                          <span className="text-green-600 font-bold">✓</span>
+                        ) : (
+                          <span className="text-red-600 font-bold" title="HANDLE record missing - profile not accessible">
+                            ✗
+                          </span>
+                        )}
+                      </td>
                       <td className="px-4 py-3 whitespace-nowrap text-sm">
                         <a
                           href={`/${profile.handle}`}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-blue-600 hover:underline"
+                          className={profile.hasHandleRecord ? "text-blue-600 hover:underline" : "text-gray-400 cursor-not-allowed"}
                         >
                           View →
                         </a>
@@ -284,6 +340,8 @@ export default async function AdminProfilesPage() {
             <li>• <strong>Published At = Never</strong>: User hasn't clicked "Drop Anchor" button yet</li>
             <li>• <strong>Green numbers</strong>: Music data exists</li>
             <li>• <strong>Gray 0</strong>: No music data (user needs to click "Haul Up Anchor")</li>
+            <li>• <strong>Handle OK = ✓</strong>: HANDLE record exists, profile is accessible</li>
+            <li>• <strong>Handle OK = ✗ (red)</strong>: HANDLE record missing, profile returns 404</li>
           </ul>
         </div>
       </div>

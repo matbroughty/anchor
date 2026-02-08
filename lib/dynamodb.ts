@@ -10,7 +10,7 @@ const dynamoConfig = {
     accessKeyId: process.env.AUTH_DYNAMODB_ID!,
     secretAccessKey: process.env.AUTH_DYNAMODB_SECRET!,
   },
-  region: process.env.AUTH_DYNAMODB_REGION!.trim(), // Trim any whitespace from region
+  region: (process.env.AUTH_DYNAMODB_REGION || "").trim() || "us-east-1", // Trim any whitespace from region
 };
 
 // Create raw DynamoDB client
