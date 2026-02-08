@@ -6,7 +6,7 @@
  */
 
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
-import { DynamoDBDocumentClient, PutCommand, BatchWriteCommand } from "@aws-sdk/lib-dynamodb";
+import { DynamoDBDocumentClient, UpdateCommand } from "@aws-sdk/lib-dynamodb";
 import { randomUUID } from "crypto";
 
 // Load environment variables
@@ -222,97 +222,105 @@ const profile3 = {
 
 async function seedProfile(profile: typeof profile1) {
   const pk = `USER#${profile.userId}`;
+  const publishedAt = Date.now() - Math.random() * 7 * 24 * 60 * 60 * 1000; // Random time in last week
 
-  // Create user record
+  // Create user record using UpdateCommand
   await dynamoDocumentClient.send(
-    new PutCommand({
+    new UpdateCommand({
       TableName: TABLE_NAME,
-      Item: {
-        pk,
-        sk: pk,
-        id: profile.userId,
-        handle: profile.handle,
-        displayName: profile.displayName,
-        email: profile.email,
-        isPublic: true,
-        publishedAt: Date.now() - Math.random() * 7 * 24 * 60 * 60 * 1000, // Random time in last week
-        updatedAt: new Date().toISOString(),
+      Key: { pk, sk: pk },
+      UpdateExpression:
+        "SET id = :id, handle = :handle, displayName = :displayName, email = :email, isPublic = :isPublic, publishedAt = :publishedAt, updatedAt = :updatedAt",
+      ExpressionAttributeValues: {
+        ":id": profile.userId,
+        ":handle": profile.handle,
+        ":displayName": profile.displayName,
+        ":email": profile.email,
+        ":isPublic": true,
+        ":publishedAt": publishedAt,
+        ":updatedAt": new Date().toISOString(),
       },
     })
   );
 
-  // Create handle mapping
+  // Create handle mapping using UpdateCommand
   await dynamoDocumentClient.send(
-    new PutCommand({
+    new UpdateCommand({
       TableName: TABLE_NAME,
-      Item: {
+      Key: {
         pk: `HANDLE#${profile.handle.toLowerCase()}`,
         sk: `HANDLE#${profile.handle.toLowerCase()}`,
-        userId: profile.userId,
+      },
+      UpdateExpression: "SET userId = :userId",
+      ExpressionAttributeValues: {
+        ":userId": profile.userId,
       },
     })
   );
 
   // Create bio
   await dynamoDocumentClient.send(
-    new PutCommand({
+    new UpdateCommand({
       TableName: TABLE_NAME,
-      Item: {
-        pk,
-        sk: "CONTENT#BIO",
-        text: profile.bio.text,
-        generatedAt: profile.bio.generatedAt,
+      Key: { pk, sk: "CONTENT#BIO" },
+      UpdateExpression: "SET #text = :text, generatedAt = :generatedAt",
+      ExpressionAttributeNames: {
+        "#text": "text",
+      },
+      ExpressionAttributeValues: {
+        ":text": profile.bio.text,
+        ":generatedAt": profile.bio.generatedAt,
       },
     })
   );
 
   // Create featured artists
   await dynamoDocumentClient.send(
-    new PutCommand({
+    new UpdateCommand({
       TableName: TABLE_NAME,
-      Item: {
-        pk,
-        sk: "MUSIC#FEATURED_ARTISTS",
-        artists: profile.featuredArtists,
-        updatedAt: new Date().toISOString(),
+      Key: { pk, sk: "MUSIC#FEATURED_ARTISTS" },
+      UpdateExpression: "SET artists = :artists, updatedAt = :updatedAt",
+      ExpressionAttributeValues: {
+        ":artists": profile.featuredArtists,
+        ":updatedAt": new Date().toISOString(),
       },
     })
   );
 
   // Create music data (artists)
   await dynamoDocumentClient.send(
-    new PutCommand({
+    new UpdateCommand({
       TableName: TABLE_NAME,
-      Item: {
-        pk,
-        sk: "MUSIC#ARTISTS",
-        artists: profile.artists,
-        updatedAt: new Date().toISOString(),
+      Key: { pk, sk: "MUSIC#ARTISTS" },
+      UpdateExpression: "SET artists = :artists, updatedAt = :updatedAt",
+      ExpressionAttributeValues: {
+        ":artists": profile.artists,
+        ":updatedAt": new Date().toISOString(),
       },
     })
   );
 
   // Create music data (albums)
   await dynamoDocumentClient.send(
-    new PutCommand({
+    new UpdateCommand({
       TableName: TABLE_NAME,
-      Item: {
-        pk,
-        sk: "MUSIC#ALBUMS",
-        albums: profile.albums,
-        updatedAt: new Date().toISOString(),
+      Key: { pk, sk: "MUSIC#ALBUMS" },
+      UpdateExpression: "SET albums = :albums, updatedAt = :updatedAt",
+      ExpressionAttributeValues: {
+        ":albums": profile.albums,
+        ":updatedAt": new Date().toISOString(),
       },
     })
   );
 
   // Create profile metadata (for caching)
   await dynamoDocumentClient.send(
-    new PutCommand({
+    new UpdateCommand({
       TableName: TABLE_NAME,
-      Item: {
-        pk,
-        sk: "PROFILE#METADATA",
-        lastRefresh: Date.now(),
+      Key: { pk, sk: "PROFILE#METADATA" },
+      UpdateExpression: "SET lastRefresh = :lastRefresh",
+      ExpressionAttributeValues: {
+        ":lastRefresh": Date.now(),
       },
     })
   );

@@ -39,3 +39,39 @@ Requires the following environment variables (from `.env.local`):
 - Sets random publishedAt timestamps within the last week
 - Profiles will appear in the "Dropped Anchors" section on the landing page
 - Safe to run multiple times (will create new UUIDs each time)
+
+### Troubleshooting
+
+#### AccessDeniedException: Not authorized to perform dynamodb:PutItem
+
+If you see this error, your IAM user needs PutItem permission. Follow these steps:
+
+1. Go to [AWS IAM Console](https://console.aws.amazon.com/iam/)
+2. Navigate to **Users** → **anchor-app** (or your IAM user name)
+3. Click the **Permissions** tab
+4. Find and edit the policy attached to this user
+5. Add `dynamodb:PutItem` to the allowed actions
+
+Your policy should include these actions:
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "dynamodb:GetItem",
+        "dynamodb:PutItem",
+        "dynamodb:UpdateItem",
+        "dynamodb:DeleteItem",
+        "dynamodb:Query",
+        "dynamodb:Scan",
+        "dynamodb:BatchWriteItem"
+      ],
+      "Resource": "arn:aws:dynamodb:eu-west-2:343893643132:table/anchor-prod"
+    }
+  ]
+}
+```
+
+**Note:** The application normally uses `UpdateCommand` which doesn't require PutItem. This seed script uses `PutCommand` for simplicity when creating example data.
