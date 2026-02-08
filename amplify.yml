@@ -1,4 +1,4 @@
-version: 1
+vaersion: 1
 frontend:
   phases:
     preBuild:
@@ -19,6 +19,7 @@ frontend:
         - echo "AUTH_RESEND_KEY=$AUTH_RESEND_KEY" >> .env.production
         - echo "SPOTIFY_CLIENT_ID=$SPOTIFY_CLIENT_ID" >> .env.production
         - echo "SPOTIFY_CLIENT_SECRET=$SPOTIFY_CLIENT_SECRET" >> .env.production
+        - echo "LASTFM_API_KEY=$LASTFM_API_KEY" >> .env.production
         # Debug: Print what variables actually contain
         - echo "DEBUG - APP_DOMAIN from env:" "$APP_DOMAIN"
         - echo "DEBUG - AUTH_URL from env:" "$AUTH_URL"
