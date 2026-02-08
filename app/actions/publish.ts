@@ -60,12 +60,13 @@ export async function publishPage(): Promise<PublishResult> {
 
       // Send notification email when anchor is dropped
       try {
-        await resend.emails.send({
-          from: "Anchor Dropped <dropped@anchor.band>",
+        const emailResult = await resend.emails.send({
+          from: "Anchor <onboarding@resend.dev>",
           to: "dropped@anchor.band",
-          subject: `New Anchor Dropped: ${userDetails.handle}`,
+          replyTo: "hello@anchor.band",
+          subject: `⚓ New Anchor Dropped: ${userDetails.handle}`,
           html: `
-            <h2>A new anchor has been dropped!</h2>
+            <h2>⚓ A new anchor has been dropped!</h2>
             <p><strong>Handle:</strong> ${userDetails.handle}</p>
             <p><strong>Display Name:</strong> ${userDetails.displayName || "Not set"}</p>
             <p><strong>Email:</strong> ${userDetails.email || "Not available"}</p>
@@ -73,6 +74,7 @@ export async function publishPage(): Promise<PublishResult> {
             <p><strong>Dropped at:</strong> ${new Date().toISOString()}</p>
           `,
         });
+        console.log("Anchor dropped notification sent:", emailResult);
       } catch (emailError) {
         // Don't fail the publish action if email fails
         console.error("Failed to send anchor dropped notification:", emailError);
