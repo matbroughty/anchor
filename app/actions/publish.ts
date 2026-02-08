@@ -5,6 +5,9 @@ import { revalidatePath } from "next/cache";
 import { UpdateCommand, GetCommand } from "@aws-sdk/lib-dynamodb";
 import { dynamoDocumentClient, TABLE_NAME } from "@/lib/dynamodb";
 import { userPK } from "@/lib/dynamodb/schema";
+import { Resend } from "resend";
+
+const resend = new Resend(process.env.AUTH_RESEND_KEY);
 
 // ---------------------------------------------------------------------------
 // Response types
@@ -36,22 +39,44 @@ export async function publishPage(): Promise<PublishResult> {
     const pk = userPK(userId);
 
     // Update the user record to set isPublic = true
+    // Set publishedAt only if it doesn't exist (first time publishing)
     await dynamoDocumentClient.send(
       new UpdateCommand({
         TableName: TABLE_NAME,
         Key: { pk, sk: pk },
-        UpdateExpression: "SET isPublic = :isPublic, updatedAt = :updatedAt",
+        UpdateExpression: "SET isPublic = :isPublic, updatedAt = :updatedAt, publishedAt = if_not_exists(publishedAt, :publishedAt)",
         ExpressionAttributeValues: {
           ":isPublic": true,
           ":updatedAt": new Date().toISOString(),
+          ":publishedAt": Date.now(),
         },
       })
     );
 
-    // Get the user's handle to revalidate the public page
-    const handle = await getUserHandle(userId);
-    if (handle) {
-      revalidatePath(`/${handle}`);
+    // Get the user's handle and details to revalidate the public page and send notification
+    const userDetails = await getUserDetails(userId);
+    if (userDetails?.handle) {
+      revalidatePath(`/${userDetails.handle}`);
+
+      // Send notification email when anchor is dropped
+      try {
+        await resend.emails.send({
+          from: "Anchor Dropped <dropped@anchor.band>",
+          to: "dropped@anchor.band",
+          subject: `New Anchor Dropped: ${userDetails.handle}`,
+          html: `
+            <h2>A new anchor has been dropped!</h2>
+            <p><strong>Handle:</strong> ${userDetails.handle}</p>
+            <p><strong>Display Name:</strong> ${userDetails.displayName || "Not set"}</p>
+            <p><strong>Email:</strong> ${userDetails.email || "Not available"}</p>
+            <p><strong>Profile URL:</strong> <a href="https://anchor.band/${userDetails.handle}">https://anchor.band/${userDetails.handle}</a></p>
+            <p><strong>Dropped at:</strong> ${new Date().toISOString()}</p>
+          `,
+        });
+      } catch (emailError) {
+        // Don't fail the publish action if email fails
+        console.error("Failed to send anchor dropped notification:", emailError);
+      }
     }
 
     return { success: true };
@@ -128,4 +153,33 @@ async function getUserHandle(userId: string): Promise<string | null> {
   );
 
   return (result.Item?.handle as string) ?? null;
+}
+
+/**
+ * Fetches the user's details from their USER record.
+ */
+async function getUserDetails(userId: string): Promise<{
+  handle: string;
+  displayName: string | null;
+  email: string | null;
+} | null> {
+  const pk = userPK(userId);
+
+  const result = await dynamoDocumentClient.send(
+    new GetCommand({
+      TableName: TABLE_NAME,
+      Key: { pk, sk: pk },
+      ProjectionExpression: "handle, displayName, email",
+    })
+  );
+
+  if (!result.Item) {
+    return null;
+  }
+
+  return {
+    handle: (result.Item.handle as string) ?? "",
+    displayName: (result.Item.displayName as string) ?? null,
+    email: (result.Item.email as string) ?? null,
+  };
 }

@@ -10,6 +10,7 @@
  * - displayName: string | null (user's display name)
  * - isPublic: boolean (default false, controls public page visibility)
  * - lastfmUsername: string | null (Last.fm username if connected)
+ * - publishedAt: number | null (Unix timestamp in ms when first published)
  * - updatedAt: string (ISO timestamp of last update)
  */
 export const MUSIC_SK = {

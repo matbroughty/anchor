@@ -42,14 +42,23 @@ export const getRecentProfiles = cache(
         return [];
       }
 
-      // Sort by handle (alphabetically) as a simple ordering
-      // In future, could add a publishedAt timestamp for chronological ordering
+      // Sort by publishedAt timestamp (most recent first)
+      // Fall back to alphabetical if publishedAt doesn't exist (legacy profiles)
       const profiles: RecentProfile[] = result.Items
         .filter((item) => item.handle) // Ensure handle exists
         .sort((a, b) => {
+          const publishedAtA = (a.publishedAt as number) || 0;
+          const publishedAtB = (b.publishedAt as number) || 0;
+
+          // Sort by publishedAt descending (most recent first)
+          if (publishedAtB !== publishedAtA) {
+            return publishedAtB - publishedAtA;
+          }
+
+          // If both have no publishedAt, sort alphabetically
           const handleA = (a.handle as string).toLowerCase();
           const handleB = (b.handle as string).toLowerCase();
-          return handleB.localeCompare(handleA); // Reverse alphabetical for "recent"
+          return handleB.localeCompare(handleA);
         })
         .slice(0, limit)
         .map((item) => ({

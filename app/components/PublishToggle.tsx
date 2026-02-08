@@ -191,12 +191,12 @@ export function PublishToggle({
                       d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                     />
                   </svg>
-                  {isPublished ? "Unpublishing..." : "Publishing..."}
+                  {isPublished ? "Unpublishing..." : "Dropping..."}
                 </>
               ) : isPublished ? (
                 "Unpublish"
               ) : (
-                "Publish"
+                "Drop Anchor"
               )}
             </button>
           </div>
@@ -211,10 +211,10 @@ export function PublishToggle({
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-lg max-w-md w-full p-6">
             <h3 className="text-lg font-semibold text-gray-900 mb-2">
-              Publish without bio?
+              Drop anchor without bio?
             </h3>
             <p className="text-sm text-gray-600 mb-4">
-              Your bio is generated to add personality and context to your page. Publishing without it means visitors won&apos;t see an introduction. Are you sure you want to publish without a bio?
+              Your bio is generated to add personality and context to your page. Dropping anchor without it means visitors won&apos;t see an introduction. Are you sure you want to drop anchor without a bio?
             </p>
             <div className="flex gap-3 justify-end">
               <button
@@ -229,7 +229,7 @@ export function PublishToggle({
                 onClick={doPublishToggle}
                 className="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
               >
-                Publish Anyway
+                Drop Anchor Anyway
               </button>
             </div>
           </div>

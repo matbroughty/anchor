@@ -70,10 +70,10 @@ export function LandingHero() {
             {showInfo && (
               <div className="absolute left-1/2 -translate-x-1/2 top-full mt-2 w-72 bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg shadow-lg p-4 text-sm text-left z-10">
                 <p className="text-neutral-700 dark:text-neutral-300 mb-2">
-                  <strong>Spotify connection required:</strong> Anchor connects to your Spotify account to fetch your top artists, albums, and tracks.
+                  <strong>Music service required:</strong> Anchor connects to Spotify or Last.fm to fetch your top artists, albums, and tracks.
                 </p>
                 <p className="text-neutral-600 dark:text-neutral-400 text-xs">
-                  Future releases may support other music providers like Apple Music and Last.fm.
+                  Last.fm has open API access. Spotify requires manual approval due to API restrictions.
                 </p>
               </div>
             )}
@@ -83,7 +83,7 @@ export function LandingHero() {
           href="/signin"
           className="inline-block bg-neutral-900 dark:bg-neutral-100 text-white dark:text-neutral-900 px-8 py-4 rounded-lg hover:bg-neutral-800 dark:hover:bg-neutral-200 transition-colors font-medium text-lg"
         >
-          Get Started
+          Drop Anchor (get started)
         </Link>
       </div>
     </section>
