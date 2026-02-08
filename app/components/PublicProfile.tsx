@@ -270,7 +270,7 @@ export function PublicProfile({
                 <div className="absolute left-0 top-full mt-2 w-64 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-10">
                   <div className="bg-white dark:bg-neutral-800 rounded-lg shadow-lg border border-neutral-200 dark:border-neutral-700 p-3">
                     <p className="text-xs text-neutral-700 dark:text-neutral-300">
-                      Your most played artists from Spotify over the past 6 months.
+                      Your most played artists over the past 6 months.
                     </p>
                   </div>
                 </div>

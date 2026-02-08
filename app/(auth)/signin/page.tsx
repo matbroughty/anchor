@@ -86,7 +86,7 @@ export default function SignInPage() {
         </form>
 
         <p className="text-xs text-slate-400 text-center mt-6">
-          You&apos;ll connect Spotify after creating your account.
+          You&apos;ll connect Last.fm or Spotify after creating your account.
         </p>
       </div>
     </div>
