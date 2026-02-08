@@ -332,17 +332,23 @@ async function seedProfile(profile: typeof profile1) {
     })
   );
 
-  // Create handle mapping using UpdateCommand
+  // Create handle mapping with all required fields
+  const handleLower = profile.handle.toLowerCase();
   await dynamoDocumentClient.send(
     new UpdateCommand({
       TableName: TABLE_NAME,
       Key: {
-        pk: `HANDLE#${profile.handle.toLowerCase()}`,
-        sk: `HANDLE#${profile.handle.toLowerCase()}`,
+        pk: `HANDLE#${handleLower}`,
+        sk: `HANDLE#${handleLower}`,
       },
-      UpdateExpression: "SET userId = :userId",
+      UpdateExpression:
+        "SET userId = :userId, handle = :handle, GSI1PK = :gsi1pk, GSI1SK = :gsi1sk, claimedAt = if_not_exists(claimedAt, :claimedAt)",
       ExpressionAttributeValues: {
         ":userId": userId,
+        ":handle": handleLower,
+        ":gsi1pk": "HANDLE",
+        ":gsi1sk": handleLower,
+        ":claimedAt": new Date().toISOString(),
       },
     })
   );

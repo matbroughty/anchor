@@ -26,6 +26,7 @@ async function fixMissingHandles() {
   console.log(`Found ${users.length} user(s) with handles\n`);
 
   let fixed = 0;
+  let updated = 0;
   let alreadyOk = 0;
 
   for (const user of users) {
@@ -47,12 +48,43 @@ async function fixMissingHandles() {
     );
 
     if (handleResult.Item) {
-      console.log(`  ✓ HANDLE record exists`);
-      alreadyOk++;
+      const item = handleResult.Item;
+
+      // Check if it has all required fields
+      const needsUpdate =
+        !item.handle ||
+        !item.GSI1PK ||
+        !item.GSI1SK ||
+        item.userId !== userId;
+
+      if (needsUpdate) {
+        console.log(`  ⚠ HANDLE record exists but incomplete - updating...`);
+
+        await dynamoDocumentClient.send(
+          new PutCommand({
+            TableName: TABLE_NAME,
+            Item: {
+              pk: handleKey,
+              sk: handleKey,
+              userId,
+              handle,
+              GSI1PK: "HANDLE",
+              GSI1SK: handle,
+              claimedAt: item.claimedAt || new Date().toISOString(),
+            },
+          })
+        );
+
+        console.log(`  ✓ HANDLE record updated`);
+        updated++;
+      } else {
+        console.log(`  ✓ HANDLE record OK`);
+        alreadyOk++;
+      }
     } else {
       console.log(`  ✗ HANDLE record missing - creating...`);
 
-      // Create HANDLE record
+      // Create HANDLE record with all required fields
       await dynamoDocumentClient.send(
         new PutCommand({
           TableName: TABLE_NAME,
@@ -61,8 +93,9 @@ async function fixMissingHandles() {
             sk: handleKey,
             userId,
             handle,
-            GSI1PK: "HANDLE",
-            GSI1SK: handle,
+            GSI1PK: "HANDLE", // For future GSI queries
+            GSI1SK: handle,   // For future GSI queries
+            claimedAt: new Date().toISOString(),
           },
         })
       );
@@ -78,7 +111,8 @@ async function fixMissingHandles() {
   console.log(`Summary:`);
   console.log(`  Total users checked: ${users.length}`);
   console.log(`  Already OK: ${alreadyOk}`);
-  console.log(`  Fixed: ${fixed}`);
+  console.log(`  Updated (incomplete): ${updated}`);
+  console.log(`  Created (missing): ${fixed}`);
   console.log("=".repeat(50));
 }
 
