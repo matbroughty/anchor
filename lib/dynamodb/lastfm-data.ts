@@ -25,7 +25,7 @@ export async function fetchLastfmMusicData(
     id: artist.mbid || `lastfm-artist-${index}`, // Use MBID if available, fallback to index
     name: artist.name,
     images: artist.images
-      .filter((img) => img.url) // Filter out empty URLs
+      .filter((img) => img.url && img.url.trim() !== "") // Filter out empty or whitespace-only URLs
       .map((img) => ({
         url: img.url,
         width: img.size === "mega" ? 300 : img.size === "large" ? 200 : 64,
@@ -48,13 +48,16 @@ export async function fetchLastfmMusicData(
       },
     ],
     images: album.images
-      .filter((img) => img.url)
+      .filter((img) => img.url && img.url.trim() !== "")
       .map((img) => ({
         url: img.url,
         width: img.size === "mega" ? 300 : img.size === "large" ? 200 : 64,
         height: img.size === "mega" ? 300 : img.size === "large" ? 200 : 64,
       })),
     albumType: "album", // Last.fm doesn't distinguish album types
+    external_urls: {
+      lastfm: album.url,
+    },
   }));
 
   // Convert Last.fm format to our standard Track format
@@ -74,6 +77,9 @@ export async function fetchLastfmMusicData(
       album_type: "album",
     },
     popularity: 0, // Last.fm doesn't provide popularity scores
+    external_urls: {
+      lastfm: track.url,
+    },
   }));
 
   return { artists, albums, tracks };

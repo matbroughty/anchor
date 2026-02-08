@@ -15,6 +15,8 @@ interface PublicProfileProps {
   captions: Caption[];
   isOwner?: boolean;
   viewCount?: number;
+  lastfmUsername?: string | null;
+  spotifyUserId?: string | null;
 }
 
 // ---------------------------------------------------------------------------
@@ -40,6 +42,26 @@ function spotifyUrl(id: string, type: 'artist' | 'album' | 'track'): string {
   return `https://open.spotify.com/${type}/${id}`;
 }
 
+/**
+ * Gets the correct external URL for an item, preferring the service-specific URL.
+ * Falls back to Spotify URL if no external_urls provided.
+ */
+function getExternalUrl(
+  item: { id: string; external_urls?: { spotify?: string; lastfm?: string } },
+  type: 'artist' | 'album' | 'track'
+): string {
+  // If Last.fm URL exists, use it
+  if (item.external_urls?.lastfm) {
+    return item.external_urls.lastfm;
+  }
+  // If Spotify URL exists, use it
+  if (item.external_urls?.spotify) {
+    return item.external_urls.spotify;
+  }
+  // Fallback to constructing Spotify URL from ID
+  return spotifyUrl(item.id, type);
+}
+
 // ---------------------------------------------------------------------------
 // Component
 // ---------------------------------------------------------------------------
@@ -60,7 +82,21 @@ export function PublicProfile({
   captions,
   isOwner = false,
   viewCount,
+  lastfmUsername,
+  spotifyUserId,
 }: PublicProfileProps) {
+  // Detect music service from the data
+  const hasLastfmData =
+    artists.some((a) => a.external_urls?.lastfm) ||
+    albums.some((a) => a.external_urls?.lastfm) ||
+    tracks.some((t) => t.external_urls?.lastfm);
+  const musicService = hasLastfmData ? "lastfm" : "spotify";
+
+  // Construct profile URL (only available for Last.fm)
+  const profileUrl = musicService === "lastfm" && lastfmUsername
+    ? `https://www.last.fm/user/${lastfmUsername}`
+    : null;
+
   return (
     <div className="min-h-screen bg-neutral-50 dark:bg-neutral-950">
       {/* Navigation bar - always visible */}
@@ -180,9 +216,58 @@ export function PublicProfile({
 
           {/* Subtle tagline */}
           <p className="text-xs text-neutral-500 dark:text-neutral-500 uppercase tracking-wide">
-            Musical Anchor
+            My Musical Anchors
           </p>
         </header>
+
+        {/* Data source card */}
+        {(artists.length > 0 || albums.length > 0 || tracks.length > 0) && (
+          <div className="mb-8 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-lg p-4">
+            <div className="flex items-center justify-between gap-4">
+              <div className="flex items-center gap-3">
+                {musicService === "spotify" ? (
+                  <>
+                    <svg className="w-5 h-5 text-green-500" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/>
+                    </svg>
+                    <div>
+                      <p className="text-sm font-medium text-neutral-900 dark:text-neutral-100">
+                        Powered by Spotify
+                      </p>
+                      <p className="text-xs text-neutral-500 dark:text-neutral-500">
+                        Music data from Spotify listening history
+                      </p>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <svg className="w-5 h-5 text-red-500" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M10.584 17.21l-.88-2.392s-1.43 1.594-3.573 1.594c-1.897 0-3.244-1.649-3.244-4.288 0-3.382 2.135-4.583 3.4-4.583 2.296 0 3.199 1.595 3.199 1.595l.88-2.392s-1.594-1.438-4.02-1.438c-3.267 0-6.078 2.544-6.078 6.693 0 4.288 2.544 6.693 5.811 6.693 2.471 0 4.504-1.382 4.504-1.382zM24 6.005V18.75h-2.694v-4.78H17.89v4.78h-2.695V6.005h2.695v4.933h3.415V6.005H24z"/>
+                    </svg>
+                    <div>
+                      <p className="text-sm font-medium text-neutral-900 dark:text-neutral-100">
+                        Powered by Last.fm
+                      </p>
+                      <p className="text-xs text-neutral-500 dark:text-neutral-500">
+                        Music data from Last.fm scrobble history
+                      </p>
+                    </div>
+                  </>
+                )}
+              </div>
+              {profileUrl && (
+                <a
+                  href={profileUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-sm text-blue-600 dark:text-blue-400 hover:underline whitespace-nowrap"
+                >
+                  View profile →
+                </a>
+              )}
+            </div>
+          </div>
+        )}
 
         {/* Favourite Artists section */}
         {featuredArtists.length > 0 && (
@@ -216,7 +301,7 @@ export function PublicProfile({
                 return (
                   <a
                     key={artist.id}
-                    href={spotifyUrl(artist.id, 'artist')}
+                    href={getExternalUrl(artist, 'artist')}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex-none flex flex-col items-center gap-3 hover:opacity-80 transition-opacity"
@@ -282,7 +367,7 @@ export function PublicProfile({
                 return (
                   <a
                     key={artist.id}
-                    href={spotifyUrl(artist.id, 'artist')}
+                    href={getExternalUrl(artist, 'artist')}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex-none flex flex-col items-center gap-2 hover:opacity-80 transition-opacity"
@@ -325,7 +410,7 @@ export function PublicProfile({
                   <div key={album.id} className="group">
                     {/* Album artwork - clickable */}
                     <a
-                      href={spotifyUrl(album.id, 'album')}
+                      href={getExternalUrl(album, 'album')}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="block aspect-square w-full mb-3 rounded-lg overflow-hidden bg-neutral-200 dark:bg-neutral-800 hover:opacity-80 transition-opacity"
@@ -346,7 +431,7 @@ export function PublicProfile({
                     </a>
                     {/* Album info - clickable */}
                     <a
-                      href={spotifyUrl(album.id, 'album')}
+                      href={getExternalUrl(album, 'album')}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="block hover:underline"
@@ -384,7 +469,7 @@ export function PublicProfile({
                     {i + 1}.
                   </span>
                   <a
-                    href={spotifyUrl(track.id, 'track')}
+                    href={getExternalUrl(track, 'track')}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="min-w-0 hover:underline"

@@ -15,6 +15,10 @@ export interface Artist {
   name: string;
   images: SpotifyImage[];
   genres: string[];
+  external_urls?: {
+    spotify?: string;
+    lastfm?: string;
+  };
 }
 
 /**
@@ -39,6 +43,10 @@ export interface Track {
     album_type: string;
   };
   popularity: number;
+  external_urls?: {
+    spotify?: string;
+    lastfm?: string;
+  };
 }
 
 /**
@@ -52,6 +60,10 @@ export interface Album {
   albumType: string;
   /** Weighted score: sum of track popularities / track count */
   score?: number;
+  external_urls?: {
+    spotify?: string;
+    lastfm?: string;
+  };
 }
 
 /**

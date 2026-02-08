@@ -95,6 +95,8 @@ export default async function HandlePage({ params }: Props) {
       captions={profile.captions}
       isOwner={isOwner}
       viewCount={profile.viewCount}
+      lastfmUsername={profile.lastfmUsername}
+      spotifyUserId={profile.spotifyUserId}
     />
   );
 }

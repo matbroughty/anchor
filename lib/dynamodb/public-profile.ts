@@ -31,6 +31,8 @@ export interface PublicProfile {
   tracks: Track[];
   captions: Caption[];
   viewCount?: number;
+  lastfmUsername?: string | null;
+  spotifyUserId?: string | null;
 }
 
 // ---------------------------------------------------------------------------
@@ -133,6 +135,8 @@ export const getPublicProfile = cache(
       tracks: musicData?.tracks?.slice(0, 10) ?? [], // UI shows top 10 tracks
       captions: contentData.captions,
       viewCount,
+      lastfmUsername: (user.lastfmUsername as string) ?? null,
+      spotifyUserId: (user.spotifyUserId as string) ?? null,
     };
   }
 );
