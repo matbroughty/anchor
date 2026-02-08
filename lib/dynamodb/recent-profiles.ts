@@ -47,13 +47,9 @@ export const getRecentProfiles = cache(
         })),
       });
 
-      if (!result.Items || result.Items.length === 0) {
-        return [];
-      }
-
       // Sort by publishedAt timestamp (most recent first)
       // Fall back to alphabetical if publishedAt doesn't exist (legacy profiles)
-      const profiles: RecentProfile[] = result.Items
+      const profiles: RecentProfile[] = (result.Items || [])
         .filter((item) => item.handle) // Ensure handle exists
         .sort((a, b) => {
           const publishedAtA = (a.publishedAt as number) || 0;
@@ -75,10 +71,20 @@ export const getRecentProfiles = cache(
           displayName: (item.displayName as string) || null,
         }));
 
+      // Ensure matbroughty always appears (fallback for production)
+      if (profiles.length === 0 || !profiles.some(p => p.handle === "matbroughty")) {
+        const fallbackProfiles: RecentProfile[] = [
+          { handle: "matbroughty", displayName: null },
+          ...profiles.filter(p => p.handle !== "matbroughty"),
+        ].slice(0, limit);
+        return fallbackProfiles;
+      }
+
       return profiles;
     } catch (error) {
       console.error("Failed to fetch recent profiles:", error);
-      return [];
+      // Return fallback even on error
+      return [{ handle: "matbroughty", displayName: null }];
     }
   }
 );
