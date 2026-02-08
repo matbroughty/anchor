@@ -242,9 +242,16 @@ export default function ProfilePageClient({
                 </label>
 
                 {/* Last.fm Connection */}
-                <div className="mb-4 p-4 border border-gray-200 rounded-lg">
+                <div className="mb-4 p-4 border border-gray-200 rounded-lg bg-gray-50">
                   <div className="flex items-center justify-between mb-2">
-                    <h4 className="text-sm font-medium text-gray-900">Last.fm</h4>
+                    <div className="flex items-center gap-2">
+                      <h4 className="text-sm font-medium text-gray-900">Last.fm</h4>
+                      {profile.lastfmUsername && (
+                        <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800">
+                          Active
+                        </span>
+                      )}
+                    </div>
                     {profile.lastfmUsername && (
                       <button
                         type="button"
@@ -281,19 +288,24 @@ export default function ProfilePageClient({
                           onChange={(e) => setLastfmUsername(e.target.value)}
                           placeholder="Enter your Last.fm username"
                           required
-                          disabled={isConnectingLastfm}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent disabled:opacity-50"
+                          disabled={isConnectingLastfm || profile.spotifyConnected}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent disabled:opacity-50 disabled:bg-gray-100"
                         />
                         <button
                           type="submit"
-                          disabled={isConnectingLastfm}
-                          className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50"
+                          disabled={isConnectingLastfm || profile.spotifyConnected}
+                          className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50 disabled:bg-gray-400"
                         >
                           {isConnectingLastfm ? "Connecting..." : "Connect Last.fm"}
                         </button>
                       </form>
                       {lastfmError && (
                         <p className="mt-2 text-xs text-red-600">{lastfmError}</p>
+                      )}
+                      {profile.spotifyConnected && (
+                        <p className="mt-2 text-xs text-amber-600">
+                          Disconnect Spotify first to use Last.fm
+                        </p>
                       )}
                     </>
                   )}
@@ -305,9 +317,16 @@ export default function ProfilePageClient({
                 </div>
 
                 {/* Spotify Connection */}
-                <div className="p-4 border border-gray-200 rounded-lg">
+                <div className="p-4 border border-gray-200 rounded-lg bg-gray-50">
                   <div className="flex items-center justify-between mb-2">
-                    <h4 className="text-sm font-medium text-gray-900">Spotify</h4>
+                    <div className="flex items-center gap-2">
+                      <h4 className="text-sm font-medium text-gray-900">Spotify</h4>
+                      {profile.spotifyConnected && (
+                        <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800">
+                          Active
+                        </span>
+                      )}
+                    </div>
                     {profile.spotifyConnected && (
                       <button
                         type="button"
@@ -338,23 +357,31 @@ export default function ProfilePageClient({
                       <form action={spotifyAction}>
                         <button
                           type="submit"
-                          className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+                          disabled={!!profile.lastfmUsername}
+                          className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50 disabled:bg-gray-400"
                         >
                           Connect Spotify
                         </button>
                       </form>
-                      <div className="mt-2 p-3 bg-amber-50 border border-amber-200 rounded">
-                        <p className="text-xs text-amber-800">
-                          <strong>Note:</strong> Due to Spotify API limitations, you must contact{" "}
-                          <a
-                            href="mailto:hello@anchor.band"
-                            className="underline hover:text-amber-900"
-                          >
-                            hello@anchor.band
-                          </a>{" "}
-                          to be added to our approved user list (limited to 25 users). We recommend using Last.fm instead.
+                      {profile.lastfmUsername && (
+                        <p className="mt-2 text-xs text-amber-600">
+                          Disconnect Last.fm first to use Spotify
                         </p>
-                      </div>
+                      )}
+                      {!profile.lastfmUsername && (
+                        <div className="mt-2 p-3 bg-amber-50 border border-amber-200 rounded">
+                          <p className="text-xs text-amber-800">
+                            <strong>Note:</strong> Due to Spotify API limitations, you must contact{" "}
+                            <a
+                              href="mailto:hello@anchor.band"
+                              className="underline hover:text-amber-900"
+                            >
+                              hello@anchor.band
+                            </a>{" "}
+                            to be added to our approved user list (limited to 25 users). We recommend using Last.fm instead.
+                          </p>
+                        </div>
+                      )}
                     </>
                   )}
                   <p className="mt-2 text-xs text-gray-500">

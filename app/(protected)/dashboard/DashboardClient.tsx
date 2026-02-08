@@ -135,13 +135,22 @@ export function DashboardClient({
       <div className="max-w-3xl mx-auto space-y-8">
         {/* Header */}
         <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-bold text-gray-900">Your Music Profile</h1>
+          <div className="flex items-center gap-3">
+            <h1 className="text-2xl font-bold text-gray-900">Your Music Profile</h1>
+            {musicService && (
+              <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
+                {musicService === "spotify" ? "Spotify" : "Last.fm"}
+              </span>
+            )}
+          </div>
           <div className={!musicData && musicService ? "relative" : ""}>
             {!musicData && musicService && (
               <div className="absolute -inset-2 bg-blue-400 rounded-lg opacity-75 animate-pulse"></div>
             )}
             <div className="relative">
-              <RefreshButton onRefresh={handleRefresh} disabled={isPending} />
+              {musicService && (
+                <RefreshButton onRefresh={handleRefresh} disabled={isPending} />
+              )}
             </div>
           </div>
         </div>

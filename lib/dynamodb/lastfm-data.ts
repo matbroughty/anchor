@@ -13,11 +13,11 @@ import type { Artist, Album, Track } from "@/types/music";
 export async function fetchLastfmMusicData(
   username: string
 ): Promise<{ artists: Artist[]; albums: Album[]; tracks: Track[] }> {
-  // Fetch top data from Last.fm (6 month period)
+  // Fetch top data from Last.fm (overall period to capture all listening history)
   const [lastfmArtists, lastfmAlbums, lastfmTracks] = await Promise.all([
-    getLastfmTopArtists(username, 50, "6month"),
-    getLastfmTopAlbums(username, 50, "6month"),
-    getLastfmTopTracks(username, 50, "6month"),
+    getLastfmTopArtists(username, 50, "overall"),
+    getLastfmTopAlbums(username, 50, "overall"),
+    getLastfmTopTracks(username, 50, "overall"),
   ]);
 
   // Convert Last.fm format to our standard Artist format
