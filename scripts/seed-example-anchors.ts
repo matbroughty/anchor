@@ -13,7 +13,7 @@ import { randomUUID } from "crypto";
 import * as dotenv from "dotenv";
 dotenv.config({ path: ".env.local" });
 
-const TABLE_NAME = process.env.AUTH_DYNAMODB_TABLE_NAME || "anchor-prod";
+const TABLE_NAME = process.env.AUTH_DYNAMODB_TABLE_NAME || "anchor-auth";
 
 const client = new DynamoDBClient({
   region: process.env.AUTH_DYNAMODB_REGION!,
