@@ -59,17 +59,19 @@ export async function publishPage(): Promise<PublishResult> {
       revalidatePath(`/${userDetails.handle}`);
 
       // Send notification email when anchor is dropped
+      // Get user's email from session (available from auth)
+      const userEmail = session.user?.email || "Not available";
+
       try {
         const emailResult = await resend.emails.send({
-          from: "Anchor <onboarding@resend.dev>",
+          from: "Anchor <noreply@anchor.band>",
           to: "dropped@anchor.band",
-          replyTo: "hello@anchor.band",
           subject: `⚓ New Anchor Dropped: ${userDetails.handle}`,
           html: `
             <h2>⚓ A new anchor has been dropped!</h2>
             <p><strong>Handle:</strong> ${userDetails.handle}</p>
             <p><strong>Display Name:</strong> ${userDetails.displayName || "Not set"}</p>
-            <p><strong>Email:</strong> ${userDetails.email || "Not available"}</p>
+            <p><strong>Email:</strong> ${userEmail}</p>
             <p><strong>Profile URL:</strong> <a href="https://anchor.band/${userDetails.handle}">https://anchor.band/${userDetails.handle}</a></p>
             <p><strong>Dropped at:</strong> ${new Date().toISOString()}</p>
           `,
@@ -158,12 +160,11 @@ async function getUserHandle(userId: string): Promise<string | null> {
 }
 
 /**
- * Fetches the user's details from their USER record.
+ * Fetches the user's handle and display name from their USER record.
  */
 async function getUserDetails(userId: string): Promise<{
   handle: string;
   displayName: string | null;
-  email: string | null;
 } | null> {
   const pk = userPK(userId);
 
@@ -171,7 +172,7 @@ async function getUserDetails(userId: string): Promise<{
     new GetCommand({
       TableName: TABLE_NAME,
       Key: { pk, sk: pk },
-      ProjectionExpression: "handle, displayName, email",
+      ProjectionExpression: "handle, displayName",
     })
   );
 
@@ -182,6 +183,5 @@ async function getUserDetails(userId: string): Promise<{
   return {
     handle: (result.Item.handle as string) ?? "",
     displayName: (result.Item.displayName as string) ?? null,
-    email: (result.Item.email as string) ?? null,
   };
 }
