@@ -1,22 +1,23 @@
 import { LandingHero } from "@/app/components/LandingHero";
 import { RecentProfiles } from "@/app/components/RecentProfiles";
+import { HowItWorks } from "@/app/components/HowItWorks";
 import { LandingFooter } from "@/app/components/LandingFooter";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Anchor.band - Your music profile, tastefully done",
+  title: "Anchor.band - Drop your anchor. Publish your music taste.",
   description:
-    "Create a shareable music profile page. Connect Spotify, generate tasteful content, and share your taste.",
+    "Turn your listening history and favourite bands into a public page worth sharing.",
   openGraph: {
     title: "Anchor.band",
-    description: "Your music profile, tastefully done",
+    description: "Drop your anchor. Publish your music taste.",
     images: ["/og-image.png"],
     siteName: "Anchor.band",
   },
   twitter: {
     card: "summary_large_image",
     title: "Anchor.band",
-    description: "Your music profile, tastefully done",
+    description: "Drop your anchor. Publish your music taste.",
     images: ["/og-image.png"],
   },
 };
@@ -29,6 +30,7 @@ export default function LandingPage() {
     <>
       <LandingHero />
       <RecentProfiles />
+      <HowItWorks />
       <LandingFooter />
     </>
   );

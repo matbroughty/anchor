@@ -4,9 +4,9 @@
  */
 export function LandingFooter() {
   return (
-    <footer className="bg-neutral-50 dark:bg-neutral-950 py-8">
+    <footer className="bg-neutral-50 py-12">
       <div className="max-w-5xl mx-auto px-4 sm:px-6">
-        <p className="text-sm text-neutral-400 dark:text-neutral-600 text-center">
+        <p className="text-sm text-neutral-500 text-center">
           Copyright 2026 Anchor.band
         </p>
       </div>
