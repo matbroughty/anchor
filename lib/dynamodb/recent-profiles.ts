@@ -51,7 +51,15 @@ export const getRecentProfiles = cache(
         })),
       });
 
+      console.log("[getRecentProfiles] All items before filtering:", result.Items?.map(item => ({
+        handle: item.handle,
+        isPublic: item.isPublic,
+        publishedAt: item.publishedAt,
+        pk: item.pk,
+      })));
+
       // Sort by publishedAt timestamp (most recent first)
+      // Profiles without publishedAt still appear but are sorted last
       const sortedUsers = (result.Items || [])
         .filter((item) => item.handle) // Ensure handle exists
         .sort((a, b) => {
@@ -59,16 +67,25 @@ export const getRecentProfiles = cache(
           const publishedAtB = (b.publishedAt as number) || 0;
 
           // Sort by publishedAt descending (most recent first)
+          // Profiles with publishedAt always come before those without
+          if (publishedAtA > 0 && publishedAtB === 0) return -1;
+          if (publishedAtA === 0 && publishedAtB > 0) return 1;
+
           if (publishedAtB !== publishedAtA) {
             return publishedAtB - publishedAtA;
           }
 
-          // If both have no publishedAt, sort alphabetically
+          // If both have same/no publishedAt, sort alphabetically
           const handleA = (a.handle as string).toLowerCase();
           const handleB = (b.handle as string).toLowerCase();
-          return handleB.localeCompare(handleA);
+          return handleA.localeCompare(handleB);
         })
         .slice(0, limit);
+
+      console.log("[getRecentProfiles] Sorted users:", sortedUsers.map(item => ({
+        handle: item.handle,
+        publishedAt: item.publishedAt,
+      })));
 
       // Batch fetch music data for top 5 profiles
       const userIds = sortedUsers
@@ -87,6 +104,8 @@ export const getRecentProfiles = cache(
 
       if (musicKeys.length > 0) {
         try {
+          console.log("[getRecentProfiles] Fetching music data for keys:", musicKeys.length);
+
           const musicResult = await dynamoDocumentClient.send(
             new BatchGetCommand({
               RequestItems: {
@@ -96,6 +115,8 @@ export const getRecentProfiles = cache(
               },
             })
           );
+
+          console.log("[getRecentProfiles] Music result responses:", musicResult.Responses?.[TABLE_NAME]?.length || 0);
 
           // Index by userId
           (musicResult.Responses?.[TABLE_NAME] || []).forEach((item) => {
@@ -111,10 +132,14 @@ export const getRecentProfiles = cache(
 
             if (sk === MUSIC_SK.ARTISTS) {
               userMusic.artists = item.data as any[];
+              console.log(`[getRecentProfiles] Found ${userMusic.artists?.length || 0} artists for ${userId}`);
             } else if (sk === MUSIC_SK.TRACKS) {
               userMusic.tracks = item.data as any[];
+              console.log(`[getRecentProfiles] Found ${userMusic.tracks?.length || 0} tracks for ${userId}`);
             }
           });
+
+          console.log("[getRecentProfiles] Music data map size:", musicDataMap.size);
         } catch (error) {
           console.error("Failed to fetch music data for profiles:", error);
         }
