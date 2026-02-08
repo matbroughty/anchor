@@ -136,7 +136,14 @@ export function DashboardClient({
         {/* Header */}
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-bold text-gray-900">Your Music Profile</h1>
-          <RefreshButton onRefresh={handleRefresh} disabled={isPending} />
+          <div className={!musicData && musicService ? "relative" : ""}>
+            {!musicData && musicService && (
+              <div className="absolute -inset-2 bg-blue-400 rounded-lg opacity-75 animate-pulse"></div>
+            )}
+            <div className="relative">
+              <RefreshButton onRefresh={handleRefresh} disabled={isPending} />
+            </div>
+          </div>
         </div>
 
         {/* Quick Navigation Menu */}
@@ -208,16 +215,49 @@ export function DashboardClient({
 
         {/* No data state */}
         {!musicData ? (
-          <div className="bg-white shadow sm:rounded-lg px-6 py-10 text-center">
-            <p className="text-gray-600 mb-4">
-              Connect Spotify to get started. Your music data will appear here once synced.
-            </p>
-            <a
-              href="/profile"
-              className="inline-block px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-            >
-              Go to Profile
-            </a>
+          <div className="bg-gradient-to-br from-blue-50 to-indigo-50 shadow-lg sm:rounded-xl px-6 py-12 text-center border-2 border-blue-200">
+            <div className="max-w-md mx-auto">
+              {musicService ? (
+                <>
+                  <div className="mb-6">
+                    <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-100 rounded-full mb-4">
+                      <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                      </svg>
+                    </div>
+                    <h3 className="text-xl font-bold text-gray-900 mb-2">
+                      Ready to sync your music!
+                    </h3>
+                    <p className="text-gray-700 mb-6">
+                      You&apos;ve connected {musicService === "spotify" ? "Spotify" : "Last.fm"}.
+                      Now click the <span className="font-semibold">Refresh button</span> (top right)
+                      to fetch your music data.
+                    </p>
+                  </div>
+                  <div className="flex items-center justify-center gap-2 text-sm text-blue-700">
+                    <svg className="w-5 h-5 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                    </svg>
+                    <span className="font-medium">Look for the circular arrow icon above</span>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <h3 className="text-xl font-bold text-gray-900 mb-2">
+                    Connect your music service
+                  </h3>
+                  <p className="text-gray-600 mb-6">
+                    Connect Spotify or Last.fm to get started. Your music data will appear here once synced.
+                  </p>
+                  <a
+                    href="/profile"
+                    className="inline-block px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                  >
+                    Go to Profile
+                  </a>
+                </>
+              )}
+            </div>
           </div>
         ) : (
           <>

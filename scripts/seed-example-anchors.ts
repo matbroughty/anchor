@@ -6,7 +6,7 @@
  */
 
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
-import { DynamoDBDocumentClient, UpdateCommand } from "@aws-sdk/lib-dynamodb";
+import { DynamoDBDocumentClient, UpdateCommand, GetCommand } from "@aws-sdk/lib-dynamodb";
 import { randomUUID } from "crypto";
 
 // Load environment variables
@@ -290,18 +290,38 @@ const profile3 = {
 };
 
 async function seedProfile(profile: typeof profile1) {
-  const pk = `USER#${profile.userId}`;
+  // Check if handle already exists
+  const handleKey = `HANDLE#${profile.handle.toLowerCase()}`;
+  const existingHandle = await dynamoDocumentClient.send(
+    new GetCommand({
+      TableName: TABLE_NAME,
+      Key: { pk: handleKey, sk: handleKey },
+    })
+  );
+
+  let userId: string;
+  if (existingHandle.Item) {
+    // Handle exists - use existing userId and update profile
+    userId = existingHandle.Item.userId as string;
+    console.log(`Profile ${profile.handle} already exists, updating...`);
+  } else {
+    // New profile - use the generated userId
+    userId = profile.userId;
+    console.log(`Creating new profile: ${profile.handle}`);
+  }
+
+  const pk = `USER#${userId}`;
   const publishedAt = Date.now() - Math.random() * 7 * 24 * 60 * 60 * 1000; // Random time in last week
 
-  // Create user record using UpdateCommand
+  // Create/update user record using UpdateCommand
   await dynamoDocumentClient.send(
     new UpdateCommand({
       TableName: TABLE_NAME,
       Key: { pk, sk: pk },
       UpdateExpression:
-        "SET id = :id, handle = :handle, displayName = :displayName, email = :email, isPublic = :isPublic, publishedAt = :publishedAt, updatedAt = :updatedAt",
+        "SET id = :id, handle = :handle, displayName = :displayName, email = :email, isPublic = :isPublic, publishedAt = if_not_exists(publishedAt, :publishedAt), updatedAt = :updatedAt",
       ExpressionAttributeValues: {
-        ":id": profile.userId,
+        ":id": userId,
         ":handle": profile.handle,
         ":displayName": profile.displayName,
         ":email": profile.email,
@@ -322,7 +342,7 @@ async function seedProfile(profile: typeof profile1) {
       },
       UpdateExpression: "SET userId = :userId",
       ExpressionAttributeValues: {
-        ":userId": profile.userId,
+        ":userId": userId,
       },
     })
   );
@@ -419,10 +439,9 @@ async function seedProfile(profile: typeof profile1) {
     })
   );
 
-  console.log(`✓ Created profile: ${profile.handle} (${profile.displayName})`);
-  console.log(`  - User ID: ${profile.userId}`);
+  console.log(`✓ Seeded profile: ${profile.handle} (${profile.displayName})`);
+  console.log(`  - User ID: ${userId}`);
   console.log(`  - Published: true`);
-  console.log(`  - PublishedAt: ${publishedAt}`);
   console.log(`  - Artists: ${profile.artists.length}`);
   console.log(`  - Albums: ${profile.albums.length}`);
   console.log(`  - Tracks: ${profile.tracks.length}`);
