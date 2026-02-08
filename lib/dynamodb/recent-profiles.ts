@@ -27,18 +27,18 @@ export interface RecentProfile {
 export const getRecentProfiles = cache(
   async (limit: number = 10): Promise<RecentProfile[]> => {
     try {
-      // Scan for published users with handles
+      // Scan for all USER records (pk = sk pattern)
+      // Then filter in code for published profiles
       // Note: This is acceptable for low volume. For high traffic, consider:
       // - GSI with isPublic as partition key and createdAt as sort key
       // - Caching results in Redis or similar
       const result = await dynamoDocumentClient.send(
         new ScanCommand({
           TableName: TABLE_NAME,
-          FilterExpression: "isPublic = :true AND attribute_exists(handle) AND pk = sk",
+          FilterExpression: "pk = sk AND begins_with(pk, :userPrefix)",
           ExpressionAttributeValues: {
-            ":true": true,
+            ":userPrefix": "USER#",
           },
-          Limit: limit * 3, // Over-fetch to account for filtering
         })
       );
 
@@ -58,10 +58,16 @@ export const getRecentProfiles = cache(
         pk: item.pk,
       })));
 
+      // Filter for published profiles with handles
+      const publishedUsers = (result.Items || []).filter(
+        (item) => item.handle && item.isPublic === true
+      );
+
+      console.log("[getRecentProfiles] Published users after filtering:", publishedUsers.length);
+
       // Sort by publishedAt timestamp (most recent first)
       // Profiles without publishedAt still appear but are sorted last
-      const sortedUsers = (result.Items || [])
-        .filter((item) => item.handle) // Ensure handle exists
+      const sortedUsers = publishedUsers
         .sort((a, b) => {
           const publishedAtA = (a.publishedAt as number) || 0;
           const publishedAtB = (b.publishedAt as number) || 0;
