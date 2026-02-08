@@ -21,6 +21,9 @@ export const metadata: Metadata = {
   },
 };
 
+// Revalidate every 5 minutes to show new profiles
+export const revalidate = 300;
+
 export default function LandingPage() {
   return (
     <>

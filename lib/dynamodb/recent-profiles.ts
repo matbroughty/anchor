@@ -38,6 +38,15 @@ export const getRecentProfiles = cache(
         })
       );
 
+      console.log("[getRecentProfiles] Scan result:", {
+        count: result.Items?.length || 0,
+        items: result.Items?.map((item) => ({
+          handle: item.handle,
+          isPublic: item.isPublic,
+          publishedAt: item.publishedAt,
+        })),
+      });
+
       if (!result.Items || result.Items.length === 0) {
         return [];
       }

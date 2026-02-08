@@ -39,19 +39,19 @@ const profile1 = {
     {
       id: "slowdive-1",
       name: "Slowdive",
-      images: [{ url: "https://example.com/slowdive.jpg", width: 300, height: 300 }],
+      images: [],
       genres: ["shoegaze", "dream pop"],
     },
     {
       id: "phoebe-1",
       name: "Phoebe Bridgers",
-      images: [{ url: "https://example.com/phoebe.jpg", width: 300, height: 300 }],
+      images: [],
       genres: ["indie folk", "sad"],
     },
     {
       id: "beach-house-1",
       name: "Beach House",
-      images: [{ url: "https://example.com/beach.jpg", width: 300, height: 300 }],
+      images: [],
       genres: ["dream pop", "indie"],
     },
   ],
@@ -68,21 +68,21 @@ const profile1 = {
       id: "souvlaki-1",
       name: "Souvlaki",
       artists: [{ id: "slowdive-1", name: "Slowdive" }],
-      images: [{ url: "https://example.com/souvlaki.jpg", width: 300, height: 300 }],
+      images: [],
       albumType: "album",
     },
     {
       id: "punisher-1",
       name: "Punisher",
       artists: [{ id: "phoebe-1", name: "Phoebe Bridgers" }],
-      images: [{ url: "https://example.com/punisher.jpg", width: 300, height: 300 }],
+      images: [],
       albumType: "album",
     },
     {
       id: "teen-dream-1",
       name: "Teen Dream",
       artists: [{ id: "beach-house-1", name: "Beach House" }],
-      images: [{ url: "https://example.com/teen.jpg", width: 300, height: 300 }],
+      images: [],
       albumType: "album",
     },
   ],
@@ -125,25 +125,25 @@ const profile2 = {
     {
       id: "kendrick-1",
       name: "Kendrick Lamar",
-      images: [{ url: "https://example.com/kendrick.jpg", width: 300, height: 300 }],
+      images: [],
       genres: ["hip hop", "conscious hip hop"],
     },
     {
       id: "tyler-1",
       name: "Tyler, The Creator",
-      images: [{ url: "https://example.com/tyler.jpg", width: 300, height: 300 }],
+      images: [],
       genres: ["hip hop", "alternative"],
     },
     {
       id: "paak-1",
       name: "Anderson .Paak",
-      images: [{ url: "https://example.com/paak.jpg", width: 300, height: 300 }],
+      images: [],
       genres: ["r&b", "funk", "hip hop"],
     },
     {
       id: "sza-1",
       name: "SZA",
-      images: [{ url: "https://example.com/sza.jpg", width: 300, height: 300 }],
+      images: [],
       genres: ["r&b", "alternative r&b"],
     },
   ],
@@ -160,21 +160,21 @@ const profile2 = {
       id: "gkmc-1",
       name: "good kid, m.A.A.d city",
       artists: [{ id: "kendrick-1", name: "Kendrick Lamar" }],
-      images: [{ url: "https://example.com/gkmc.jpg", width: 300, height: 300 }],
+      images: [],
       albumType: "album",
     },
     {
       id: "cmiygl-1",
       name: "Call Me If You Get Lost",
       artists: [{ id: "tyler-1", name: "Tyler, The Creator" }],
-      images: [{ url: "https://example.com/cmiygl.jpg", width: 300, height: 300 }],
+      images: [],
       albumType: "album",
     },
     {
       id: "malibu-1",
       name: "Malibu",
       artists: [{ id: "paak-1", name: "Anderson .Paak" }],
-      images: [{ url: "https://example.com/malibu.jpg", width: 300, height: 300 }],
+      images: [],
       albumType: "album",
     },
   ],
@@ -217,19 +217,19 @@ const profile3 = {
     {
       id: "floyd-1",
       name: "Pink Floyd",
-      images: [{ url: "https://example.com/floyd.jpg", width: 300, height: 300 }],
+      images: [],
       genres: ["psychedelic rock", "progressive rock"],
     },
     {
       id: "tame-1",
       name: "Tame Impala",
-      images: [{ url: "https://example.com/tame.jpg", width: 300, height: 300 }],
+      images: [],
       genres: ["psychedelic rock", "neo-psychedelia"],
     },
     {
       id: "beatles-1",
       name: "The Beatles",
-      images: [{ url: "https://example.com/beatles.jpg", width: 300, height: 300 }],
+      images: [],
       genres: ["rock", "psychedelic rock"],
     },
   ],
@@ -246,21 +246,21 @@ const profile3 = {
       id: "dsotm-1",
       name: "The Dark Side of the Moon",
       artists: [{ id: "floyd-1", name: "Pink Floyd" }],
-      images: [{ url: "https://example.com/dsotm.jpg", width: 300, height: 300 }],
+      images: [],
       albumType: "album",
     },
     {
       id: "currents-1",
       name: "Currents",
       artists: [{ id: "tame-1", name: "Tame Impala" }],
-      images: [{ url: "https://example.com/currents.jpg", width: 300, height: 300 }],
+      images: [],
       albumType: "album",
     },
     {
       id: "abbey-1",
       name: "Abbey Road",
       artists: [{ id: "beatles-1", name: "The Beatles" }],
-      images: [{ url: "https://example.com/abbey.jpg", width: 300, height: 300 }],
+      images: [],
       albumType: "album",
     },
   ],
@@ -420,6 +420,13 @@ async function seedProfile(profile: typeof profile1) {
   );
 
   console.log(`✓ Created profile: ${profile.handle} (${profile.displayName})`);
+  console.log(`  - User ID: ${profile.userId}`);
+  console.log(`  - Published: true`);
+  console.log(`  - PublishedAt: ${publishedAt}`);
+  console.log(`  - Artists: ${profile.artists.length}`);
+  console.log(`  - Albums: ${profile.albums.length}`);
+  console.log(`  - Tracks: ${profile.tracks.length}`);
+  console.log(`  - Featured: ${profile.featuredArtists.length}`);
 }
 
 async function main() {
