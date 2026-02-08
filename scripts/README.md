@@ -25,6 +25,8 @@ Seeds the database with 3 example anchor profiles for the landing page.
 npx tsx scripts/seed-example-anchors.ts
 ```
 
+**Note:** If you've already run this script with the old version, you'll need to run it again to fix the data structure. The script will overwrite existing profiles with the correct schema.
+
 ### Environment
 
 Requires the following environment variables (from `.env.local`):
