@@ -275,12 +275,16 @@ export function DashboardClient({
               <h2 className="text-lg font-semibold text-gray-900 mb-4">Favourite Artists</h2>
               <p className="text-sm text-gray-600 mb-4">
                 Highlight up to 4 artists on your profile (optional).
-                These will appear above your top recent artists.
+                {musicService === "lastfm"
+                  ? " Select from your top artists."
+                  : " These will appear above your top recent artists."}
               </p>
               <FeaturedArtistsEditor
                 initialFeatured={featuredArtists}
                 onUpdate={setFeaturedArtists}
                 disabled={isPending}
+                allArtists={musicData?.artists || []}
+                musicService={musicService}
               />
             </div>
 
