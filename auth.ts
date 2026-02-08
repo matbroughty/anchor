@@ -35,7 +35,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       allowDangerousEmailAccountLinking: true,
     }),
     Resend({
-      from: "onboarding@resend.dev",
+      from: "Anchor <noreply@anchor.band>",
       apiKey: process.env.AUTH_RESEND_KEY,
     }),
     Spotify({
