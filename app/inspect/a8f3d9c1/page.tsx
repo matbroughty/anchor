@@ -9,6 +9,10 @@ import { userPK, MUSIC_SK } from "@/lib/dynamodb/schema";
  * Not linked anywhere - keep this URL private.
  */
 
+// Force dynamic rendering - don't prerender at build time
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 interface ProfileData {
   handle: string;
   displayName: string | null;
