@@ -4,12 +4,14 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { ProfileForm } from "@/app/components/ProfileForm";
 import { disconnectSpotify } from "@/app/actions/disconnect-spotify";
+import { connectLastfm, disconnectLastfm } from "@/app/actions/lastfm";
 
 interface Profile {
   handle: string;
   displayName: string | null;
   email: string | null;
   spotifyConnected: boolean;
+  lastfmUsername: string | null;
 }
 
 interface ProfilePageClientProps {
@@ -29,6 +31,14 @@ export default function ProfilePageClient({
   const [showDisconnectConfirm, setShowDisconnectConfirm] = useState(false);
   const [isDisconnecting, setIsDisconnecting] = useState(false);
   const [disconnectError, setDisconnectError] = useState<string | null>(null);
+
+  // Last.fm state
+  const [lastfmUsername, setLastfmUsername] = useState("");
+  const [isConnectingLastfm, setIsConnectingLastfm] = useState(false);
+  const [lastfmError, setLastfmError] = useState<string | null>(null);
+  const [showLastfmDisconnectConfirm, setShowLastfmDisconnectConfirm] = useState(false);
+  const [isDisconnectingLastfm, setIsDisconnectingLastfm] = useState(false);
+  const [lastfmDisconnectError, setLastfmDisconnectError] = useState<string | null>(null);
 
   const handleSave = async (displayName: string) => {
     const response = await fetch("/api/profile", {
@@ -50,11 +60,18 @@ export default function ProfilePageClient({
     setDeleteError(null);
 
     try {
-      // Optionally disconnect Spotify first
-      if (alsoDisconnectSpotify && profile.spotifyConnected) {
-        const disconnectResult = await disconnectSpotify();
-        if (!disconnectResult.success) {
-          throw new Error(disconnectResult.error || "Failed to disconnect Spotify");
+      // Optionally disconnect music service first
+      if (alsoDisconnectSpotify) {
+        if (profile.spotifyConnected) {
+          const disconnectResult = await disconnectSpotify();
+          if (!disconnectResult.success) {
+            throw new Error(disconnectResult.error || "Failed to disconnect Spotify");
+          }
+        } else if (profile.lastfmUsername) {
+          const disconnectResult = await disconnectLastfm();
+          if (!disconnectResult.success) {
+            throw new Error(disconnectResult.error || "Failed to disconnect Last.fm");
+          }
         }
       }
 
@@ -96,6 +113,48 @@ export default function ProfilePageClient({
     }
   };
 
+  const handleConnectLastfm = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsConnectingLastfm(true);
+    setLastfmError(null);
+
+    try {
+      const result = await connectLastfm(lastfmUsername);
+
+      if (!result.success) {
+        throw new Error(result.error || "Failed to connect Last.fm");
+      }
+
+      // Refresh page to show updated state
+      router.refresh();
+      setLastfmUsername("");
+    } catch (error) {
+      setLastfmError(error instanceof Error ? error.message : "Failed to connect Last.fm");
+    } finally {
+      setIsConnectingLastfm(false);
+    }
+  };
+
+  const handleDisconnectLastfm = async () => {
+    setIsDisconnectingLastfm(true);
+    setLastfmDisconnectError(null);
+
+    try {
+      const result = await disconnectLastfm();
+
+      if (!result.success) {
+        throw new Error(result.error || "Failed to disconnect Last.fm");
+      }
+
+      // Refresh page to show updated state
+      router.refresh();
+      setShowLastfmDisconnectConfirm(false);
+    } catch (error) {
+      setLastfmDisconnectError(error instanceof Error ? error.message : "Failed to disconnect Last.fm");
+      setIsDisconnectingLastfm(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-3xl mx-auto">
@@ -105,8 +164,8 @@ export default function ProfilePageClient({
               Your Profile
             </h1>
 
-            {/* Dashboard CTA if Spotify is connected */}
-            {profile.spotifyConnected && (
+            {/* Dashboard CTA if any music service is connected */}
+            {(profile.spotifyConnected || profile.lastfmUsername) && (
               <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
                 <div className="flex items-center justify-between">
                   <div>
@@ -114,7 +173,7 @@ export default function ProfilePageClient({
                       Ready to manage your music?
                     </h3>
                     <p className="mt-1 text-sm text-blue-700">
-                      Go to your dashboard to refresh Spotify data, edit content, and publish your page.
+                      Go to your dashboard to refresh music data, edit content, and publish your page.
                     </p>
                   </div>
                   <a
@@ -176,13 +235,90 @@ export default function ProfilePageClient({
                 <p className="mt-1 text-sm text-gray-900">{profile.email}</p>
               </div>
 
-              {/* Spotify Connection */}
+              {/* Music Data Connection */}
               <div>
-                <label className="block text-base font-semibold text-gray-900 mb-2">
-                  Spotify Connection
+                <label className="block text-base font-semibold text-gray-900 mb-3">
+                  Music Data Connection
                 </label>
-                {profile.spotifyConnected ? (
-                  <div className="flex items-center justify-between">
+
+                {/* Last.fm Connection */}
+                <div className="mb-4 p-4 border border-gray-200 rounded-lg">
+                  <div className="flex items-center justify-between mb-2">
+                    <h4 className="text-sm font-medium text-gray-900">Last.fm</h4>
+                    {profile.lastfmUsername && (
+                      <button
+                        type="button"
+                        onClick={() => setShowLastfmDisconnectConfirm(true)}
+                        className="text-xs text-red-600 hover:text-red-800 hover:underline"
+                      >
+                        Disconnect
+                      </button>
+                    )}
+                  </div>
+                  {profile.lastfmUsername ? (
+                    <div className="flex items-center">
+                      <svg
+                        className="h-5 w-5 text-green-500 mr-2"
+                        fill="currentColor"
+                        viewBox="0 0 20 20"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                      <span className="text-sm text-green-700">
+                        Connected as {profile.lastfmUsername}
+                      </span>
+                    </div>
+                  ) : (
+                    <>
+                      <form onSubmit={handleConnectLastfm} className="space-y-2">
+                        <input
+                          type="text"
+                          value={lastfmUsername}
+                          onChange={(e) => setLastfmUsername(e.target.value)}
+                          placeholder="Enter your Last.fm username"
+                          required
+                          disabled={isConnectingLastfm}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent disabled:opacity-50"
+                        />
+                        <button
+                          type="submit"
+                          disabled={isConnectingLastfm}
+                          className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50"
+                        >
+                          {isConnectingLastfm ? "Connecting..." : "Connect Last.fm"}
+                        </button>
+                      </form>
+                      {lastfmError && (
+                        <p className="mt-2 text-xs text-red-600">{lastfmError}</p>
+                      )}
+                    </>
+                  )}
+                  <p className="mt-2 text-xs text-gray-500">
+                    {profile.lastfmUsername
+                      ? "Disconnecting will remove all your music data and unpublish your page"
+                      : "Open API - No approval needed. Fetches your top artists, albums, and tracks"}
+                  </p>
+                </div>
+
+                {/* Spotify Connection */}
+                <div className="p-4 border border-gray-200 rounded-lg">
+                  <div className="flex items-center justify-between mb-2">
+                    <h4 className="text-sm font-medium text-gray-900">Spotify</h4>
+                    {profile.spotifyConnected && (
+                      <button
+                        type="button"
+                        onClick={() => setShowDisconnectConfirm(true)}
+                        className="text-xs text-red-600 hover:text-red-800 hover:underline"
+                      >
+                        Disconnect
+                      </button>
+                    )}
+                  </div>
+                  {profile.spotifyConnected ? (
                     <div className="flex items-center">
                       <svg
                         className="h-5 w-5 text-green-500 mr-2"
@@ -197,29 +333,36 @@ export default function ProfilePageClient({
                       </svg>
                       <span className="text-sm text-green-700">Connected</span>
                     </div>
-                    <button
-                      type="button"
-                      onClick={() => setShowDisconnectConfirm(true)}
-                      className="text-xs text-red-600 hover:text-red-800 hover:underline"
-                    >
-                      Disconnect
-                    </button>
-                  </div>
-                ) : (
-                  <form action={spotifyAction}>
-                    <button
-                      type="submit"
-                      className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
-                    >
-                      Connect Spotify
-                    </button>
-                  </form>
-                )}
-                <p className="mt-1 text-xs text-gray-500">
-                  {profile.spotifyConnected
-                    ? "Disconnecting will remove all your music data and unpublish your page"
-                    : "Connect to fetch your top artists, albums, and tracks"}
-                </p>
+                  ) : (
+                    <>
+                      <form action={spotifyAction}>
+                        <button
+                          type="submit"
+                          className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+                        >
+                          Connect Spotify
+                        </button>
+                      </form>
+                      <div className="mt-2 p-3 bg-amber-50 border border-amber-200 rounded">
+                        <p className="text-xs text-amber-800">
+                          <strong>Note:</strong> Due to Spotify API limitations, you must contact{" "}
+                          <a
+                            href="mailto:hello@anchor.band"
+                            className="underline hover:text-amber-900"
+                          >
+                            hello@anchor.band
+                          </a>{" "}
+                          to be added to our approved user list (limited to 25 users). We recommend using Last.fm instead.
+                        </p>
+                      </div>
+                    </>
+                  )}
+                  <p className="mt-2 text-xs text-gray-500">
+                    {profile.spotifyConnected
+                      ? "Disconnecting will remove all your music data and unpublish your page"
+                      : "Requires manual approval - Contact us first"}
+                  </p>
+                </div>
               </div>
             </div>
           </div>
@@ -275,6 +418,55 @@ export default function ProfilePageClient({
         </div>
       )}
 
+      {/* Disconnect Last.fm Confirmation Dialog */}
+      {showLastfmDisconnectConfirm && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-lg max-w-md w-full p-6">
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">
+              Disconnect Last.fm?
+            </h3>
+            <p className="text-sm text-gray-600 mb-4">
+              This will permanently delete:
+            </p>
+            <ul className="text-sm text-gray-600 mb-4 list-disc list-inside space-y-1">
+              <li>Your Last.fm connection</li>
+              <li>All music data (artists, albums, tracks)</li>
+              <li>AI-generated bio and captions</li>
+              <li>Your page will be unpublished</li>
+            </ul>
+            <p className="text-sm text-gray-600 mb-4">
+              You can reconnect Last.fm later, but you&apos;ll need to regenerate all content.
+            </p>
+            {lastfmDisconnectError && (
+              <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded text-sm text-red-800">
+                {lastfmDisconnectError}
+              </div>
+            )}
+            <div className="flex gap-3 justify-end">
+              <button
+                type="button"
+                onClick={() => {
+                  setShowLastfmDisconnectConfirm(false);
+                  setLastfmDisconnectError(null);
+                }}
+                disabled={isDisconnectingLastfm}
+                className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleDisconnectLastfm}
+                disabled={isDisconnectingLastfm}
+                className="px-4 py-2 text-sm font-medium text-white bg-red-600 border border-transparent rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50"
+              >
+                {isDisconnectingLastfm ? "Disconnecting..." : "Disconnect Last.fm"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Delete Handle Confirmation Dialog */}
       {showDeleteConfirm && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
@@ -285,7 +477,7 @@ export default function ProfilePageClient({
             <p className="text-sm text-gray-600 mb-4">
               This will permanently delete your handle <strong>{profile.handle}</strong> and unpublish your page. You&apos;ll be able to claim a new handle, but this one will become available for others to claim.
             </p>
-            {profile.spotifyConnected && (
+            {(profile.spotifyConnected || profile.lastfmUsername) && (
               <div className="mb-4">
                 <label className="flex items-start gap-2 text-sm text-gray-600 cursor-pointer">
                   <input
@@ -295,7 +487,7 @@ export default function ProfilePageClient({
                     className="mt-0.5"
                   />
                   <span>
-                    Also disconnect Spotify (this will delete all music data and content)
+                    Also disconnect {profile.spotifyConnected ? "Spotify" : "Last.fm"} (this will delete all music data and content)
                   </span>
                 </label>
               </div>

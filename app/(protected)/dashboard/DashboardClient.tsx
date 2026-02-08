@@ -10,6 +10,7 @@ import { AgeGuess } from "@/app/components/AgeGuess";
 import { RefreshButton } from "@/app/components/RefreshButton";
 import { PublishToggle } from "@/app/components/PublishToggle";
 import { refreshSpotifyData } from "@/app/actions/spotify";
+import { refreshLastfmUserData } from "@/app/actions/lastfm";
 import { generateBio, generateAlbumCaptions, regenerateBio, regenerateCaption } from "@/app/actions/ai-content";
 import type { MusicData, Artist } from "@/types/music";
 import type { ContentData, Bio, Caption, TasteAnalysis as TasteAnalysisType, AgeGuess as AgeGuessType } from "@/types/content";
@@ -27,6 +28,7 @@ interface DashboardClientProps {
   userId: string;
   handle: string | null;
   isPublished: boolean;
+  musicService: "spotify" | "lastfm" | null;
 }
 
 // ---------------------------------------------------------------------------
@@ -41,6 +43,7 @@ export function DashboardClient({
   initialAgeGuess,
   handle,
   isPublished: initialIsPublished,
+  musicService,
 }: DashboardClientProps) {
   const [musicData, setMusicData] = useState<MusicData | null>(initialMusicData);
   const [content, setContent] = useState<ContentData>(initialContent);
@@ -53,22 +56,35 @@ export function DashboardClient({
   // -----------------------------------------------------------------------
   const handleRefresh = async () => {
     startTransition(async () => {
-      const result = await refreshSpotifyData();
-      if (result.data) {
-        setMusicData(result.data);
-        // After fresh music data arrives, kick off content generation if
-        // the user has never had content generated before.
-        if (!content.bio) {
-          const bioResult = await generateBio();
-          if (bioResult.bio) {
-            setContent((prev) => ({ ...prev, bio: bioResult.bio }));
+      // Call appropriate refresh action based on connected service
+      if (musicService === "spotify") {
+        const result = await refreshSpotifyData();
+        if (result.data) {
+          setMusicData(result.data);
+          // After fresh music data arrives, kick off content generation if
+          // the user has never had content generated before.
+          if (!content.bio) {
+            const bioResult = await generateBio();
+            if (bioResult.bio) {
+              setContent((prev) => ({ ...prev, bio: bioResult.bio }));
+            }
+          }
+          if (content.captions.length === 0) {
+            const captionsResult = await generateAlbumCaptions();
+            if (captionsResult.captions.length > 0) {
+              setContent((prev) => ({ ...prev, captions: captionsResult.captions }));
+            }
           }
         }
-        if (content.captions.length === 0) {
-          const captionsResult = await generateAlbumCaptions();
-          if (captionsResult.captions.length > 0) {
-            setContent((prev) => ({ ...prev, captions: captionsResult.captions }));
-          }
+      } else if (musicService === "lastfm") {
+        const result = await refreshLastfmUserData();
+        // For Last.fm, we need to fetch the music data after refresh
+        // since refreshLastfmUserData doesn't return it
+        if (result.success) {
+          // The data will be available on next page load
+          // For now, trigger a page refresh
+          window.location.reload();
+          return;
         }
       }
     });

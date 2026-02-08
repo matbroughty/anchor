@@ -15,22 +15,41 @@ import { DashboardClient } from "./DashboardClient";
 interface UserStatus {
   handle: string | null;
   isPublic: boolean;
+  musicService: "spotify" | "lastfm" | null;
 }
 
 async function getUserStatus(userId: string): Promise<UserStatus> {
   const pk = userPK(userId);
 
-  const result = await dynamoDocumentClient.send(
+  // Get user record
+  const userResult = await dynamoDocumentClient.send(
     new GetCommand({
       TableName: TABLE_NAME,
       Key: { pk, sk: pk },
-      ProjectionExpression: "handle, isPublic",
+      ProjectionExpression: "handle, isPublic, lastfmUsername",
     })
   );
 
+  // Check for Spotify connection
+  const spotifyResult = await dynamoDocumentClient.send(
+    new GetCommand({
+      TableName: TABLE_NAME,
+      Key: { pk, sk: "SPOTIFY" },
+    })
+  );
+
+  // Determine which service is connected
+  let musicService: "spotify" | "lastfm" | null = null;
+  if (spotifyResult.Item) {
+    musicService = "spotify";
+  } else if (userResult.Item?.lastfmUsername) {
+    musicService = "lastfm";
+  }
+
   return {
-    handle: (result.Item?.handle as string) ?? null,
-    isPublic: result.Item?.isPublic === true,
+    handle: (userResult.Item?.handle as string) ?? null,
+    isPublic: userResult.Item?.isPublic === true,
+    musicService,
   };
 }
 
@@ -72,6 +91,7 @@ export default async function DashboardPage() {
       userId={userId}
       handle={userStatus.handle}
       isPublished={userStatus.isPublic}
+      musicService={userStatus.musicService}
     />
   );
 }

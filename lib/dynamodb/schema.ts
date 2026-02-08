@@ -9,6 +9,7 @@
  * - handle: string (the user's claimed handle)
  * - displayName: string | null (user's display name)
  * - isPublic: boolean (default false, controls public page visibility)
+ * - lastfmUsername: string | null (Last.fm username if connected)
  * - updatedAt: string (ISO timestamp of last update)
  */
 export const MUSIC_SK = {
