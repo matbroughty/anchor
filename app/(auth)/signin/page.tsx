@@ -66,35 +66,24 @@ export default function SignInPage() {
           </div>
         </div>
 
-        {/* Magic Link Email - Disabled temporarily */}
-        <div className="relative group">
-          <form onSubmit={(e) => e.preventDefault()} className="space-y-3 opacity-50 pointer-events-none">
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="Enter your email"
-              disabled
-              className="w-full px-4 py-3 border border-slate-300 rounded-lg bg-slate-50 cursor-not-allowed"
-            />
-            <button
-              type="submit"
-              disabled
-              className="w-full px-4 py-3 bg-blue-600 text-white rounded-lg font-medium cursor-not-allowed"
-            >
-              Send Magic Link
-            </button>
-          </form>
-          {/* Coming Soon Tooltip */}
-          <div className="absolute inset-0 flex items-center justify-center pointer-events-auto cursor-not-allowed">
-            <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10">
-              <div className="bg-slate-900 text-white text-sm px-3 py-2 rounded-lg shadow-lg whitespace-nowrap">
-                Coming Soon
-                <div className="absolute top-full left-1/2 -translate-x-1/2 -mt-1 border-4 border-transparent border-t-slate-900"></div>
-              </div>
-            </div>
-          </div>
-        </div>
+        {/* Magic Link Email */}
+        <form onSubmit={handleMagicLink} className="space-y-3">
+          <input
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="Enter your email"
+            required
+            className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          />
+          <button
+            type="submit"
+            disabled={isLoading}
+            className="w-full px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {isLoading ? "Sending..." : "Send Magic Link"}
+          </button>
+        </form>
 
         <p className="text-xs text-slate-400 text-center mt-6">
           You&apos;ll connect Spotify after creating your account.
