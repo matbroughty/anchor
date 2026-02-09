@@ -15,7 +15,7 @@ import { DashboardClient } from "./DashboardClient";
 interface UserStatus {
   handle: string | null;
   isPublic: boolean;
-  musicService: "spotify" | "lastfm" | null;
+  musicService: "spotify" | "lastfm" | "manual" | null;
 }
 
 async function getUserStatus(userId: string): Promise<UserStatus> {
@@ -26,7 +26,7 @@ async function getUserStatus(userId: string): Promise<UserStatus> {
     new GetCommand({
       TableName: TABLE_NAME,
       Key: { pk, sk: pk },
-      ProjectionExpression: "handle, isPublic, lastfmUsername",
+      ProjectionExpression: "handle, isPublic, lastfmUsername, manualCuration",
     })
   );
 
@@ -39,11 +39,13 @@ async function getUserStatus(userId: string): Promise<UserStatus> {
   );
 
   // Determine which service is connected
-  let musicService: "spotify" | "lastfm" | null = null;
+  let musicService: "spotify" | "lastfm" | "manual" | null = null;
   if (spotifyResult.Item) {
     musicService = "spotify";
   } else if (userResult.Item?.lastfmUsername) {
     musicService = "lastfm";
+  } else if (userResult.Item?.manualCuration) {
+    musicService = "manual";
   }
 
   return {

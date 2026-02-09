@@ -18,6 +18,7 @@ export interface Artist {
   external_urls?: {
     spotify?: string;
     lastfm?: string;
+    applemusic?: string;
   };
 }
 
@@ -46,6 +47,7 @@ export interface Track {
   external_urls?: {
     spotify?: string;
     lastfm?: string;
+    applemusic?: string;
   };
 }
 
@@ -63,6 +65,7 @@ export interface Album {
   external_urls?: {
     spotify?: string;
     lastfm?: string;
+    applemusic?: string;
   };
 }
 

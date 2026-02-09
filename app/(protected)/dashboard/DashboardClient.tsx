@@ -28,7 +28,7 @@ interface DashboardClientProps {
   userId: string;
   handle: string | null;
   isPublished: boolean;
-  musicService: "spotify" | "lastfm" | null;
+  musicService: "spotify" | "lastfm" | "manual" | null;
 }
 
 // ---------------------------------------------------------------------------
@@ -139,18 +139,25 @@ export function DashboardClient({
             <h1 className="text-2xl font-bold text-gray-900">Your Music Profile</h1>
             {musicService && (
               <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
-                {musicService === "spotify" ? "Spotify" : "Last.fm"}
+                {musicService === "spotify" ? "Spotify" : musicService === "lastfm" ? "Last.fm" : "Self-Curated"}
               </span>
             )}
           </div>
-          <div className={!musicData && musicService ? "relative" : ""}>
-            {!musicData && musicService && (
+          <div className={!musicData && musicService && musicService !== "manual" ? "relative" : ""}>
+            {!musicData && musicService && musicService !== "manual" && (
               <div className="absolute -inset-2 bg-blue-400 rounded-lg opacity-75 animate-pulse"></div>
             )}
             <div className="relative">
-              {musicService && (
+              {musicService === "manual" ? (
+                <a
+                  href="/curate"
+                  className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                >
+                  Edit Curation
+                </a>
+              ) : musicService ? (
                 <RefreshButton onRefresh={handleRefresh} disabled={isPending} />
-              )}
+              ) : null}
             </div>
           </div>
         </div>
@@ -238,9 +245,17 @@ export function DashboardClient({
                       Ready to sync your music!
                     </h3>
                     <p className="text-gray-700 mb-6">
-                      You&apos;ve connected {musicService === "spotify" ? "Spotify" : "Last.fm"}.
-                      Now click the <span className="font-semibold">Refresh button</span> (top right)
-                      to fetch your music data.
+                      You&apos;ve connected {musicService === "spotify" ? "Spotify" : musicService === "lastfm" ? "Last.fm" : "manual curation"}.
+                      {musicService === "manual" ? (
+                        <>
+                          Visit your <a href="/profile" className="font-semibold text-blue-600 hover:text-blue-700">profile page</a> and click &quot;Curate Your Anchor&quot; to select your music.
+                        </>
+                      ) : (
+                        <>
+                          Now click the <span className="font-semibold">Refresh button</span> (top right)
+                          to fetch your music data.
+                        </>
+                      )}
                     </p>
                   </div>
                   <div className="flex items-center justify-center gap-2 text-sm text-blue-700">
@@ -256,7 +271,7 @@ export function DashboardClient({
                     Connect your music service
                   </h3>
                   <p className="text-gray-600 mb-6">
-                    Connect Spotify or Last.fm to get started. Your music data will appear here once synced.
+                    Connect Spotify, Last.fm, or curate your own anchor to get started. Your music data will appear here once synced.
                   </p>
                   <a
                     href="/profile"
@@ -275,7 +290,7 @@ export function DashboardClient({
               <h2 className="text-lg font-semibold text-gray-900 mb-4">Favourite Artists</h2>
               <p className="text-sm text-gray-600 mb-4">
                 Highlight up to 4 artists on your profile (optional).
-                {musicService === "lastfm"
+                {musicService === "lastfm" || musicService === "manual"
                   ? " Select from your top artists."
                   : " These will appear above your top recent artists."}
               </p>

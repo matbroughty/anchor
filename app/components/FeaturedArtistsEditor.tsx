@@ -14,7 +14,7 @@ interface FeaturedArtistsEditorProps {
   onUpdate: (artists: Artist[]) => void;
   disabled?: boolean;
   allArtists?: Artist[]; // For Last.fm users - their full artist list
-  musicService?: "spotify" | "lastfm" | null;
+  musicService?: "spotify" | "lastfm" | "manual" | null;
 }
 
 // ---------------------------------------------------------------------------

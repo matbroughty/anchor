@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { ProfileForm } from "@/app/components/ProfileForm";
 import { disconnectSpotify } from "@/app/actions/disconnect-spotify";
 import { connectLastfm, disconnectLastfm } from "@/app/actions/lastfm";
+import { disconnectManualCuration } from "@/app/actions/manual-curation";
 
 interface Profile {
   handle: string;
@@ -12,6 +13,7 @@ interface Profile {
   email: string | null;
   spotifyConnected: boolean;
   lastfmUsername: string | null;
+  manualCuration: boolean;
 }
 
 interface ProfilePageClientProps {
@@ -41,6 +43,12 @@ export default function ProfilePageClient({
   const [showLastfmDisconnectConfirm, setShowLastfmDisconnectConfirm] = useState(false);
   const [isDisconnectingLastfm, setIsDisconnectingLastfm] = useState(false);
   const [lastfmDisconnectError, setLastfmDisconnectError] = useState<string | null>(null);
+
+  // Manual curation state
+  const [showManualDisconnectConfirm, setShowManualDisconnectConfirm] = useState(false);
+  const [isDisconnectingManual, setIsDisconnectingManual] = useState(false);
+  const [manualDisconnectError, setManualDisconnectError] = useState<string | null>(null);
+
   const [showOAuthError, setShowOAuthError] = useState(!!oauthError);
 
   // Get user-friendly error message based on OAuth error code
@@ -95,6 +103,11 @@ export default function ProfilePageClient({
           const disconnectResult = await disconnectLastfm();
           if (!disconnectResult.success) {
             throw new Error(disconnectResult.error || "Failed to disconnect Last.fm");
+          }
+        } else if (profile.manualCuration) {
+          const disconnectResult = await disconnectManualCuration();
+          if (!disconnectResult.success) {
+            throw new Error(disconnectResult.error || "Failed to disconnect manual curation");
           }
         }
       }
@@ -179,6 +192,26 @@ export default function ProfilePageClient({
     }
   };
 
+  const handleDisconnectManual = async () => {
+    setIsDisconnectingManual(true);
+    setManualDisconnectError(null);
+
+    try {
+      const result = await disconnectManualCuration();
+
+      if (!result.success) {
+        throw new Error(result.error || "Failed to disconnect manual curation");
+      }
+
+      // Refresh page to show updated state
+      router.refresh();
+      setShowManualDisconnectConfirm(false);
+    } catch (error) {
+      setManualDisconnectError(error instanceof Error ? error.message : "Failed to disconnect manual curation");
+      setIsDisconnectingManual(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-3xl mx-auto">
@@ -234,7 +267,7 @@ export default function ProfilePageClient({
             </h1>
 
             {/* Dashboard CTA if any music service is connected */}
-            {(profile.spotifyConnected || profile.lastfmUsername) && (
+            {(profile.spotifyConnected || profile.lastfmUsername || profile.manualCuration) && (
               <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
                 <div className="flex items-center justify-between">
                   <div>
@@ -362,7 +395,7 @@ export default function ProfilePageClient({
                         />
                         <button
                           type="submit"
-                          disabled={isConnectingLastfm || profile.spotifyConnected}
+                          disabled={isConnectingLastfm || profile.spotifyConnected || profile.manualCuration}
                           className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50 disabled:bg-gray-400"
                         >
                           {isConnectingLastfm ? "Connecting..." : "Connect Last.fm"}
@@ -371,9 +404,9 @@ export default function ProfilePageClient({
                       {lastfmError && (
                         <p className="mt-2 text-xs text-red-600">{lastfmError}</p>
                       )}
-                      {profile.spotifyConnected && (
+                      {(profile.spotifyConnected || profile.manualCuration) && (
                         <p className="mt-2 text-xs text-amber-600">
-                          Disconnect Spotify first to use Last.fm
+                          Disconnect {profile.spotifyConnected ? "Spotify" : "manual curation"} first to use Last.fm
                         </p>
                       )}
                     </>
@@ -426,15 +459,15 @@ export default function ProfilePageClient({
                       <form action={spotifyAction}>
                         <button
                           type="submit"
-                          disabled={!!profile.lastfmUsername}
+                          disabled={!!profile.lastfmUsername || profile.manualCuration}
                           className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50 disabled:bg-gray-400"
                         >
                           Connect Spotify
                         </button>
                       </form>
-                      {profile.lastfmUsername && (
+                      {(profile.lastfmUsername || profile.manualCuration) && (
                         <p className="mt-2 text-xs text-amber-600">
-                          Disconnect Last.fm first to use Spotify
+                          Disconnect {profile.lastfmUsername ? "Last.fm" : "manual curation"} first to use Spotify
                         </p>
                       )}
                       {!profile.lastfmUsername && (
@@ -457,6 +490,76 @@ export default function ProfilePageClient({
                     {profile.spotifyConnected
                       ? "Disconnecting will remove all your music data and unpublish your page"
                       : "Requires manual approval - Contact us first"}
+                  </p>
+                </div>
+
+                {/* Manual Curation */}
+                <div className="mt-4 p-4 border border-gray-200 rounded-lg bg-gray-50">
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-2">
+                      <h4 className="text-sm font-medium text-gray-900">Self-Curate</h4>
+                      {profile.manualCuration && (
+                        <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800">
+                          Active
+                        </span>
+                      )}
+                    </div>
+                    {profile.manualCuration && (
+                      <button
+                        type="button"
+                        onClick={() => setShowManualDisconnectConfirm(true)}
+                        className="text-xs text-red-600 hover:text-red-800 hover:underline"
+                      >
+                        Disconnect
+                      </button>
+                    )}
+                  </div>
+                  {profile.manualCuration ? (
+                    <>
+                      <div className="flex items-center mb-2">
+                        <svg
+                          className="h-5 w-5 text-green-500 mr-2"
+                          fill="currentColor"
+                          viewBox="0 0 20 20"
+                        >
+                          <path
+                            fillRule="evenodd"
+                            d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                            clipRule="evenodd"
+                          />
+                        </svg>
+                        <span className="text-sm text-green-700">Active</span>
+                      </div>
+                      <a
+                        href="/curate"
+                        className="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                      >
+                        Edit Curation
+                      </a>
+                    </>
+                  ) : (
+                    <>
+                      <a
+                        href="/curate"
+                        className={`inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 ${
+                          profile.spotifyConnected || profile.lastfmUsername
+                            ? "opacity-50 cursor-not-allowed pointer-events-none"
+                            : ""
+                        }`}
+                      >
+                        Curate Your Anchor
+                      </a>
+                      {(profile.spotifyConnected || profile.lastfmUsername) && (
+                        <p className="mt-2 text-xs text-amber-600">
+                          Disconnect {profile.spotifyConnected ? "Spotify" : "Last.fm"} first to use manual curation
+                        </p>
+                      )}
+                    </>
+                  )}
+                  <p className="mt-2 text-xs text-gray-500">
+                    {profile.manualCuration
+                      ? "Disconnecting will remove all your music data and unpublish your page"
+                      : "Manually select your favorite artists, albums, and tracks. No account connection required."}
                   </p>
                 </div>
               </div>
@@ -563,6 +666,55 @@ export default function ProfilePageClient({
         </div>
       )}
 
+      {/* Disconnect Manual Curation Confirmation Dialog */}
+      {showManualDisconnectConfirm && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-lg max-w-md w-full p-6">
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">
+              Disconnect Manual Curation?
+            </h3>
+            <p className="text-sm text-gray-600 mb-4">
+              This will permanently delete:
+            </p>
+            <ul className="text-sm text-gray-600 mb-4 list-disc list-inside space-y-1">
+              <li>Your manually curated music data</li>
+              <li>All music data (artists, albums, tracks)</li>
+              <li>AI-generated bio and captions</li>
+              <li>Your page will be unpublished</li>
+            </ul>
+            <p className="text-sm text-gray-600 mb-4">
+              You can curate your anchor again later, but you&apos;ll need to reselect all your music and regenerate all content.
+            </p>
+            {manualDisconnectError && (
+              <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded text-sm text-red-800">
+                {manualDisconnectError}
+              </div>
+            )}
+            <div className="flex gap-3 justify-end">
+              <button
+                type="button"
+                onClick={() => {
+                  setShowManualDisconnectConfirm(false);
+                  setManualDisconnectError(null);
+                }}
+                disabled={isDisconnectingManual}
+                className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleDisconnectManual}
+                disabled={isDisconnectingManual}
+                className="px-4 py-2 text-sm font-medium text-white bg-red-600 border border-transparent rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50"
+              >
+                {isDisconnectingManual ? "Disconnecting..." : "Disconnect Manual Curation"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Delete Handle Confirmation Dialog */}
       {showDeleteConfirm && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
@@ -573,7 +725,7 @@ export default function ProfilePageClient({
             <p className="text-sm text-gray-600 mb-4">
               This will permanently delete your handle <strong>{profile.handle}</strong> and unpublish your page. You&apos;ll be able to claim a new handle, but this one will become available for others to claim.
             </p>
-            {(profile.spotifyConnected || profile.lastfmUsername) && (
+            {(profile.spotifyConnected || profile.lastfmUsername || profile.manualCuration) && (
               <div className="mb-4">
                 <label className="flex items-start gap-2 text-sm text-gray-600 cursor-pointer">
                   <input
@@ -583,7 +735,7 @@ export default function ProfilePageClient({
                     className="mt-0.5"
                   />
                   <span>
-                    Also disconnect {profile.spotifyConnected ? "Spotify" : "Last.fm"} (this will delete all music data and content)
+                    Also disconnect {profile.spotifyConnected ? "Spotify" : profile.lastfmUsername ? "Last.fm" : "manual curation"} (this will delete all music data and content)
                   </span>
                 </label>
               </div>

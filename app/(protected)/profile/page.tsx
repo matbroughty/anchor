@@ -39,6 +39,7 @@ async function getProfile(userId: string) {
     email: result.Item.email || null,
     spotifyConnected: !!spotifyResult.Item,
     lastfmUsername: result.Item.lastfmUsername || null,
+    manualCuration: result.Item.manualCuration || false,
   };
 }
 

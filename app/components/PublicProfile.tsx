@@ -47,7 +47,7 @@ function spotifyUrl(id: string, type: 'artist' | 'album' | 'track'): string {
  * Falls back to Spotify URL if no external_urls provided.
  */
 function getExternalUrl(
-  item: { id: string; external_urls?: { spotify?: string; lastfm?: string } },
+  item: { id: string; external_urls?: { spotify?: string; lastfm?: string; applemusic?: string } },
   type: 'artist' | 'album' | 'track'
 ): string {
   // If Last.fm URL exists, use it
@@ -57,6 +57,10 @@ function getExternalUrl(
   // If Spotify URL exists, use it
   if (item.external_urls?.spotify) {
     return item.external_urls.spotify;
+  }
+  // If Apple Music URL exists, use it
+  if (item.external_urls?.applemusic) {
+    return item.external_urls.applemusic;
   }
   // Fallback to constructing Spotify URL from ID
   return spotifyUrl(item.id, type);
@@ -90,7 +94,11 @@ export function PublicProfile({
     artists.some((a) => a.external_urls?.lastfm) ||
     albums.some((a) => a.external_urls?.lastfm) ||
     tracks.some((t) => t.external_urls?.lastfm);
-  const musicService = hasLastfmData ? "lastfm" : "spotify";
+  const hasAppleMusicData =
+    artists.some((a) => a.external_urls?.applemusic) ||
+    albums.some((a) => a.external_urls?.applemusic) ||
+    tracks.some((t) => t.external_urls?.applemusic);
+  const musicService = hasLastfmData ? "lastfm" : hasAppleMusicData ? "manual" : "spotify";
 
   // Construct profile URL (only available for Last.fm)
   const profileUrl = musicService === "lastfm" && lastfmUsername
@@ -239,7 +247,7 @@ export function PublicProfile({
                       </p>
                     </div>
                   </>
-                ) : (
+                ) : musicService === "lastfm" ? (
                   <>
                     <svg className="w-5 h-5 text-red-500" viewBox="0 0 24 24" fill="currentColor">
                       <path d="M10.584 17.21l-.88-2.392s-1.43 1.594-3.573 1.594c-1.897 0-3.244-1.649-3.244-4.288 0-3.382 2.135-4.583 3.4-4.583 2.296 0 3.199 1.595 3.199 1.595l.88-2.392s-1.594-1.438-4.02-1.438c-3.267 0-6.078 2.544-6.078 6.693 0 4.288 2.544 6.693 5.811 6.693 2.471 0 4.504-1.382 4.504-1.382zM24 6.005V18.75h-2.694v-4.78H17.89v4.78h-2.695V6.005h2.695v4.933h3.415V6.005H24z"/>
@@ -250,6 +258,20 @@ export function PublicProfile({
                       </p>
                       <p className="text-xs text-neutral-500 dark:text-neutral-500">
                         Music data from Last.fm scrobble history
+                      </p>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <svg className="w-5 h-5 text-blue-500" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
+                    </svg>
+                    <div>
+                      <p className="text-sm font-medium text-neutral-900 dark:text-neutral-100">
+                        Self-Curated Musical Anchor
+                      </p>
+                      <p className="text-xs text-neutral-500 dark:text-neutral-500">
+                        Manually curated favorite artists, albums, and tracks
                       </p>
                     </div>
                   </>

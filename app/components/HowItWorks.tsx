@@ -16,7 +16,7 @@ export function HowItWorks() {
               1
             </span>
             <p className="text-lg text-neutral-900 pt-0.5">
-              Connect Last.fm or Spotify
+              Connect Spotify, Last.fm, or curate your own
             </p>
           </li>
 
