@@ -12,6 +12,7 @@ export interface RecentProfile {
   publishedAt: number | null;
   topArtists: string[]; // Up to 3 artist names
   recentTracks: string[]; // Up to 2 track titles
+  albumArtwork: string | null; // First album cover image URL
 }
 
 /**
@@ -103,10 +104,11 @@ export const getRecentProfiles = cache(
 
       const musicKeys = userIds.flatMap((userId) => [
         { pk: userPK(userId), sk: MUSIC_SK.ARTISTS },
+        { pk: userPK(userId), sk: MUSIC_SK.ALBUMS },
         { pk: userPK(userId), sk: MUSIC_SK.TRACKS },
       ]);
 
-      let musicDataMap = new Map<string, { artists?: any[]; tracks?: any[] }>();
+      let musicDataMap = new Map<string, { artists?: any[]; albums?: any[]; tracks?: any[] }>();
 
       if (musicKeys.length > 0) {
         try {
@@ -139,6 +141,9 @@ export const getRecentProfiles = cache(
             if (sk === MUSIC_SK.ARTISTS) {
               userMusic.artists = item.data as any[];
               console.log(`[getRecentProfiles] Found ${userMusic.artists?.length || 0} artists for ${userId}`);
+            } else if (sk === MUSIC_SK.ALBUMS) {
+              userMusic.albums = item.data as any[];
+              console.log(`[getRecentProfiles] Found ${userMusic.albums?.length || 0} albums for ${userId}`);
             } else if (sk === MUSIC_SK.TRACKS) {
               userMusic.tracks = item.data as any[];
               console.log(`[getRecentProfiles] Found ${userMusic.tracks?.length || 0} tracks for ${userId}`);
@@ -157,12 +162,25 @@ export const getRecentProfiles = cache(
         const userId = pk.replace("USER#", "");
         const musicData = musicDataMap.get(userId);
 
+        // Get first album artwork (preferring ~300px width)
+        let albumArtwork: string | null = null;
+        if (musicData?.albums && musicData.albums.length > 0) {
+          const firstAlbum = musicData.albums[0];
+          if (firstAlbum.images && firstAlbum.images.length > 0) {
+            // Find image closest to 300px width, or just use first
+            const images = firstAlbum.images;
+            const preferred = images.find((img: any) => img.width >= 300) || images[0];
+            albumArtwork = preferred?.url || null;
+          }
+        }
+
         return {
           handle: item.handle as string,
           displayName: (item.displayName as string) || null,
           publishedAt: (item.publishedAt as number) || null,
           topArtists: musicData?.artists?.slice(0, 3).map((a: any) => a.name) || [],
           recentTracks: musicData?.tracks?.slice(0, 2).map((t: any) => t.name) || [],
+          albumArtwork,
         };
       });
 
@@ -175,6 +193,7 @@ export const getRecentProfiles = cache(
             publishedAt: null,
             topArtists: [],
             recentTracks: [],
+            albumArtwork: null,
           },
           ...profiles.filter(p => p.handle !== "matbroughty"),
         ].slice(0, limit);
@@ -192,6 +211,7 @@ export const getRecentProfiles = cache(
           publishedAt: null,
           topArtists: [],
           recentTracks: [],
+          albumArtwork: null,
         },
       ];
     }
