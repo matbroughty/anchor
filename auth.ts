@@ -4,7 +4,7 @@ import Resend from "next-auth/providers/resend"
 import Spotify from "next-auth/providers/spotify"
 import { DynamoDBAdapter } from "@auth/dynamodb-adapter"
 import { dynamoDocumentClient, TABLE_NAME } from "@/lib/dynamodb"
-import { storeSpotifyTokens } from "@/lib/spotify"
+import { storeSpotifyTokens, fetchInitialSpotifyData } from "@/lib/spotify"
 
 // Ensure AUTH_SECRET is set (required for NextAuth v5)
 // In production (AWS Amplify), ensure AUTH_URL is also set to your domain
@@ -60,6 +60,12 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             account.access_token,
             account.refresh_token
           )
+
+          // Fetch initial music data automatically (non-blocking)
+          // Don't await - let it run in background so sign-in completes quickly
+          fetchInitialSpotifyData(user.id!, account.access_token).catch((error) => {
+            console.error("Failed to fetch initial Spotify data:", error)
+          })
         } catch (error) {
           console.error("Failed to store Spotify tokens:", error)
           // Don't block sign-in on token storage failure

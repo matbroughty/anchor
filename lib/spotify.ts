@@ -2,6 +2,8 @@ import { JWT } from "next-auth/jwt"
 import { encryptToken, decryptToken } from "./kms"
 import { dynamoDocumentClient, TABLE_NAME } from "./dynamodb"
 import { UpdateCommand, GetCommand } from "@aws-sdk/lib-dynamodb"
+import { getTopArtists, getTopTracks, deriveTopAlbums } from "./spotify-data"
+import { putMusicData } from "./dynamodb/music-data"
 
 /**
  * Refreshes an expired Spotify access token using the refresh token
@@ -129,5 +131,39 @@ export async function getSpotifyTokens(
     throw new Error(
       `Failed to retrieve Spotify tokens: ${error instanceof Error ? error.message : "Unknown error"}`
     )
+  }
+}
+
+/**
+ * Fetches and stores initial Spotify music data for a newly connected user.
+ * Called automatically on first Spotify connection, bypasses cooldown.
+ *
+ * @param userId - User ID to fetch data for
+ * @param accessToken - Spotify access token (already available from OAuth)
+ */
+export async function fetchInitialSpotifyData(
+  userId: string,
+  accessToken: string
+): Promise<void> {
+  try {
+    console.log(`[Spotify] Fetching initial data for user ${userId}`)
+
+    // Fetch artists and tracks in parallel
+    const [artists, allTracks] = await Promise.all([
+      getTopArtists(accessToken, 6),
+      getTopTracks(accessToken, 50),
+    ])
+
+    // Derive top albums from tracks
+    const albums = deriveTopAlbums(allTracks, 6)
+
+    // Store in DynamoDB
+    await putMusicData(userId, { artists, albums, tracks: allTracks })
+
+    console.log(`[Spotify] Initial data stored for user ${userId}`)
+  } catch (error) {
+    // Don't throw - we don't want to break the sign-in flow
+    // User can manually refresh if this fails
+    console.error("[Spotify] Error fetching initial data:", error)
   }
 }
