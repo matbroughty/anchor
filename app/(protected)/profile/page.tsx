@@ -45,7 +45,7 @@ async function getProfile(userId: string) {
 export default async function ProfilePage({
   searchParams,
 }: {
-  searchParams: { error?: string };
+  searchParams: Promise<{ error?: string }>;
 }) {
   const session = await auth();
 
@@ -66,8 +66,9 @@ export default async function ProfilePage({
     redirect("/profile/claim-handle");
   }
 
-  // Extract OAuth error from URL if present
-  const oauthError = searchParams.error || null;
+  // Extract OAuth error from URL if present (Next.js 15: searchParams is async)
+  const params = await searchParams;
+  const oauthError = params.error || null;
 
   return (
     <ProfilePageClient
