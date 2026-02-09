@@ -42,7 +42,11 @@ async function getProfile(userId: string) {
   };
 }
 
-export default async function ProfilePage() {
+export default async function ProfilePage({
+  searchParams,
+}: {
+  searchParams: { error?: string };
+}) {
   const session = await auth();
 
   if (!session?.user?.id) {
@@ -62,9 +66,13 @@ export default async function ProfilePage() {
     redirect("/profile/claim-handle");
   }
 
+  // Extract OAuth error from URL if present
+  const oauthError = searchParams.error || null;
+
   return (
     <ProfilePageClient
       profile={profile}
+      oauthError={oauthError}
       spotifyAction={async () => {
         "use server";
         await signIn("spotify", { redirectTo: "/profile" });

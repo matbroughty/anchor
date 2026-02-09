@@ -17,11 +17,13 @@ interface Profile {
 interface ProfilePageClientProps {
   profile: Profile;
   spotifyAction: () => Promise<void>;
+  oauthError?: string | null;
 }
 
 export default function ProfilePageClient({
   profile,
   spotifyAction,
+  oauthError,
 }: ProfilePageClientProps) {
   const router = useRouter();
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -39,6 +41,28 @@ export default function ProfilePageClient({
   const [showLastfmDisconnectConfirm, setShowLastfmDisconnectConfirm] = useState(false);
   const [isDisconnectingLastfm, setIsDisconnectingLastfm] = useState(false);
   const [lastfmDisconnectError, setLastfmDisconnectError] = useState<string | null>(null);
+  const [showOAuthError, setShowOAuthError] = useState(!!oauthError);
+
+  // Get user-friendly error message based on OAuth error code
+  const getOAuthErrorMessage = (error: string) => {
+    switch (error) {
+      case "OAuthAccountNotLinked":
+        return {
+          title: "This Spotify account is already connected",
+          message: "This Spotify account is already linked to a different Anchor profile. To connect it here, you need to disconnect it from the other profile first. If you don't have access to that profile, please contact us at hello@anchor.band for assistance.",
+        };
+      case "AccessDenied":
+        return {
+          title: "Connection cancelled",
+          message: "You cancelled the Spotify connection. Click 'Connect Spotify' to try again.",
+        };
+      default:
+        return {
+          title: "Connection failed",
+          message: "Something went wrong while connecting to Spotify. Please try again or contact us at hello@anchor.band if the problem persists.",
+        };
+    }
+  };
 
   const handleSave = async (displayName: string) => {
     const response = await fetch("/api/profile", {
@@ -158,6 +182,51 @@ export default function ProfilePageClient({
   return (
     <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-3xl mx-auto">
+        {/* OAuth Error Banner */}
+        {showOAuthError && oauthError && (
+          <div className="mb-6 bg-red-50 border-l-4 border-red-400 p-4 rounded-r-lg">
+            <div className="flex items-start">
+              <div className="flex-shrink-0">
+                <svg
+                  className="h-5 w-5 text-red-400"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+              </div>
+              <div className="ml-3 flex-1">
+                <h3 className="text-sm font-medium text-red-800">
+                  {getOAuthErrorMessage(oauthError).title}
+                </h3>
+                <p className="mt-1 text-sm text-red-700">
+                  {getOAuthErrorMessage(oauthError).message}
+                </p>
+              </div>
+              <div className="ml-auto pl-3">
+                <button
+                  type="button"
+                  onClick={() => setShowOAuthError(false)}
+                  className="inline-flex rounded-md bg-red-50 p-1.5 text-red-500 hover:bg-red-100 focus:outline-none focus:ring-2 focus:ring-red-600 focus:ring-offset-2 focus:ring-offset-red-50"
+                >
+                  <span className="sr-only">Dismiss</span>
+                  <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path
+                      fillRule="evenodd"
+                      d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
         <div className="bg-white shadow sm:rounded-lg">
           <div className="px-4 py-5 sm:p-6">
             <h1 className="text-2xl font-bold text-gray-900 mb-6">
