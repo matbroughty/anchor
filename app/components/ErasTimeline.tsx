@@ -41,11 +41,11 @@ export default function ErasTimeline({ erasData }: ErasTimelineProps) {
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       {/* Section header */}
       <div>
-        <h2 className="text-2xl font-bold text-white mb-2">Musical Eras</h2>
-        <p className="text-zinc-400">
+        <h2 className="text-3xl font-bold text-neutral-900 dark:text-white mb-2">Musical Eras</h2>
+        <p className="text-neutral-600 dark:text-neutral-400">
           {erasData.timelineMode === "life_era" && erasData.birthYear
             ? "Albums that shaped my journey, with ages"
             : "Albums that shaped my journey, by release date"}
@@ -53,13 +53,10 @@ export default function ErasTimeline({ erasData }: ErasTimelineProps) {
       </div>
 
       {/* Horizontal scrollable timeline */}
-      <div className="relative">
-        {/* Timeline line */}
-        <div className="absolute top-24 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-zinc-700 to-transparent" />
-
+      <div className="relative py-4">
         {/* Scrollable container */}
-        <div className="overflow-x-auto pb-4 scrollbar-thin scrollbar-thumb-zinc-700 scrollbar-track-transparent">
-          <div className="flex gap-8 min-w-max px-4">
+        <div className="overflow-x-auto pb-6 scrollbar-thin scrollbar-thumb-neutral-300 dark:scrollbar-thumb-neutral-700 scrollbar-track-transparent">
+          <div className="flex gap-12 min-w-max px-4">
             {sortedEntries.map((entry, index) => {
               const age = calculateAge(entry.releaseYear);
               const showAge = erasData.timelineMode === "life_era" && age !== null;
@@ -67,15 +64,12 @@ export default function ErasTimeline({ erasData }: ErasTimelineProps) {
               return (
                 <div
                   key={entry.entryId}
-                  className="flex flex-col items-center relative"
-                  style={{ minWidth: "160px" }}
+                  className="flex flex-col items-center"
+                  style={{ minWidth: "200px" }}
                 >
-                  {/* Timeline dot */}
-                  <div className="absolute top-24 w-3 h-3 bg-blue-500 rounded-full border-2 border-zinc-900 z-10" />
-
-                  {/* Album card */}
+                  {/* Album card - larger and more impactful */}
                   <div className="mb-6 group">
-                    <div className="relative w-40 h-40 rounded-lg overflow-hidden shadow-lg group-hover:shadow-2xl transition-shadow">
+                    <div className="relative w-48 h-48 rounded-xl overflow-hidden shadow-2xl group-hover:shadow-3xl transition-all duration-300 ring-1 ring-neutral-200 dark:ring-neutral-800">
                       <Image
                         src={entry.artworkUrl}
                         alt={`${entry.albumName} by ${entry.artistName}`}
@@ -85,25 +79,25 @@ export default function ErasTimeline({ erasData }: ErasTimelineProps) {
                     </div>
                   </div>
 
-                  {/* Info below timeline */}
-                  <div className="mt-8 text-center space-y-1" style={{ maxWidth: "160px" }}>
+                  {/* Info below album */}
+                  <div className="text-center space-y-2" style={{ maxWidth: "200px" }}>
                     {/* Prompt label */}
-                    <div className="inline-block px-2 py-1 rounded-full bg-zinc-800 text-xs text-zinc-400 font-medium mb-2">
+                    <div className="inline-block px-3 py-1 rounded-full bg-neutral-100 dark:bg-neutral-800 text-xs text-neutral-700 dark:text-neutral-300 font-semibold mb-1 uppercase tracking-wider">
                       {entry.promptLabel}
                     </div>
 
                     {/* Album name */}
-                    <p className="font-semibold text-white text-sm leading-tight line-clamp-2">
+                    <p className="font-bold text-neutral-900 dark:text-white text-base leading-tight line-clamp-2">
                       {entry.albumName}
                     </p>
 
                     {/* Artist name */}
-                    <p className="text-zinc-400 text-xs leading-tight line-clamp-1">
+                    <p className="text-neutral-700 dark:text-neutral-300 text-sm leading-tight line-clamp-1 font-medium">
                       {entry.artistName}
                     </p>
 
                     {/* Year / Age */}
-                    <p className="text-zinc-500 text-xs font-medium">
+                    <p className="text-neutral-500 dark:text-neutral-400 text-sm font-semibold">
                       {showAge ? `Age ${age} (${entry.releaseYear})` : entry.releaseYear}
                     </p>
                   </div>
@@ -116,7 +110,7 @@ export default function ErasTimeline({ erasData }: ErasTimelineProps) {
 
       {/* Legend for life_era mode */}
       {erasData.timelineMode === "life_era" && erasData.birthYear && (
-        <div className="text-center text-xs text-zinc-500 italic">
+        <div className="text-center text-sm text-neutral-500 dark:text-neutral-400 italic">
           Timeline shows my age when each album was released
         </div>
       )}
