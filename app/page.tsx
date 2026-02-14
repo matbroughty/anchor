@@ -22,8 +22,9 @@ export const metadata: Metadata = {
   },
 };
 
-// Revalidate every 1 minute to show new profiles quickly
-export const revalidate = 60;
+// Revalidate every 10 seconds to show new profiles quickly
+// Combined with unstable_noStore() in getRecentProfiles, this ensures fresh data
+export const revalidate = 10;
 
 export default function LandingPage() {
   return (

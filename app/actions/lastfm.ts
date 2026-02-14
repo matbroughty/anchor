@@ -132,6 +132,8 @@ export async function disconnectLastfm(): Promise<{
 
     revalidatePath("/profile");
     revalidatePath("/dashboard");
+    // Revalidate landing page to remove unpublished profile from dropped anchors
+    revalidatePath("/");
 
     return { success: true };
   } catch (error) {

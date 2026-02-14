@@ -1,4 +1,4 @@
-import { cache } from "react";
+import { unstable_noStore as noStore } from "next/cache";
 import { ScanCommand, BatchGetCommand } from "@aws-sdk/lib-dynamodb";
 import { dynamoDocumentClient, TABLE_NAME } from "@/lib/dynamodb";
 import { userPK, MUSIC_SK } from "@/lib/dynamodb/schema";
@@ -21,12 +21,13 @@ export interface RecentProfile {
  * Scans for USER records where isPublic=true and handle is set,
  * sorted by most recent updates.
  *
- * Wrapped in React cache() for request-level deduplication.
+ * Uses unstable_noStore() to prevent caching and ensure fresh data.
  *
  * @param limit - Number of profiles to return (default 10)
  */
-export const getRecentProfiles = cache(
-  async (limit: number = 10): Promise<RecentProfile[]> => {
+export async function getRecentProfiles(limit: number = 10): Promise<RecentProfile[]> {
+  // Opt out of caching to ensure we always fetch fresh data
+  noStore();
     try {
       // Scan for all USER records (pk = sk pattern)
       // Then filter in code for published profiles
@@ -184,12 +185,11 @@ export const getRecentProfiles = cache(
         };
       });
 
-      // Return the profiles we found
-      return profiles;
-    } catch (error) {
-      console.error("Failed to fetch recent profiles:", error);
-      // Return empty array on error - component will handle gracefully
-      return [];
-    }
+    // Return the profiles we found
+    return profiles;
+  } catch (error) {
+    console.error("Failed to fetch recent profiles:", error);
+    // Return empty array on error - component will handle gracefully
+    return [];
   }
-);
+}

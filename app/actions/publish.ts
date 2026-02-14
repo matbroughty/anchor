@@ -57,6 +57,8 @@ export async function publishPage(): Promise<PublishResult> {
     const userDetails = await getUserDetails(userId);
     if (userDetails?.handle) {
       revalidatePath(`/${userDetails.handle}`);
+      // Revalidate landing page to show newly published profile
+      revalidatePath("/");
 
       // Send notification email when anchor is dropped
       // Get user's email from session (available from auth)
@@ -126,6 +128,8 @@ export async function unpublishPage(): Promise<PublishResult> {
     const handle = await getUserHandle(userId);
     if (handle) {
       revalidatePath(`/${handle}`);
+      // Revalidate landing page to remove unpublished profile
+      revalidatePath("/");
     }
 
     return { success: true };

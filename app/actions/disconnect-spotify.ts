@@ -84,6 +84,8 @@ export async function disconnectSpotify(): Promise<{ success: boolean; error?: s
 
     revalidatePath("/profile");
     revalidatePath("/dashboard");
+    // Revalidate landing page to remove unpublished profile from dropped anchors
+    revalidatePath("/");
 
     return { success: true };
   } catch (error) {
