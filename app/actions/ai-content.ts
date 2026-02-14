@@ -11,8 +11,14 @@ import {
 import { putBio, putCaption } from "@/lib/dynamodb/content";
 import { getMusicData } from "@/lib/dynamodb/music-data";
 import { getFeaturedArtists } from "@/lib/dynamodb/featured-artists";
+import { getErasData } from "@/app/actions/eras";
+import { GetCommand } from "@aws-sdk/lib-dynamodb";
+import { dynamoDocumentClient, TABLE_NAME } from "@/lib/dynamodb";
+import { userPK } from "@/lib/dynamodb/schema";
 import type { Bio, Caption } from "@/types/content";
 import type { Artist, Track, Album } from "@/types/music";
+import type { ErasData } from "@/types/eras";
+import type { FavouriteListeningParty } from "@/types/listening-party";
 
 // ---------------------------------------------------------------------------
 // Response types
@@ -37,10 +43,51 @@ export interface RegenerateCaptionResult {
 // Helpers
 // ---------------------------------------------------------------------------
 
+/**
+ * Fetches user's favourite listening party from DynamoDB
+ */
+async function getFavouriteListeningParty(userId: string): Promise<FavouriteListeningParty | null> {
+  try {
+    const pk = userPK(userId);
+    const sk = "LISTENING_PARTY#FAVOURITE";
+
+    const result = await dynamoDocumentClient.send(
+      new GetCommand({
+        TableName: TABLE_NAME,
+        Key: { pk, sk },
+      })
+    );
+
+    if (!result.Item) {
+      return null;
+    }
+
+    return {
+      partyId: result.Item.partyId,
+      partyDateTime: result.Item.partyDateTime,
+      artist: result.Item.artist,
+      album: result.Item.album,
+      replayLink: result.Item.replayLink,
+      spotifyAlbumLink: result.Item.spotifyAlbumLink,
+      artworkSmall: result.Item.artworkSmall,
+      artworkMedium: result.Item.artworkMedium,
+      artworkLarge: result.Item.artworkLarge,
+      albumReleaseDate: result.Item.albumReleaseDate,
+      tweetLink: result.Item.tweetLink,
+      timelineLink: result.Item.timelineLink,
+    };
+  } catch (error) {
+    console.error("Failed to fetch favourite listening party:", error);
+    return null;
+  }
+}
+
 function buildBioUserMessage(
   artists: Artist[],
   tracks: Track[],
-  featuredArtists: Artist[]
+  featuredArtists: Artist[],
+  erasData?: ErasData,
+  listeningParty?: FavouriteListeningParty | null
 ): string {
   const artistNames = artists.map((a) => a.name).join(", ");
   const trackLines = tracks
@@ -53,6 +100,19 @@ function buildBioUserMessage(
   if (featuredArtists.length > 0) {
     const featuredNames = featuredArtists.map((a) => a.name).join(", ");
     message += `\n\nI've especially highlighted these artists on my profile: ${featuredNames}`;
+  }
+
+  // Add Musical Eras timeline if present
+  if (erasData && erasData.entries.length > 0) {
+    const erasInfo = erasData.entries
+      .map((entry) => `${entry.albumName} by ${entry.artistName} (${entry.releaseYear}) - ${entry.promptLabel}`)
+      .join("\n");
+    message += `\n\nMy Musical Eras timeline - key albums from my journey:\n${erasInfo}`;
+  }
+
+  // Add favourite listening party if present
+  if (listeningParty) {
+    message += `\n\nMy favourite Tim's Twitter Listening Party: "${listeningParty.album}" by ${listeningParty.artist}`;
   }
 
   return message;
@@ -114,6 +174,7 @@ async function callBedrock(
 /**
  * Generates a bio for the authenticated user from their cached music data.
  * If a bio already exists it is overwritten (same behaviour as regenerate).
+ * Includes Musical Eras and favourite listening party data if available.
  */
 export async function generateBio(): Promise<GenerateBioResult> {
   try {
@@ -122,9 +183,11 @@ export async function generateBio(): Promise<GenerateBioResult> {
       return { bio: null, error: "Not authenticated" };
     }
 
-    const [musicData, featuredArtists] = await Promise.all([
+    const [musicData, featuredArtists, erasDataResult, listeningParty] = await Promise.all([
       getMusicData(session.user.id),
       getFeaturedArtists(session.user.id),
+      getErasData(),
+      getFavouriteListeningParty(session.user.id),
     ]);
 
     if (!musicData) {
@@ -134,9 +197,17 @@ export async function generateBio(): Promise<GenerateBioResult> {
       };
     }
 
+    const erasData = erasDataResult.success ? erasDataResult.data : undefined;
+
     const text = await callBedrock(
       BIO_SYSTEM_PROMPT,
-      buildBioUserMessage(musicData.artists, musicData.tracks, featuredArtists),
+      buildBioUserMessage(
+        musicData.artists,
+        musicData.tracks,
+        featuredArtists,
+        erasData,
+        listeningParty
+      ),
       0.6
     );
 

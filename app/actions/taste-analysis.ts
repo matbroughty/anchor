@@ -8,7 +8,13 @@ import { TASTE_ANALYSIS_SYSTEM_PROMPT } from "@/lib/bedrock/prompts";
 import { putTasteAnalysis } from "@/lib/dynamodb/content";
 import { getMusicData } from "@/lib/dynamodb/music-data";
 import { getFeaturedArtists } from "@/lib/dynamodb/featured-artists";
+import { getErasData } from "@/app/actions/eras";
+import { GetCommand } from "@aws-sdk/lib-dynamodb";
+import { dynamoDocumentClient, TABLE_NAME } from "@/lib/dynamodb";
+import { userPK } from "@/lib/dynamodb/schema";
 import type { TasteAnalysis } from "@/types/content";
+import type { ErasData } from "@/types/eras";
+import type { FavouriteListeningParty } from "@/types/listening-party";
 
 // ---------------------------------------------------------------------------
 // Response types
@@ -23,11 +29,52 @@ export interface GenerateTasteAnalysisResult {
 // Helper
 // ---------------------------------------------------------------------------
 
+/**
+ * Fetches user's favourite listening party from DynamoDB
+ */
+async function getFavouriteListeningParty(userId: string): Promise<FavouriteListeningParty | null> {
+  try {
+    const pk = userPK(userId);
+    const sk = "LISTENING_PARTY#FAVOURITE";
+
+    const result = await dynamoDocumentClient.send(
+      new GetCommand({
+        TableName: TABLE_NAME,
+        Key: { pk, sk },
+      })
+    );
+
+    if (!result.Item) {
+      return null;
+    }
+
+    return {
+      partyId: result.Item.partyId,
+      partyDateTime: result.Item.partyDateTime,
+      artist: result.Item.artist,
+      album: result.Item.album,
+      replayLink: result.Item.replayLink,
+      spotifyAlbumLink: result.Item.spotifyAlbumLink,
+      artworkSmall: result.Item.artworkSmall,
+      artworkMedium: result.Item.artworkMedium,
+      artworkLarge: result.Item.artworkLarge,
+      albumReleaseDate: result.Item.albumReleaseDate,
+      tweetLink: result.Item.tweetLink,
+      timelineLink: result.Item.timelineLink,
+    };
+  } catch (error) {
+    console.error("Failed to fetch favourite listening party:", error);
+    return null;
+  }
+}
+
 function buildTasteAnalysisInput(input: {
   favourites: string[];
   recent: string[];
   albums: Array<{ artist: string; title: string }>;
   tracks: Array<{ name: string; artists: string[] }>;
+  musicalEras?: Array<{ artist: string; album: string; year: number; prompt: string }>;
+  listeningParty?: { artist: string; album: string } | null;
 }): string {
   const inputJson = JSON.stringify(input, null, 2);
   return `${inputJson}\n\nAnalyze this music taste and respond with ONLY the JSON object (no markdown, no code fences, no extra text).`;
@@ -75,6 +122,7 @@ async function callBedrockForAnalysis(
 /**
  * Generates a fun music taste analysis for the authenticated user.
  * Analyzes their featured artists, top artists, albums, and tracks.
+ * Includes Musical Eras and favourite listening party data if available.
  * Returns a traffic-light rating with insights and recommendations.
  */
 export async function generateTasteAnalysis(): Promise<GenerateTasteAnalysisResult> {
@@ -84,9 +132,11 @@ export async function generateTasteAnalysis(): Promise<GenerateTasteAnalysisResu
       return { analysis: null, error: "Not authenticated" };
     }
 
-    const [musicData, featuredArtists] = await Promise.all([
+    const [musicData, featuredArtists, erasDataResult, listeningParty] = await Promise.all([
       getMusicData(session.user.id),
       getFeaturedArtists(session.user.id),
+      getErasData(),
+      getFavouriteListeningParty(session.user.id),
     ]);
 
     if (!musicData) {
@@ -96,8 +146,17 @@ export async function generateTasteAnalysis(): Promise<GenerateTasteAnalysisResu
       };
     }
 
+    const erasData = erasDataResult.success ? erasDataResult.data : undefined;
+
     // Build the input JSON for the AI
-    const input = {
+    const input: {
+      favourites: string[];
+      recent: string[];
+      albums: Array<{ artist: string; title: string }>;
+      tracks: Array<{ name: string; artists: string[] }>;
+      musicalEras?: Array<{ artist: string; album: string; year: number; prompt: string }>;
+      listeningParty?: { artist: string; album: string } | null;
+    } = {
       favourites: featuredArtists.map((a) => a.name),
       recent: musicData.artists.slice(0, 10).map((a) => a.name),
       albums: musicData.albums.slice(0, 6).map((a) => ({
@@ -109,6 +168,24 @@ export async function generateTasteAnalysis(): Promise<GenerateTasteAnalysisResu
         artists: t.artists.map((a) => a.name),
       })),
     };
+
+    // Add Musical Eras if present
+    if (erasData && erasData.entries.length > 0) {
+      input.musicalEras = erasData.entries.map((entry) => ({
+        artist: entry.artistName,
+        album: entry.albumName,
+        year: entry.releaseYear,
+        prompt: entry.promptLabel,
+      }));
+    }
+
+    // Add listening party if present
+    if (listeningParty) {
+      input.listeningParty = {
+        artist: listeningParty.artist,
+        album: listeningParty.album,
+      };
+    }
 
     const userMessage = buildTasteAnalysisInput(input);
     const analysis = await callBedrockForAnalysis(userMessage);

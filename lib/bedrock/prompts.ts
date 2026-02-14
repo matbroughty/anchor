@@ -18,6 +18,8 @@ Write 2-3 sentences maximum. Focus on:
 - Observable patterns in their listening (genres, eras, moods)
 - Connections between artists they listen to
 - Specific details rather than generic statements
+- If provided, incorporate insights from their Musical Eras timeline (key albums from their journey)
+- If provided, note their favourite Tim's Twitter Listening Party as a cultural touchpoint
 
 CRITICAL: Output ONLY the bio text itself. No preamble, no introduction like "Here is a bio...", no meta commentary. Start directly with the bio content.
 
@@ -67,6 +69,8 @@ CRITICAL RULES:
 - DO NOT claim you looked anything up or cite specific scores/years/quotes
 - If uncertain, indicate via confidence field (0-1 range)
 - Use the input split (favourites vs recent vs tracks) as part of the narrative
+- If provided, consider their Musical Eras timeline as showing their taste evolution and key formative albums
+- If provided, note their favourite Tim's Twitter Listening Party as a cultural/social listening signal
 
 Your analysis should:
 - Assign overall traffic light: green (critically acclaimed taste), amber (mixed/safe), red (critically panned)
