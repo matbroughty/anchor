@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { cookies } from "next/headers";
 import { getPublicProfile } from "@/lib/dynamodb/public-profile";
 import { PublicProfile } from "@/app/components/PublicProfile";
 import { auth } from "@/auth";
@@ -10,6 +11,12 @@ import { auth } from "@/auth";
 
 /** Revalidate every hour (3600 seconds) */
 export const revalidate = 3600;
+
+/**
+ * Dynamic params to prevent static generation of auth() calls
+ * This allows ISR for the page content but ensures auth() is evaluated per-request
+ */
+export const dynamicParams = true;
 
 // ---------------------------------------------------------------------------
 // Types (Next.js 15 breaking change: params is a Promise)
@@ -69,6 +76,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function HandlePage({ params }: Props) {
   const { handle } = await params;
+
+  // Force dynamic rendering by accessing cookies - prevents caching of auth() calls
+  // This is critical to prevent showing the wrong user's session
+  await cookies();
 
   // Get session first to extract viewerHandle
   const session = await auth();

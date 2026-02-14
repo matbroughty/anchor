@@ -3,6 +3,10 @@ import { redirect } from "next/navigation";
 import { getManualCuration } from "@/app/actions/manual-curation";
 import { CurateClient } from "./CurateClient";
 
+// Force dynamic rendering - prevents caching of auth() calls
+// This is CRITICAL to prevent user session leakage
+export const dynamic = "force-dynamic";
+
 /**
  * Manual curation page - allows users to select their own music
  * Uses Apple Music catalog search (no user authentication required)

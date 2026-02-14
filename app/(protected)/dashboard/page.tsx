@@ -8,6 +8,10 @@ import { getFeaturedArtists } from "@/lib/dynamodb/featured-artists";
 import { getContent, getTasteAnalysis, getAgeGuess } from "@/lib/dynamodb/content";
 import { DashboardClient } from "./DashboardClient";
 
+// Force dynamic rendering - prevents caching of auth() calls
+// This is CRITICAL to prevent user session leakage
+export const dynamic = "force-dynamic";
+
 // ---------------------------------------------------------------------------
 // User Status Query
 // ---------------------------------------------------------------------------

@@ -4,6 +4,10 @@ import { dynamoDocumentClient, TABLE_NAME } from "@/lib/dynamodb";
 import { GetCommand } from "@aws-sdk/lib-dynamodb";
 import ProfilePageClient from "./ProfilePageClient";
 
+// Force dynamic rendering - prevents caching of auth() calls
+// This is CRITICAL to prevent user session leakage
+export const dynamic = "force-dynamic";
+
 async function getProfile(userId: string) {
   const userKey = `USER#${userId}`;
 

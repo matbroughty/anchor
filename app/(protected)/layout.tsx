@@ -2,6 +2,10 @@ import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import { SignOutButton } from "@/app/components/SignOutButton";
 
+// Force dynamic rendering - prevents caching of auth() calls
+// This is CRITICAL to prevent user session leakage
+export const dynamic = "force-dynamic";
+
 /**
  * Layout for protected routes
  * Verifies authentication and provides sign out access
