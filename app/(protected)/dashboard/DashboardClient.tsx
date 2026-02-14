@@ -10,12 +10,14 @@ import { AgeGuess } from "@/app/components/AgeGuess";
 import { RefreshButton } from "@/app/components/RefreshButton";
 import { PublishToggle } from "@/app/components/PublishToggle";
 import ErasTimeline from "@/app/components/ErasTimeline";
+import { ListeningPartySelector } from "@/app/components/ListeningPartySelector";
 import { refreshSpotifyData } from "@/app/actions/spotify";
 import { refreshLastfmUserData } from "@/app/actions/lastfm";
 import { generateBio, generateAlbumCaptions, regenerateBio, regenerateCaption } from "@/app/actions/ai-content";
 import type { MusicData, Artist } from "@/types/music";
 import type { ContentData, Bio, Caption, TasteAnalysis as TasteAnalysisType, AgeGuess as AgeGuessType } from "@/types/content";
 import type { ErasData } from "@/types/eras";
+import type { FavouriteListeningParty } from "@/types/listening-party";
 
 // ---------------------------------------------------------------------------
 // Props
@@ -28,6 +30,7 @@ interface DashboardClientProps {
   initialTasteAnalysis: TasteAnalysisType | null;
   initialAgeGuess: AgeGuessType | null;
   initialErasData?: ErasData;
+  initialFavouriteListeningParty: FavouriteListeningParty | null;
   userId: string;
   handle: string | null;
   isPublished: boolean;
@@ -45,6 +48,7 @@ export function DashboardClient({
   initialTasteAnalysis,
   initialAgeGuess,
   initialErasData,
+  initialFavouriteListeningParty,
   handle,
   isPublished: initialIsPublished,
   musicService,
@@ -53,6 +57,7 @@ export function DashboardClient({
   const [content, setContent] = useState<ContentData>(initialContent);
   const [featuredArtists, setFeaturedArtists] = useState<Artist[]>(initialFeaturedArtists);
   const [erasData, setErasData] = useState<ErasData | undefined>(initialErasData);
+  const [favouriteListeningParty, setFavouriteListeningParty] = useState<FavouriteListeningParty | null>(initialFavouriteListeningParty);
   const [published, setPublished] = useState(initialIsPublished);
   const [isPending, startTransition] = useTransition();
 
@@ -179,6 +184,9 @@ export function DashboardClient({
               </a>
               <a href="#musical-eras" className="text-xs font-medium text-gray-600 hover:text-gray-900 whitespace-nowrap px-3 py-1 rounded-md hover:bg-gray-100 transition-colors">
                 Musical Eras
+              </a>
+              <a href="#listening-party" className="text-xs font-medium text-gray-600 hover:text-gray-900 whitespace-nowrap px-3 py-1 rounded-md hover:bg-gray-100 transition-colors">
+                Listening Party
               </a>
               <a href="#bio" className="text-xs font-medium text-gray-600 hover:text-gray-900 whitespace-nowrap px-3 py-1 rounded-md hover:bg-gray-100 transition-colors">
                 Bio
@@ -342,6 +350,18 @@ export function DashboardClient({
                   </a>
                 </div>
               )}
+            </div>
+
+            {/* Tim's Twitter Listening Party */}
+            <div id="listening-party" className="bg-white shadow sm:rounded-lg px-4 py-5 sm:p-6 scroll-mt-20">
+              <h2 className="text-lg font-semibold text-gray-900 mb-4">Tim&apos;s Twitter Listening Party</h2>
+              <p className="text-sm text-gray-600 mb-4">
+                Select your favourite listening party to showcase on your profile (optional).
+              </p>
+              <ListeningPartySelector
+                initialFavourite={favouriteListeningParty}
+                onUpdate={setFavouriteListeningParty}
+              />
             </div>
 
             {/* Bio editor */}

@@ -1,7 +1,9 @@
 import type { Artist, Album, Track } from "@/types/music";
 import type { Caption } from "@/types/content";
 import type { ErasData } from "@/types/eras";
+import type { FavouriteListeningParty } from "@/types/listening-party";
 import ErasTimeline from "@/app/components/ErasTimeline";
+import { TimsListeningPartyIcon } from "@/app/components/TimsListeningPartyIcon";
 
 // ---------------------------------------------------------------------------
 // Props
@@ -16,6 +18,7 @@ interface PublicProfileProps {
   tracks: Track[];
   captions: Caption[];
   erasData?: ErasData;
+  favouriteListeningParty?: FavouriteListeningParty | null;
   isOwner?: boolean;
   viewCount?: number;
   lastfmUsername?: string | null;
@@ -88,6 +91,7 @@ export function PublicProfile({
   tracks,
   captions,
   erasData,
+  favouriteListeningParty,
   isOwner = false,
   viewCount,
   lastfmUsername,
@@ -533,6 +537,11 @@ export function PublicProfile({
           </p>
         </footer>
       </main>
+
+      {/* Tim's Listening Party Icon */}
+      {favouriteListeningParty && (
+        <TimsListeningPartyIcon favourite={favouriteListeningParty} />
+      )}
     </div>
   );
 }

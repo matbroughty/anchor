@@ -12,6 +12,7 @@ import {
 import type { Artist, Album, Track } from "@/types/music";
 import type { Caption } from "@/types/content";
 import type { ErasData } from "@/types/eras";
+import type { FavouriteListeningParty } from "@/types/listening-party";
 
 // ---------------------------------------------------------------------------
 // Public Profile Types
@@ -32,6 +33,7 @@ export interface PublicProfile {
   tracks: Track[];
   captions: Caption[];
   erasData?: ErasData;
+  favouriteListeningParty?: FavouriteListeningParty | null;
   viewCount?: number;
   lastfmUsername?: string | null;
   spotifyUserId?: string | null;
@@ -55,6 +57,46 @@ async function getErasDataInternal(userId: string): Promise<ErasData | undefined
   );
 
   return result.Item ? (result.Item as ErasData) : undefined;
+}
+
+/**
+ * Fetches user's favourite listening party from DynamoDB
+ * Returns null if no favourite exists
+ */
+async function getFavouriteListeningPartyInternal(userId: string): Promise<FavouriteListeningParty | null> {
+  try {
+    const pk = userPK(userId);
+    const sk = "LISTENING_PARTY#FAVOURITE";
+
+    const result = await dynamoDocumentClient.send(
+      new GetCommand({
+        TableName: TABLE_NAME,
+        Key: { pk, sk },
+      })
+    );
+
+    if (!result.Item) {
+      return null;
+    }
+
+    return {
+      partyId: result.Item.partyId,
+      partyDateTime: result.Item.partyDateTime,
+      artist: result.Item.artist,
+      album: result.Item.album,
+      replayLink: result.Item.replayLink,
+      spotifyAlbumLink: result.Item.spotifyAlbumLink,
+      artworkSmall: result.Item.artworkSmall,
+      artworkMedium: result.Item.artworkMedium,
+      artworkLarge: result.Item.artworkLarge,
+      albumReleaseDate: result.Item.albumReleaseDate,
+      tweetLink: result.Item.tweetLink,
+      timelineLink: result.Item.timelineLink,
+    };
+  } catch (error) {
+    console.error("Failed to fetch favourite listening party:", error);
+    return null;
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -125,12 +167,13 @@ export const getPublicProfile = cache(
       return null;
     }
 
-    // Step 3: Fetch music data, featured artists, content, and eras data in parallel
-    const [musicData, featuredArtists, contentData, erasData] = await Promise.all([
+    // Step 3: Fetch music data, featured artists, content, eras data, and favourite listening party in parallel
+    const [musicData, featuredArtists, contentData, erasData, favouriteListeningParty] = await Promise.all([
       getMusicData(userId),
       getFeaturedArtists(userId),
       getContent(userId),
       getErasDataInternal(userId),
+      getFavouriteListeningPartyInternal(userId),
     ]);
 
     // Step 4: Increment view count if viewer is not the owner
@@ -158,6 +201,7 @@ export const getPublicProfile = cache(
       tracks: musicData?.tracks?.slice(0, 10) ?? [], // UI shows top 10 tracks
       captions: contentData.captions,
       erasData,
+      favouriteListeningParty,
       viewCount,
       lastfmUsername: (user.lastfmUsername as string) ?? null,
       spotifyUserId: (user.spotifyUserId as string) ?? null,

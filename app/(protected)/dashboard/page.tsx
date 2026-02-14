@@ -8,6 +8,7 @@ import { getFeaturedArtists } from "@/lib/dynamodb/featured-artists";
 import { getContent, getTasteAnalysis, getAgeGuess } from "@/lib/dynamodb/content";
 import { getErasData } from "@/app/actions/eras";
 import { DashboardClient } from "./DashboardClient";
+import type { FavouriteListeningParty } from "@/types/listening-party";
 
 // Force dynamic rendering - prevents caching of auth() calls
 // This is CRITICAL to prevent user session leakage
@@ -61,6 +62,46 @@ async function getUserStatus(userId: string): Promise<UserStatus> {
 }
 
 // ---------------------------------------------------------------------------
+// Favourite Listening Party Query
+// ---------------------------------------------------------------------------
+
+async function getFavouriteListeningParty(userId: string): Promise<FavouriteListeningParty | null> {
+  try {
+    const pk = userPK(userId);
+    const sk = "LISTENING_PARTY#FAVOURITE";
+
+    const result = await dynamoDocumentClient.send(
+      new GetCommand({
+        TableName: TABLE_NAME,
+        Key: { pk, sk },
+      })
+    );
+
+    if (!result.Item) {
+      return null;
+    }
+
+    return {
+      partyId: result.Item.partyId,
+      partyDateTime: result.Item.partyDateTime,
+      artist: result.Item.artist,
+      album: result.Item.album,
+      replayLink: result.Item.replayLink,
+      spotifyAlbumLink: result.Item.spotifyAlbumLink,
+      artworkSmall: result.Item.artworkSmall,
+      artworkMedium: result.Item.artworkMedium,
+      artworkLarge: result.Item.artworkLarge,
+      albumReleaseDate: result.Item.albumReleaseDate,
+      tweetLink: result.Item.tweetLink,
+      timelineLink: result.Item.timelineLink,
+    };
+  } catch (error) {
+    console.error("Failed to fetch favourite listening party:", error);
+    return null;
+  }
+}
+
+// ---------------------------------------------------------------------------
 // Dashboard Page
 // ---------------------------------------------------------------------------
 
@@ -78,7 +119,7 @@ export default async function DashboardPage() {
 
   const userId = session.user.id;
 
-  const [musicData, contentData, featuredArtists, tasteAnalysis, ageGuess, userStatus, erasDataResult] =
+  const [musicData, contentData, featuredArtists, tasteAnalysis, ageGuess, userStatus, erasDataResult, favouriteListeningParty] =
     await Promise.all([
       getMusicData(userId),
       getContent(userId),
@@ -87,6 +128,7 @@ export default async function DashboardPage() {
       getAgeGuess(userId),
       getUserStatus(userId),
       getErasData(),
+      getFavouriteListeningParty(userId),
     ]);
 
   const erasData = erasDataResult.success ? erasDataResult.data : undefined;
@@ -99,6 +141,7 @@ export default async function DashboardPage() {
       initialTasteAnalysis={tasteAnalysis}
       initialAgeGuess={ageGuess}
       initialErasData={erasData}
+      initialFavouriteListeningParty={favouriteListeningParty}
       userId={userId}
       handle={userStatus.handle}
       isPublished={userStatus.isPublic}
