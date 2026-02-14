@@ -47,6 +47,7 @@ export function LandingHero() {
 
         <Link
           href="/signin"
+          title="Get started - create your music profile and publish it to share your taste with the world"
           className="inline-block bg-neutral-900 text-white px-8 py-4 rounded-lg hover:bg-neutral-800 transition-colors font-medium text-lg"
         >
           Drop your anchor

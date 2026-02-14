@@ -138,7 +138,7 @@ export function PublishToggle({
                 type="button"
                 onClick={handleShare}
                 className="inline-flex items-center gap-2 px-3 py-2 bg-white border border-blue-300 rounded-md text-sm font-medium text-blue-700 hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                title="Share your profile"
+                title="Share your profile URL with others or copy the link"
               >
                 {copySuccess ? (
                   <>
@@ -163,6 +163,7 @@ export function PublishToggle({
               type="button"
               onClick={handleToggle}
               disabled={isLoading}
+              title={isPublished ? "Haul up anchor - make your profile private and remove it from public view" : "Drop anchor - publish your profile and make it visible to everyone"}
               className={`inline-flex items-center gap-2 px-4 py-2 border rounded-md text-sm font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed ${
                 isPublished
                   ? "border-gray-300 text-gray-700 bg-white hover:bg-gray-50 focus:ring-gray-500"

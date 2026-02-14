@@ -192,6 +192,7 @@ function AlbumCard({ album, caption, onCaptionUpdate, disabled }: AlbumCardProps
                 type="button"
                 onClick={handleRegenerate}
                 disabled={disabled || isRegenerating}
+                title="Generate a new caption for this album using AI"
                 className="inline-flex items-center gap-1 px-2 py-1 border border-gray-300 rounded text-xs font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isRegenerating ? (

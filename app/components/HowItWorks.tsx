@@ -24,9 +24,14 @@ export function HowItWorks() {
             <span className="flex-shrink-0 flex items-center justify-center w-8 h-8 rounded-full bg-neutral-900 text-white font-semibold text-sm">
               2
             </span>
-            <p className="text-lg text-neutral-900 pt-0.5">
-              Generate your anchor
-            </p>
+            <div className="pt-0.5">
+              <p className="text-lg text-neutral-900">
+                Generate your anchor
+              </p>
+              <p className="text-sm text-neutral-600 mt-1">
+                Create your bio, add your Musical Eras timeline, and customize your profile
+              </p>
+            </div>
           </li>
 
           <li className="flex gap-4">
