@@ -95,13 +95,12 @@ export async function getRecentProfiles(limit: number = 10): Promise<RecentProfi
         publishedAt: item.publishedAt,
       })));
 
-      // Batch fetch music data for top 5 profiles
+      // Batch fetch music data for all returned profiles
       const userIds = sortedUsers
         .map((item) => {
           const pk = item.pk as string;
           return pk.replace("USER#", "");
-        })
-        .slice(0, 5);
+        });
 
       const musicKeys = userIds.flatMap((userId) => [
         { pk: userPK(userId), sk: MUSIC_SK.ARTISTS },
