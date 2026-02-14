@@ -65,7 +65,7 @@ export async function publishPage(): Promise<PublishResult> {
       try {
         const emailResult = await resend.emails.send({
           from: "Anchor <noreply@anchor.band>",
-          to: "dropped@anchor.band",
+          to: "mat@broughty.com",
           subject: `⚓ New Anchor Dropped: ${userDetails.handle}`,
           html: `
             <h2>⚓ A new anchor has been dropped!</h2>
