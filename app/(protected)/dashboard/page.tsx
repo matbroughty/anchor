@@ -6,6 +6,7 @@ import { userPK } from "@/lib/dynamodb/schema";
 import { getMusicData } from "@/lib/dynamodb/music-data";
 import { getFeaturedArtists } from "@/lib/dynamodb/featured-artists";
 import { getContent, getTasteAnalysis, getAgeGuess } from "@/lib/dynamodb/content";
+import { getErasData } from "@/app/actions/eras";
 import { DashboardClient } from "./DashboardClient";
 
 // Force dynamic rendering - prevents caching of auth() calls
@@ -77,7 +78,7 @@ export default async function DashboardPage() {
 
   const userId = session.user.id;
 
-  const [musicData, contentData, featuredArtists, tasteAnalysis, ageGuess, userStatus] =
+  const [musicData, contentData, featuredArtists, tasteAnalysis, ageGuess, userStatus, erasDataResult] =
     await Promise.all([
       getMusicData(userId),
       getContent(userId),
@@ -85,7 +86,10 @@ export default async function DashboardPage() {
       getTasteAnalysis(userId),
       getAgeGuess(userId),
       getUserStatus(userId),
+      getErasData(),
     ]);
+
+  const erasData = erasDataResult.success ? erasDataResult.data : undefined;
 
   return (
     <DashboardClient
@@ -94,6 +98,7 @@ export default async function DashboardPage() {
       initialFeaturedArtists={featuredArtists}
       initialTasteAnalysis={tasteAnalysis}
       initialAgeGuess={ageGuess}
+      initialErasData={erasData}
       userId={userId}
       handle={userStatus.handle}
       isPublished={userStatus.isPublic}

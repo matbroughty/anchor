@@ -347,3 +347,123 @@ export async function searchTracks(query: string, limit = 10): Promise<Track[]> 
     };
   });
 }
+
+/**
+ * Lookup a specific album by Apple Music catalog ID
+ * Used for Eras feature to fetch full album metadata
+ */
+export async function lookupAlbum(
+  albumId: string,
+  storefront: string = "us"
+): Promise<{
+  appleAlbumId: string;
+  albumName: string;
+  artistName: string;
+  releaseDate: string;
+  releaseYear: number;
+  artworkUrlTemplate: string;
+  artworkUrl600: string;
+  artworkUrl300: string;
+  genreNames: string[];
+} | null> {
+  const token = generateDeveloperToken();
+  const url = `${APPLE_MUSIC_API_BASE}/catalog/${storefront}/albums/${albumId}`;
+
+  const response = await fetch(url, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (!response.ok) {
+    if (response.status === 404) {
+      return null;
+    }
+    const errorText = await response.text();
+    throw new Error(`Apple Music API error: ${response.status} ${errorText}`);
+  }
+
+  const data: { data: AppleMusicAlbum[] } = await response.json();
+  const album = data.data[0];
+
+  if (!album) {
+    return null;
+  }
+
+  const artworkTemplate = album.attributes.artwork.url;
+  const releaseDate = album.attributes.releaseDate;
+  const releaseYear = parseInt(releaseDate.split("-")[0], 10);
+
+  return {
+    appleAlbumId: album.id,
+    albumName: album.attributes.name,
+    artistName: album.attributes.artistName,
+    releaseDate,
+    releaseYear,
+    artworkUrlTemplate: artworkTemplate,
+    artworkUrl600: getArtworkUrl(artworkTemplate, 600, 600),
+    artworkUrl300: getArtworkUrl(artworkTemplate, 300, 300),
+    genreNames: album.attributes.genreNames || [],
+  };
+}
+
+/**
+ * Batch lookup multiple albums by Apple Music catalog IDs
+ * More efficient than multiple individual lookups
+ */
+export async function lookupAlbums(
+  albumIds: string[],
+  storefront: string = "us"
+): Promise<Map<string, {
+  appleAlbumId: string;
+  albumName: string;
+  artistName: string;
+  releaseDate: string;
+  releaseYear: number;
+  artworkUrlTemplate: string;
+  artworkUrl600: string;
+  artworkUrl300: string;
+  genreNames: string[];
+}>> {
+  if (albumIds.length === 0) {
+    return new Map();
+  }
+
+  const token = generateDeveloperToken();
+  const idsParam = albumIds.join(",");
+  const url = `${APPLE_MUSIC_API_BASE}/catalog/${storefront}/albums?ids=${idsParam}`;
+
+  const response = await fetch(url, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`Apple Music API error: ${response.status} ${errorText}`);
+  }
+
+  const data: { data: AppleMusicAlbum[] } = await response.json();
+  const results = new Map();
+
+  for (const album of data.data) {
+    const artworkTemplate = album.attributes.artwork.url;
+    const releaseDate = album.attributes.releaseDate;
+    const releaseYear = parseInt(releaseDate.split("-")[0], 10);
+
+    results.set(album.id, {
+      appleAlbumId: album.id,
+      albumName: album.attributes.name,
+      artistName: album.attributes.artistName,
+      releaseDate,
+      releaseYear,
+      artworkUrlTemplate: artworkTemplate,
+      artworkUrl600: getArtworkUrl(artworkTemplate, 600, 600),
+      artworkUrl300: getArtworkUrl(artworkTemplate, 300, 300),
+      genreNames: album.attributes.genreNames || [],
+    });
+  }
+
+  return results;
+}

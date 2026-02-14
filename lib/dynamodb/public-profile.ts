@@ -1,7 +1,7 @@
 import { cache } from "react";
 import { GetCommand } from "@aws-sdk/lib-dynamodb";
 import { dynamoDocumentClient, TABLE_NAME } from "@/lib/dynamodb";
-import { userPK } from "@/lib/dynamodb/schema";
+import { userPK, ERAS_SK } from "@/lib/dynamodb/schema";
 import { getMusicData } from "@/lib/dynamodb/music-data";
 import { getFeaturedArtists } from "@/lib/dynamodb/featured-artists";
 import { getContent } from "@/lib/dynamodb/content";
@@ -11,6 +11,7 @@ import {
 } from "@/lib/dynamodb/view-counter";
 import type { Artist, Album, Track } from "@/types/music";
 import type { Caption } from "@/types/content";
+import type { ErasData } from "@/types/eras";
 
 // ---------------------------------------------------------------------------
 // Public Profile Types
@@ -30,9 +31,30 @@ export interface PublicProfile {
   albums: Album[];
   tracks: Track[];
   captions: Caption[];
+  erasData?: ErasData;
   viewCount?: number;
   lastfmUsername?: string | null;
   spotifyUserId?: string | null;
+}
+
+// ---------------------------------------------------------------------------
+// Helper Functions
+// ---------------------------------------------------------------------------
+
+/**
+ * Fetches user's eras data from DynamoDB
+ * Returns undefined if no eras data exists
+ */
+async function getErasDataInternal(userId: string): Promise<ErasData | undefined> {
+  const pk = userPK(userId);
+  const result = await dynamoDocumentClient.send(
+    new GetCommand({
+      TableName: TABLE_NAME,
+      Key: { pk, sk: ERAS_SK },
+    })
+  );
+
+  return result.Item ? (result.Item as ErasData) : undefined;
 }
 
 // ---------------------------------------------------------------------------
@@ -103,11 +125,12 @@ export const getPublicProfile = cache(
       return null;
     }
 
-    // Step 3: Fetch music data, featured artists, and content in parallel
-    const [musicData, featuredArtists, contentData] = await Promise.all([
+    // Step 3: Fetch music data, featured artists, content, and eras data in parallel
+    const [musicData, featuredArtists, contentData, erasData] = await Promise.all([
       getMusicData(userId),
       getFeaturedArtists(userId),
       getContent(userId),
+      getErasDataInternal(userId),
     ]);
 
     // Step 4: Increment view count if viewer is not the owner
@@ -134,6 +157,7 @@ export const getPublicProfile = cache(
       albums: musicData?.albums ?? [],
       tracks: musicData?.tracks?.slice(0, 10) ?? [], // UI shows top 10 tracks
       captions: contentData.captions,
+      erasData,
       viewCount,
       lastfmUsername: (user.lastfmUsername as string) ?? null,
       spotifyUserId: (user.spotifyUserId as string) ?? null,

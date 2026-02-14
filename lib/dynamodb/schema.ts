@@ -28,6 +28,12 @@ export const MUSIC_SK = {
 export const METADATA_SK = "PROFILE#METADATA";
 
 /**
+ * Sort key for the user's musical eras/timeline data.
+ * Stores the user's curated album timeline for their musical journey.
+ */
+export const ERAS_SK = "ERAS";
+
+/**
  * Builds the partition key for a given user.
  *
  * Consistent with the pattern used in lib/spotify.ts (USER#{id})

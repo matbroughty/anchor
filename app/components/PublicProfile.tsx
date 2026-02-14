@@ -1,5 +1,7 @@
 import type { Artist, Album, Track } from "@/types/music";
 import type { Caption } from "@/types/content";
+import type { ErasData } from "@/types/eras";
+import { ErasTimeline } from "@/app/components/ErasTimeline";
 
 // ---------------------------------------------------------------------------
 // Props
@@ -13,6 +15,7 @@ interface PublicProfileProps {
   albums: Album[];
   tracks: Track[];
   captions: Caption[];
+  erasData?: ErasData;
   isOwner?: boolean;
   viewCount?: number;
   lastfmUsername?: string | null;
@@ -84,6 +87,7 @@ export function PublicProfile({
   albums,
   tracks,
   captions,
+  erasData,
   isOwner = false,
   viewCount,
   lastfmUsername,
@@ -288,6 +292,13 @@ export function PublicProfile({
                 </a>
               )}
             </div>
+          </div>
+        )}
+
+        {/* Musical Eras Timeline */}
+        {erasData && erasData.entries.length > 0 && (
+          <div className="mb-12">
+            <ErasTimeline erasData={erasData} />
           </div>
         )}
 

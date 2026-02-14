@@ -9,11 +9,13 @@ import { TasteAnalysis } from "@/app/components/TasteAnalysis";
 import { AgeGuess } from "@/app/components/AgeGuess";
 import { RefreshButton } from "@/app/components/RefreshButton";
 import { PublishToggle } from "@/app/components/PublishToggle";
+import { ErasTimeline } from "@/app/components/ErasTimeline";
 import { refreshSpotifyData } from "@/app/actions/spotify";
 import { refreshLastfmUserData } from "@/app/actions/lastfm";
 import { generateBio, generateAlbumCaptions, regenerateBio, regenerateCaption } from "@/app/actions/ai-content";
 import type { MusicData, Artist } from "@/types/music";
 import type { ContentData, Bio, Caption, TasteAnalysis as TasteAnalysisType, AgeGuess as AgeGuessType } from "@/types/content";
+import type { ErasData } from "@/types/eras";
 
 // ---------------------------------------------------------------------------
 // Props
@@ -25,6 +27,7 @@ interface DashboardClientProps {
   initialFeaturedArtists: Artist[];
   initialTasteAnalysis: TasteAnalysisType | null;
   initialAgeGuess: AgeGuessType | null;
+  initialErasData?: ErasData;
   userId: string;
   handle: string | null;
   isPublished: boolean;
@@ -41,6 +44,7 @@ export function DashboardClient({
   initialFeaturedArtists,
   initialTasteAnalysis,
   initialAgeGuess,
+  initialErasData,
   handle,
   isPublished: initialIsPublished,
   musicService,
@@ -48,6 +52,7 @@ export function DashboardClient({
   const [musicData, setMusicData] = useState<MusicData | null>(initialMusicData);
   const [content, setContent] = useState<ContentData>(initialContent);
   const [featuredArtists, setFeaturedArtists] = useState<Artist[]>(initialFeaturedArtists);
+  const [erasData, setErasData] = useState<ErasData | undefined>(initialErasData);
   const [published, setPublished] = useState(initialIsPublished);
   const [isPending, startTransition] = useTransition();
 
@@ -171,6 +176,9 @@ export function DashboardClient({
               </a>
               <a href="#favourite-artists" className="text-xs font-medium text-gray-600 hover:text-gray-900 whitespace-nowrap px-3 py-1 rounded-md hover:bg-gray-100 transition-colors">
                 Favourite Artists
+              </a>
+              <a href="#musical-eras" className="text-xs font-medium text-gray-600 hover:text-gray-900 whitespace-nowrap px-3 py-1 rounded-md hover:bg-gray-100 transition-colors">
+                Musical Eras
               </a>
               <a href="#bio" className="text-xs font-medium text-gray-600 hover:text-gray-900 whitespace-nowrap px-3 py-1 rounded-md hover:bg-gray-100 transition-colors">
                 Bio
@@ -301,6 +309,39 @@ export function DashboardClient({
                 allArtists={musicData?.artists || []}
                 musicService={musicService}
               />
+            </div>
+
+            {/* Musical Eras */}
+            <div id="musical-eras" className="bg-white shadow sm:rounded-lg px-4 py-5 sm:p-6 scroll-mt-20">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-lg font-semibold text-gray-900">Musical Eras</h2>
+                <a
+                  href="/eras"
+                  className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                >
+                  {erasData && erasData.entries.length > 0 ? "Edit Timeline" : "Create Timeline"}
+                </a>
+              </div>
+              <p className="text-sm text-gray-600 mb-4">
+                Build a timeline of the albums that shaped your musical journey.
+              </p>
+              {erasData && erasData.entries.length > 0 ? (
+                <div className="mt-6">
+                  <ErasTimeline erasData={erasData} />
+                </div>
+              ) : (
+                <div className="p-6 bg-gray-50 border-2 border-dashed border-gray-300 rounded-lg text-center">
+                  <p className="text-gray-500 mb-4">
+                    You haven&apos;t created your musical timeline yet.
+                  </p>
+                  <a
+                    href="/eras"
+                    className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
+                  >
+                    Start Your Timeline
+                  </a>
+                </div>
+              )}
             </div>
 
             {/* Bio editor */}

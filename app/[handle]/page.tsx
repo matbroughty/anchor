@@ -104,6 +104,7 @@ export default async function HandlePage({ params }: Props) {
       albums={profile.albums}
       tracks={profile.tracks}
       captions={profile.captions}
+      erasData={profile.erasData}
       isOwner={isOwner}
       viewCount={profile.viewCount}
       lastfmUsername={profile.lastfmUsername}
