@@ -167,3 +167,126 @@ export async function fetchInitialSpotifyData(
     console.error("[Spotify] Error fetching initial data:", error)
   }
 }
+
+/**
+ * Search Spotify catalog for albums
+ * Used in Eras wizard for album selection
+ *
+ * @param accessToken - Spotify access token
+ * @param query - Search query string
+ * @param limit - Number of results to return (default 10)
+ * @returns Array of album objects
+ */
+export async function searchSpotifyAlbums(
+  accessToken: string,
+  query: string,
+  limit: number = 10
+): Promise<any[]> {
+  if (!query.trim()) {
+    return [];
+  }
+
+  try {
+    const encodedQuery = encodeURIComponent(query);
+    const url = `https://api.spotify.com/v1/search?q=${encodedQuery}&type=album&limit=${limit}`;
+
+    const response = await fetch(url, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Spotify API error: ${response.status} ${errorText}`);
+    }
+
+    const data = await response.json();
+    const albums = data.albums?.items || [];
+
+    // Transform to common Album format
+    return albums.map((album: any) => ({
+      id: album.id,
+      name: album.name,
+      artists: album.artists.map((artist: any) => ({
+        id: artist.id,
+        name: artist.name,
+      })),
+      images: album.images.map((img: any) => ({
+        url: img.url,
+        width: img.width,
+        height: img.height,
+      })),
+      albumType: album.album_type,
+      releaseDate: album.release_date,
+      external_urls: {
+        spotify: album.external_urls.spotify,
+      },
+    }));
+  } catch (error) {
+    console.error("Spotify album search error:", error);
+    throw error;
+  }
+}
+
+/**
+ * Get full album details from Spotify
+ * Used when saving eras entries to get complete metadata
+ *
+ * @param accessToken - Spotify access token
+ * @param albumId - Spotify album ID
+ * @returns Album object with full metadata
+ */
+export async function getSpotifyAlbum(
+  accessToken: string,
+  albumId: string
+): Promise<{
+  albumId: string;
+  albumName: string;
+  artistName: string;
+  releaseDate: string;
+  releaseYear: number;
+  artworkUrl: string;
+  artworkUrl600: string;
+  artworkUrl300: string;
+} | null> {
+  try {
+    const url = `https://api.spotify.com/v1/albums/${albumId}`;
+
+    const response = await fetch(url, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+
+    if (!response.ok) {
+      if (response.status === 404) {
+        return null;
+      }
+      const errorText = await response.text();
+      throw new Error(`Spotify API error: ${response.status} ${errorText}`);
+    }
+
+    const album = await response.json();
+
+    // Find best artwork URLs
+    const artworkUrl600 = album.images.find((img: any) => img.height === 640)?.url || album.images[0]?.url || "";
+    const artworkUrl300 = album.images.find((img: any) => img.height === 300)?.url || album.images[1]?.url || artworkUrl600;
+
+    const releaseYear = parseInt(album.release_date.split("-")[0], 10);
+
+    return {
+      albumId: album.id,
+      albumName: album.name,
+      artistName: album.artists.map((a: any) => a.name).join(", "),
+      releaseDate: album.release_date,
+      releaseYear,
+      artworkUrl: artworkUrl600,
+      artworkUrl600,
+      artworkUrl300,
+    };
+  } catch (error) {
+    console.error("Spotify get album error:", error);
+    throw error;
+  }
+}

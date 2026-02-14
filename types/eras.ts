@@ -35,8 +35,11 @@ export interface EraEntry {
   promptId: EraPromptId;              // Which prompt this answers
   promptLabel: string;                // Display label (e.g., "First album", "Teenage years")
 
-  // Apple Music album data (denormalized for performance)
-  appleAlbumId: string;               // Apple Music catalog ID
+  // Album data source
+  source: "spotify" | "applemusic";   // Which API the album came from
+
+  // Album metadata (denormalized for performance)
+  albumId: string;                    // Spotify or Apple Music catalog ID
   albumName: string;
   artistName: string;
   releaseDate: string;                // ISO date (YYYY-MM-DD or YYYY)

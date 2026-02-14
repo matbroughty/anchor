@@ -9,7 +9,7 @@ import { TasteAnalysis } from "@/app/components/TasteAnalysis";
 import { AgeGuess } from "@/app/components/AgeGuess";
 import { RefreshButton } from "@/app/components/RefreshButton";
 import { PublishToggle } from "@/app/components/PublishToggle";
-import { ErasTimeline } from "@/app/components/ErasTimeline";
+import ErasTimeline from "@/app/components/ErasTimeline";
 import { refreshSpotifyData } from "@/app/actions/spotify";
 import { refreshLastfmUserData } from "@/app/actions/lastfm";
 import { generateBio, generateAlbumCaptions, regenerateBio, regenerateCaption } from "@/app/actions/ai-content";

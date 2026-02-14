@@ -16,6 +16,7 @@ interface SelectedAlbum {
   promptId: EraPromptId;
   promptLabel: string;
   album: Album;
+  source: "spotify" | "applemusic";
 }
 
 export default function ErasWizard({ existingData }: ErasWizardProps) {
@@ -25,8 +26,9 @@ export default function ErasWizard({ existingData }: ErasWizardProps) {
     existingData?.entries.map((entry) => ({
       promptId: entry.promptId,
       promptLabel: entry.promptLabel,
+      source: entry.source,
       album: {
-        id: entry.appleAlbumId,
+        id: entry.albumId,
         name: entry.albumName,
         artists: [{ id: "", name: entry.artistName }],
         images: [{ url: entry.artworkUrl, width: 600, height: 600 }],
@@ -37,6 +39,7 @@ export default function ErasWizard({ existingData }: ErasWizardProps) {
   );
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<Album[]>([]);
+  const [searchSource, setSearchSource] = useState<"spotify" | "applemusic">("applemusic");
   const [isSearching, setIsSearching] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -65,6 +68,7 @@ export default function ErasWizard({ existingData }: ErasWizardProps) {
       const result = await searchAlbumsForEras(query);
       if (result.success && result.albums) {
         setSearchResults(result.albums);
+        setSearchSource(result.source || "applemusic");
       } else {
         setError(result.error || "Search failed");
         setSearchResults([]);
@@ -98,6 +102,7 @@ export default function ErasWizard({ existingData }: ErasWizardProps) {
         promptId,
         promptLabel: currentPrompt.label,
         album,
+        source: searchSource,
       },
     ]);
 
@@ -145,12 +150,13 @@ export default function ErasWizard({ existingData }: ErasWizardProps) {
       await deleteErasData();
 
       // Add each selection using server action
-      // This fetches full metadata from Apple Music for each album
+      // This fetches full metadata from the appropriate source (Spotify or Apple Music)
       for (const sel of selections) {
         const result = await addEraEntry(
           sel.promptId,
           sel.promptLabel,
-          sel.album.id
+          sel.album.id,
+          sel.source
         );
 
         if (!result.success) {
@@ -242,13 +248,34 @@ export default function ErasWizard({ existingData }: ErasWizardProps) {
       {/* Search interface */}
       {currentSelections.length < maxSelections && (
         <div className="mb-6">
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={(e) => handleSearch(e.target.value)}
-            placeholder="Search for albums..."
-            className="w-full px-4 py-3 rounded-lg bg-zinc-800 border border-zinc-700 text-white placeholder-zinc-500 focus:outline-none focus:border-blue-500"
-          />
+          <div className="flex items-center gap-2 mb-2">
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => handleSearch(e.target.value)}
+              placeholder="Search for albums..."
+              className="flex-1 px-4 py-3 rounded-lg bg-zinc-800 border border-zinc-700 text-white placeholder-zinc-500 focus:outline-none focus:border-blue-500"
+            />
+            {searchQuery && (
+              <span className="px-3 py-2 rounded-lg bg-zinc-800 border border-zinc-700 text-xs text-zinc-400">
+                {searchSource === "spotify" ? (
+                  <span className="flex items-center gap-1">
+                    <svg className="w-3 h-3 text-green-500" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/>
+                    </svg>
+                    Spotify
+                  </span>
+                ) : (
+                  <span className="flex items-center gap-1">
+                    <svg className="w-3 h-3" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                    </svg>
+                    Apple Music
+                  </span>
+                )}
+              </span>
+            )}
+          </div>
 
           {/* Search results */}
           {searchQuery && (

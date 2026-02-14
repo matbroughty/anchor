@@ -6,17 +6,19 @@ import { dynamoDocumentClient, TABLE_NAME } from "@/lib/dynamodb";
 import { GetCommand, PutCommand, DeleteCommand } from "@aws-sdk/lib-dynamodb";
 import { userPK, ERAS_SK } from "@/lib/dynamodb/schema";
 import { searchAlbums as searchAppleMusicAlbums, lookupAlbum } from "@/lib/apple-music";
+import { getSpotifyTokens, searchSpotifyAlbums, getSpotifyAlbum } from "@/lib/spotify";
 import type { ErasData, EraEntry, TimelineMode, EraPromptId } from "@/types/eras";
 import type { Album } from "@/types/music";
 import { v4 as uuidv4 } from "uuid";
 
 /**
- * Search for albums using Apple Music catalog
- * Used in the Eras wizard for album selection
+ * Search for albums using Spotify or Apple Music catalog
+ * Uses Spotify if user has it connected, otherwise Apple Music
  */
 export async function searchAlbumsForEras(query: string): Promise<{
   success: boolean;
   albums?: Album[];
+  source?: "spotify" | "applemusic";
   error?: string;
 }> {
   try {
@@ -26,11 +28,35 @@ export async function searchAlbumsForEras(query: string): Promise<{
     }
 
     if (!query.trim()) {
-      return { success: true, albums: [] };
+      return { success: true, albums: [], source: "applemusic" };
     }
 
+    // Check if user has Spotify connected
+    const pk = userPK(session.user.id);
+    const spotifyResult = await dynamoDocumentClient.send(
+      new GetCommand({
+        TableName: TABLE_NAME,
+        Key: { pk, sk: "SPOTIFY" },
+      })
+    );
+
+    // If Spotify connected, use Spotify API
+    if (spotifyResult.Item) {
+      try {
+        const tokens = await getSpotifyTokens(session.user.id);
+        if (tokens) {
+          const albums = await searchSpotifyAlbums(tokens.accessToken, query, 10);
+          return { success: true, albums, source: "spotify" };
+        }
+      } catch (spotifyError) {
+        console.error("Spotify search failed, falling back to Apple Music:", spotifyError);
+        // Fall through to Apple Music
+      }
+    }
+
+    // Use Apple Music as fallback (or default for Last.fm/manual users)
     const albums = await searchAppleMusicAlbums(query, 10);
-    return { success: true, albums };
+    return { success: true, albums, source: "applemusic" };
   } catch (error) {
     console.error("Failed to search albums for eras:", error);
     return {
@@ -138,11 +164,13 @@ export async function saveErasData(erasData: ErasData): Promise<{
 /**
  * Add a new entry to user's eras
  * Used in the wizard to add albums one at a time
+ * Supports both Spotify and Apple Music album IDs
  */
 export async function addEraEntry(
   promptId: EraPromptId,
   promptLabel: string,
-  appleAlbumId: string
+  albumId: string,
+  source: "spotify" | "applemusic"
 ): Promise<{
   success: boolean;
   entry?: EraEntry;
@@ -154,10 +182,48 @@ export async function addEraEntry(
       return { success: false, error: "Not authenticated" };
     }
 
-    // Fetch album metadata from Apple Music
-    const albumData = await lookupAlbum(appleAlbumId);
-    if (!albumData) {
-      return { success: false, error: "Album not found" };
+    // Fetch album metadata from appropriate source
+    let albumData: {
+      albumName: string;
+      artistName: string;
+      releaseDate: string;
+      releaseYear: number;
+      artworkUrl: string;
+    } | null = null;
+
+    if (source === "spotify") {
+      // Get Spotify tokens and fetch album data
+      const tokens = await getSpotifyTokens(session.user.id);
+      if (!tokens) {
+        return { success: false, error: "Spotify not connected" };
+      }
+
+      const spotifyAlbum = await getSpotifyAlbum(tokens.accessToken, albumId);
+      if (!spotifyAlbum) {
+        return { success: false, error: "Album not found on Spotify" };
+      }
+
+      albumData = {
+        albumName: spotifyAlbum.albumName,
+        artistName: spotifyAlbum.artistName,
+        releaseDate: spotifyAlbum.releaseDate,
+        releaseYear: spotifyAlbum.releaseYear,
+        artworkUrl: spotifyAlbum.artworkUrl600,
+      };
+    } else {
+      // Use Apple Music
+      const appleAlbum = await lookupAlbum(albumId);
+      if (!appleAlbum) {
+        return { success: false, error: "Album not found on Apple Music" };
+      }
+
+      albumData = {
+        albumName: appleAlbum.albumName,
+        artistName: appleAlbum.artistName,
+        releaseDate: appleAlbum.releaseDate,
+        releaseYear: appleAlbum.releaseYear,
+        artworkUrl: appleAlbum.artworkUrl600,
+      };
     }
 
     // Get existing eras data
@@ -173,12 +239,13 @@ export async function addEraEntry(
       entryId: uuidv4(),
       promptId,
       promptLabel,
-      appleAlbumId,
+      source,
+      albumId,
       albumName: albumData.albumName,
       artistName: albumData.artistName,
       releaseDate: albumData.releaseDate,
       releaseYear: albumData.releaseYear,
-      artworkUrl: albumData.artworkUrl600,
+      artworkUrl: albumData.artworkUrl,
       orderIndex: erasData.entries.length,
       createdAt: new Date().toISOString(),
     };

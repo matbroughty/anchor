@@ -1,7 +1,7 @@
 import type { Artist, Album, Track } from "@/types/music";
 import type { Caption } from "@/types/content";
 import type { ErasData } from "@/types/eras";
-import { ErasTimeline } from "@/app/components/ErasTimeline";
+import ErasTimeline from "@/app/components/ErasTimeline";
 
 // ---------------------------------------------------------------------------
 // Props
