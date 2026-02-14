@@ -11,6 +11,7 @@ Anchor.band is like Letterboxd for music - a place to share your music taste in 
 **Features:**
 - 🎵 Three music source options: Spotify, Last.fm, or Self-Curate (manual selection)
 - 📖 Musical Eras timeline - curate key albums from your musical journey
+- 🎧 Tim's Twitter Listening Party integration - showcase your favourite listening party
 - 🤖 AI-generated bios and album captions (powered by Claude)
 - ⭐ Highlight up to 4 favourite artists on your profile
 - 📊 Fun music taste analysis with critic-informed insights
@@ -187,6 +188,16 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 - **Timeline Modes**: Display by release date, with your age at release (life_era mode), or custom order
 - **Public Display**: Timeline appears prominently on your published profile page
 
+### Tim's Twitter Listening Party Integration
+- **Favourite Party Selection**: Search and select your favourite listening party from Tim's extensive archive
+- **Live Data**: CSV feed from timstwitterlisteningparty.com automatically cached with 6-hour refresh
+- **Search by Artist/Album**: Debounced search interface filters thousands of listening parties
+- **Icon Display**: Tim's iconic apple icon appears on your published profile when you have a favourite selected
+- **Hover Card**: Interactive card shows album artwork, artist, album, party date, and replay link
+- **Direct Links**: Quick access to replay the party, view on Spotify, or see the original tweet
+- **Dashboard Integration**: Select and manage your favourite from a dedicated section on your dashboard
+- **Optional Feature**: Showcase your favourite listening party or leave it unset
+
 ### Music Profile
 - **Public Profile Pages**: Clean, shareable pages at `anchor.band/yourhandle`
 - **Favourite Artists**: Highlight up to 4 favourite artists with circular profile images and blue ring highlighting
@@ -245,10 +256,13 @@ anchor/
 │   │   └── featured-artists.ts # Featured artist management
 │   ├── api/                 # API routes
 │   │   ├── auth/            # NextAuth handlers
+│   │   ├── listening-party/ # Listening party search and favourite APIs
 │   │   └── profile/         # Profile management APIs
 │   ├── components/          # React components
 │   │   ├── PublicProfile.tsx # Public profile display
 │   │   ├── ErasTimeline.tsx # Musical Eras timeline rail
+│   │   ├── ListeningPartySelector.tsx # Listening party search & selection
+│   │   ├── TimsListeningPartyIcon.tsx # Tim's icon with hover card
 │   │   ├── TasteAnalysis.tsx # Taste analysis UI
 │   │   ├── BioEditor.tsx    # Bio editing interface
 │   │   ├── AlbumCaptions.tsx # Caption management
@@ -274,11 +288,13 @@ anchor/
 │   ├── spotify.ts           # Spotify API integration
 │   ├── lastfm.ts            # Last.fm API integration
 │   ├── apple-music.ts       # Apple Music API integration
+│   ├── listening-party-cache.ts # Tim's Twitter Listening Party CSV cache
 │   └── eras-prompts.ts      # Musical Eras wizard prompts
 ├── types/                   # TypeScript type definitions
 │   ├── content.ts           # Content types (bio, captions, analysis)
 │   ├── music.ts             # Music types (artists, albums, tracks)
-│   └── eras.ts              # Musical Eras types (timeline, entries, prompts)
+│   ├── eras.ts              # Musical Eras types (timeline, entries, prompts)
+│   └── listening-party.ts   # Tim's Twitter Listening Party types
 ├── auth.ts                  # NextAuth configuration
 ├── middleware.ts            # Route protection
 └── .planning/               # GSD project planning (not deployed)
@@ -302,6 +318,7 @@ anchor/
    - Select up to 4 favourite artists
    - Generate music taste analysis
    - Reorder or edit Musical Eras timeline
+   - Select favourite Tim's Twitter Listening Party (optional)
 8. **Publish**: User toggles profile to public, making it visible at `anchor.band/handle`
 9. **Share**: Profile URL can be shared on social media
 
@@ -329,7 +346,7 @@ All AI content follows strict anti-cringe rules:
 ### Data Architecture
 
 **Single-Table DynamoDB Design:**
-- Partition Key: `USER#{userId}` or `HANDLE#{handle}`
+- Partition Key: `USER#{userId}`, `HANDLE#{handle}`, or `CACHE#{source}`
 - Sort Keys:
   - `USER#{userId}` - User record (includes lastfmUsername, manualCuration flags)
   - `SPOTIFY` - Encrypted Spotify tokens (if Spotify connected)
@@ -338,12 +355,14 @@ All AI content follows strict anti-cringe rules:
   - `MUSIC#TRACKS` - Top tracks (from Spotify, Last.fm, or manual)
   - `MUSIC#FEATURED_ARTISTS` - Featured artists
   - `ERAS` - Musical Eras timeline data (entries with album metadata)
+  - `LISTENING_PARTY#FAVOURITE` - User's favourite Tim's Twitter Listening Party
   - `PROFILE#METADATA` - Last refresh timestamp, view count
   - `CONTENT#BIO` - AI-generated bio
   - `CONTENT#CAPTIONS` - Album captions
   - `CONTENT#TASTE_ANALYSIS` - Taste analysis
   - `CONTENT#AGE_GUESS` - Age guess game data
   - `HANDLE#{handle}` - Handle → userId lookup
+  - `CACHE#TWTLP` + `CSV` - Cached CSV data from timstwitterlisteningparty.com (6-hour TTL)
 
 **View Counter:**
 - Atomic ADD operations prevent race conditions

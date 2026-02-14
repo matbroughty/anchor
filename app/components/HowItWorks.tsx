@@ -29,7 +29,7 @@ export function HowItWorks() {
                 Generate your anchor
               </p>
               <p className="text-sm text-neutral-600 mt-1">
-                Create your bio, add your Musical Eras timeline, and customize your profile
+                Create your bio, add your Musical Eras timeline, select your favourite Tim&apos;s Twitter Listening Party, and customize your profile
               </p>
             </div>
           </li>
