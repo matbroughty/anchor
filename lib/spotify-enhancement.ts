@@ -80,12 +80,27 @@ export async function enhanceLastfmArtistImages(
     for (const artist of artists) {
       try {
         // Skip if artist already has high-quality images
-        const hasGoodImages = artist.images.some((img) => img.width >= 300);
+        // Check for: non-empty array, valid URLs, and proper dimensions
+        const hasGoodImages =
+          artist.images.length > 0 &&
+          artist.images.some((img) =>
+            img.width >= 300 &&
+            img.url &&
+            img.url.trim() !== "" &&
+            !img.url.includes('2a96cbd8b46e442fc41c2b86b821562f.png') // Last.fm placeholder
+          );
         if (hasGoodImages) {
           console.log(`[Enhancement] Skipping ${artist.name} - already has good images`);
           result.skippedCount++;
           enhancedArtists.push(artist);
           continue;
+        }
+
+        // Log why we're enhancing this artist
+        if (artist.images.length === 0) {
+          console.log(`[Enhancement] Artist ${artist.name} has no images`);
+        } else {
+          console.log(`[Enhancement] Artist ${artist.name} has ${artist.images.length} images but none are high-quality`);
         }
 
         // Add delay between API calls (skip delay for first artist)
