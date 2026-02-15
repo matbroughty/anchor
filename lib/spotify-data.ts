@@ -170,6 +170,53 @@ export async function searchTracks(
 }
 
 /**
+ * Get full album details from Spotify using any access token (OAuth or Client Credentials).
+ * Used when saving eras entries to get complete metadata.
+ *
+ * @param accessToken - Spotify access token (OAuth or client credentials)
+ * @param albumId     - Spotify album ID
+ * @returns Album metadata object with full details
+ */
+export async function getAlbum(
+  accessToken: string,
+  albumId: string
+): Promise<{
+  albumId: string;
+  albumName: string;
+  artistName: string;
+  releaseDate: string;
+  releaseYear: number;
+  artworkUrl600: string;
+} | null> {
+  try {
+    const url = `https://api.spotify.com/v1/albums/${albumId}`;
+    const data = await spotifyGet<any>(url, accessToken);
+
+    if (!data || !data.id) {
+      return null;
+    }
+
+    // Extract release year from release_date (format: YYYY-MM-DD or YYYY)
+    const releaseYear = parseInt(data.release_date.split("-")[0]);
+
+    // Get 600x600 artwork (usually the second image in the array)
+    const artwork600 = data.images.find((img: any) => img.width === 640) || data.images[0];
+
+    return {
+      albumId: data.id,
+      albumName: data.name,
+      artistName: data.artists[0]?.name || "Unknown Artist",
+      releaseDate: data.release_date,
+      releaseYear,
+      artworkUrl600: artwork600?.url || "",
+    };
+  } catch (error) {
+    console.error("Failed to get album details:", error);
+    return null;
+  }
+}
+
+/**
  * Derives the user's top albums from their top tracks.
  *
  * Algorithm:

@@ -5,15 +5,16 @@ import { revalidatePath } from "next/cache";
 import { dynamoDocumentClient, TABLE_NAME } from "@/lib/dynamodb";
 import { GetCommand, PutCommand, DeleteCommand } from "@aws-sdk/lib-dynamodb";
 import { userPK, ERAS_SK } from "@/lib/dynamodb/schema";
-import { searchAlbums as searchAppleMusicAlbums, lookupAlbum } from "@/lib/apple-music";
 import { getSpotifyTokens, searchSpotifyAlbums, getSpotifyAlbum } from "@/lib/spotify";
+import { searchAlbums as searchSpotifyAlbumsAnon, getAlbum as getSpotifyAlbumAnon } from "@/lib/spotify-data";
+import { getClientCredentialsToken } from "@/lib/spotify-client-credentials";
 import type { ErasData, EraEntry, TimelineMode, EraPromptId } from "@/types/eras";
 import type { Album } from "@/types/music";
 import { v4 as uuidv4 } from "uuid";
 
 /**
- * Search for albums using Spotify or Apple Music catalog
- * Uses Spotify if user has it connected, otherwise Apple Music
+ * Search for albums using Spotify catalog
+ * Uses user's Spotify OAuth if connected, otherwise anonymous Client Credentials
  */
 export async function searchAlbumsForEras(query: string): Promise<{
   success: boolean;
@@ -28,7 +29,7 @@ export async function searchAlbumsForEras(query: string): Promise<{
     }
 
     if (!query.trim()) {
-      return { success: true, albums: [], source: "applemusic" };
+      return { success: true, albums: [], source: "spotify" };
     }
 
     // Check if user has Spotify connected
@@ -40,7 +41,7 @@ export async function searchAlbumsForEras(query: string): Promise<{
       })
     );
 
-    // If Spotify connected, use Spotify API
+    // If Spotify connected, use user's OAuth token
     if (spotifyResult.Item) {
       try {
         const tokens = await getSpotifyTokens(session.user.id);
@@ -49,14 +50,16 @@ export async function searchAlbumsForEras(query: string): Promise<{
           return { success: true, albums, source: "spotify" };
         }
       } catch (spotifyError) {
-        console.error("Spotify search failed, falling back to Apple Music:", spotifyError);
-        // Fall through to Apple Music
+        console.error("Spotify OAuth search failed, falling back to anonymous:", spotifyError);
+        // Fall through to anonymous Spotify
       }
     }
 
-    // Use Apple Music as fallback (or default for Last.fm/manual users)
-    const albums = await searchAppleMusicAlbums(query, 10);
-    return { success: true, albums, source: "applemusic" };
+    // Use Spotify Client Credentials (anonymous access) as fallback
+    // This is FREE and works for Last.fm/manual users
+    const token = await getClientCredentialsToken();
+    const albums = await searchSpotifyAlbumsAnon(token, query, 10);
+    return { success: true, albums, source: "spotify" };
   } catch (error) {
     console.error("Failed to search albums for eras:", error);
     return {
@@ -164,7 +167,7 @@ export async function saveErasData(erasData: ErasData): Promise<{
 /**
  * Add a new entry to user's eras
  * Used in the wizard to add albums one at a time
- * Supports both Spotify and Apple Music album IDs
+ * Uses Spotify OAuth if user has it connected, otherwise Client Credentials (free)
  */
 export async function addEraEntry(
   promptId: EraPromptId,
@@ -182,7 +185,7 @@ export async function addEraEntry(
       return { success: false, error: "Not authenticated" };
     }
 
-    // Fetch album metadata from appropriate source
+    // Fetch album metadata from Spotify
     let albumData: {
       albumName: string;
       artistName: string;
@@ -191,13 +194,11 @@ export async function addEraEntry(
       artworkUrl: string;
     } | null = null;
 
-    if (source === "spotify") {
-      // Get Spotify tokens and fetch album data
-      const tokens = await getSpotifyTokens(session.user.id);
-      if (!tokens) {
-        return { success: false, error: "Spotify not connected" };
-      }
+    // Try user's Spotify OAuth token first
+    const tokens = await getSpotifyTokens(session.user.id);
 
+    if (tokens) {
+      // User has Spotify connected - use OAuth token
       const spotifyAlbum = await getSpotifyAlbum(tokens.accessToken, albumId);
       if (!spotifyAlbum) {
         return { success: false, error: "Album not found on Spotify" };
@@ -211,18 +212,19 @@ export async function addEraEntry(
         artworkUrl: spotifyAlbum.artworkUrl600,
       };
     } else {
-      // Use Apple Music
-      const appleAlbum = await lookupAlbum(albumId);
-      if (!appleAlbum) {
-        return { success: false, error: "Album not found on Apple Music" };
+      // User doesn't have Spotify - use anonymous Client Credentials (free)
+      const anonToken = await getClientCredentialsToken();
+      const spotifyAlbum = await getSpotifyAlbumAnon(anonToken, albumId);
+      if (!spotifyAlbum) {
+        return { success: false, error: "Album not found on Spotify" };
       }
 
       albumData = {
-        albumName: appleAlbum.albumName,
-        artistName: appleAlbum.artistName,
-        releaseDate: appleAlbum.releaseDate,
-        releaseYear: appleAlbum.releaseYear,
-        artworkUrl: appleAlbum.artworkUrl600,
+        albumName: spotifyAlbum.albumName,
+        artistName: spotifyAlbum.artistName,
+        releaseDate: spotifyAlbum.releaseDate,
+        releaseYear: spotifyAlbum.releaseYear,
+        artworkUrl: spotifyAlbum.artworkUrl600,
       };
     }
 
@@ -234,12 +236,12 @@ export async function addEraEntry(
 
     const erasData = erasResult.data;
 
-    // Create new entry
+    // Create new entry (source is always "spotify" now)
     const newEntry: EraEntry = {
       entryId: uuidv4(),
       promptId,
       promptLabel,
-      source,
+      source: "spotify",
       albumId,
       albumName: albumData.albumName,
       artistName: albumData.artistName,
