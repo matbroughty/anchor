@@ -17,6 +17,7 @@ const resend = new Resend(process.env.AUTH_RESEND_KEY);
 export interface PublishResult {
   success: boolean;
   error?: string;
+  isFirstPublish?: boolean;
 }
 
 // ---------------------------------------------------------------------------
@@ -38,6 +39,16 @@ export async function publishPage(): Promise<PublishResult> {
 
     const userId = session.user.id;
     const pk = userPK(userId);
+
+    // Check if this is the first time publishing
+    const userRecord = await dynamoDocumentClient.send(
+      new GetCommand({
+        TableName: TABLE_NAME,
+        Key: { pk, sk: pk },
+        ProjectionExpression: "publishedAt",
+      })
+    );
+    const isFirstPublish = !userRecord.Item?.publishedAt;
 
     // Enhance Last.fm artist images before publishing
     try {
@@ -98,7 +109,7 @@ export async function publishPage(): Promise<PublishResult> {
       }
     }
 
-    return { success: true };
+    return { success: true, isFirstPublish };
   } catch (error) {
     console.error("Error publishing page:", error);
     return {

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { publishPage, unpublishPage } from "@/app/actions/publish";
+import { CelebrationModal } from "@/app/components/CelebrationModal";
 
 // ---------------------------------------------------------------------------
 // Props
@@ -28,6 +29,7 @@ export function PublishToggle({
   const [error, setError] = useState<string | null>(null);
   const [showConfirm, setShowConfirm] = useState(false);
   const [copySuccess, setCopySuccess] = useState(false);
+  const [showCelebration, setShowCelebration] = useState(false);
 
   const handleToggle = async () => {
     // If publishing without a bio, show confirmation
@@ -51,6 +53,10 @@ export function PublishToggle({
 
       if (result.success) {
         onStatusChange(!isPublished);
+        // Show celebration modal if this was the first publish
+        if (!isPublished && result.isFirstPublish) {
+          setShowCelebration(true);
+        }
       } else {
         setError(result.error ?? "Failed to update publish status");
       }
@@ -132,6 +138,20 @@ export function PublishToggle({
           </div>
 
           <div className="flex items-center gap-2 flex-shrink-0">
+            {/* Preview button - always visible */}
+            <button
+              type="button"
+              onClick={() => window.open(`/${handle}?preview=true`, '_blank')}
+              className="inline-flex items-center gap-2 px-3 py-2 bg-white border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
+              title="Preview how your profile will look"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+              </svg>
+              <span className="hidden sm:inline">Preview</span>
+            </button>
+
             {/* Share button - only when published */}
             {isPublished && (
               <button
@@ -235,6 +255,14 @@ export function PublishToggle({
             </div>
           </div>
         </div>
+      )}
+
+      {/* Celebration modal for first-time publish */}
+      {showCelebration && (
+        <CelebrationModal
+          handle={handle}
+          onClose={() => setShowCelebration(false)}
+        />
       )}
     </div>
   );

@@ -24,6 +24,7 @@ export const dynamicParams = true;
 
 type Props = {
   params: Promise<{ handle: string }>;
+  searchParams: Promise<{ preview?: string }>;
 };
 
 // ---------------------------------------------------------------------------
@@ -74,8 +75,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 // Page Component
 // ---------------------------------------------------------------------------
 
-export default async function HandlePage({ params }: Props) {
+export default async function HandlePage({ params, searchParams }: Props) {
   const { handle } = await params;
+  const { preview } = await searchParams;
 
   // Force dynamic rendering by accessing cookies - prevents caching of auth() calls
   // This is critical to prevent showing the wrong user's session
@@ -85,8 +87,11 @@ export default async function HandlePage({ params }: Props) {
   const session = await auth();
   const viewerHandle = session?.user?.handle ?? null;
 
-  // Fetch profile with viewer information
-  const profile = await getPublicProfile(handle, viewerHandle);
+  // Check if preview mode is requested
+  const isPreviewMode = preview === "true";
+
+  // Fetch profile with viewer information and preview flag
+  const profile = await getPublicProfile(handle, viewerHandle, isPreviewMode);
 
   if (!profile) {
     notFound();
@@ -110,6 +115,7 @@ export default async function HandlePage({ params }: Props) {
       viewCount={profile.viewCount}
       lastfmUsername={profile.lastfmUsername}
       spotifyUserId={profile.spotifyUserId}
+      isPreviewMode={isPreviewMode}
     />
   );
 }

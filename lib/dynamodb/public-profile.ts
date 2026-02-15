@@ -112,17 +112,19 @@ async function getFavouriteListeningPartyInternal(userId: string): Promise<Favou
  * Returns null when:
  * - Handle doesn't exist
  * - User doesn't exist
- * - User is not published (isPublic is false or undefined)
+ * - User is not published (isPublic is false or undefined) - UNLESS preview mode is enabled and viewer is the owner
  *
  * Returns complete profile data for published users.
  *
  * @param viewerHandle - The handle of the viewer (null if not logged in).
  *   Used to exclude owner views from the counter and to fetch the count for the owner.
+ * @param preview - If true and viewer is the owner, bypasses the isPublic check to allow preview of unpublished profiles.
  */
 export const getPublicProfile = cache(
   async (
     handle: string,
-    viewerHandle?: string | null
+    viewerHandle?: string | null,
+    preview?: boolean
   ): Promise<PublicProfile | null> => {
     const normalizedHandle = handle.toLowerCase();
     const handleKey = `HANDLE#${normalizedHandle}`;
@@ -161,9 +163,10 @@ export const getPublicProfile = cache(
 
     const user = userResult.Item;
     const isPublic = user.isPublic === true;
+    const isOwnerPreview = preview === true && viewerHandle === normalizedHandle;
 
-    // Return null for unpublished users
-    if (!isPublic) {
+    // Return null for unpublished users (unless owner is previewing)
+    if (!isPublic && !isOwnerPreview) {
       return null;
     }
 
@@ -193,7 +196,7 @@ export const getPublicProfile = cache(
     return {
       displayName: (user.displayName as string) ?? null,
       handle: normalizedHandle,
-      isPublic: true,
+      isPublic,
       bio: contentData.bio?.text ?? null,
       featuredArtists,
       artists: musicData?.artists ?? [],
