@@ -68,8 +68,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           })
         } catch (error) {
           console.error("Failed to store Spotify tokens:", error)
-          // Don't block sign-in on token storage failure
-          // User can re-connect Spotify later
+          // Throw error to prevent sign-in and show message to user
+          throw new Error("Failed to connect Spotify. Please try again or contact support if the problem persists.")
         }
       }
       return true

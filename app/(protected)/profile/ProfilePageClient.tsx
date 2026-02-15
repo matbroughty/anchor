@@ -391,7 +391,7 @@ export default function ProfilePageClient({
                           placeholder="Enter your Last.fm username"
                           required
                           disabled={isConnectingLastfm || profile.spotifyConnected}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent disabled:opacity-50 disabled:bg-gray-100"
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent disabled:opacity-50 disabled:bg-gray-100"
                         />
                         <button
                           type="submit"
