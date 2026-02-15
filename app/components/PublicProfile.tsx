@@ -535,6 +535,15 @@ export function PublicProfile({
               Anchor.band
             </a>
           </p>
+          <p className="text-xs text-neutral-500 dark:text-neutral-600 mt-2">
+            Contact:{" "}
+            <a
+              href="mailto:mat@broughty.com"
+              className="hover:text-neutral-600 dark:hover:text-neutral-400 transition-colors"
+            >
+              mat@broughty.com
+            </a>
+          </p>
         </footer>
       </main>
 

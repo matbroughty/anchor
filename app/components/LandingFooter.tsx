@@ -21,6 +21,15 @@ export function LandingFooter() {
           <p className="text-sm text-neutral-500">
             Copyright 2026 Anchor.band
           </p>
+          <p className="text-xs text-neutral-500">
+            Contact:{" "}
+            <a
+              href="mailto:mat@broughty.com"
+              className="text-blue-600 hover:text-blue-700 underline transition-colors"
+            >
+              mat@broughty.com
+            </a>
+          </p>
         </div>
       </div>
     </footer>

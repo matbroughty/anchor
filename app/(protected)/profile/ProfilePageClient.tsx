@@ -57,7 +57,7 @@ export default function ProfilePageClient({
       case "OAuthAccountNotLinked":
         return {
           title: "This Spotify account is already connected",
-          message: "This Spotify account is already linked to a different Anchor profile. To connect it here, you need to disconnect it from the other profile first. If you don't have access to that profile, please contact us at hello@anchor.band for assistance.",
+          message: "This Spotify account is already linked to a different Anchor profile. To connect it here, you need to disconnect it from the other profile first. If you don't have access to that profile, please contact us at mat@broughty.com for assistance.",
         };
       case "AccessDenied":
         return {
@@ -67,7 +67,7 @@ export default function ProfilePageClient({
       default:
         return {
           title: "Connection failed",
-          message: "Something went wrong while connecting to Spotify. Please try again or contact us at hello@anchor.band if the problem persists.",
+          message: "Something went wrong while connecting to Spotify. Please try again or contact us at mat@broughty.com if the problem persists.",
         };
     }
   };
@@ -475,10 +475,10 @@ export default function ProfilePageClient({
                           <p className="text-xs text-amber-800">
                             <strong>Note:</strong> Due to Spotify API limitations, you must contact{" "}
                             <a
-                              href="mailto:hello@anchor.band"
+                              href="mailto:mat@broughty.com"
                               className="underline hover:text-amber-900"
                             >
-                              hello@anchor.band
+                              mat@broughty.com
                             </a>{" "}
                             to be added to our approved user list (limited to 25 users). We recommend using Last.fm instead.
                           </p>
