@@ -6,6 +6,7 @@ import { UpdateCommand, GetCommand } from "@aws-sdk/lib-dynamodb";
 import { dynamoDocumentClient, TABLE_NAME } from "@/lib/dynamodb";
 import { userPK } from "@/lib/dynamodb/schema";
 import { Resend } from "resend";
+import { enhanceLastfmArtistImages } from "@/lib/spotify-enhancement";
 
 const resend = new Resend(process.env.AUTH_RESEND_KEY);
 
@@ -37,6 +38,18 @@ export async function publishPage(): Promise<PublishResult> {
 
     const userId = session.user.id;
     const pk = userPK(userId);
+
+    // Enhance Last.fm artist images before publishing
+    try {
+      const enhancementResult = await enhanceLastfmArtistImages(userId);
+      console.log(
+        `[Publish] Enhanced ${enhancementResult.enhancedCount} artist images, ` +
+        `skipped ${enhancementResult.skippedCount}, failed ${enhancementResult.failedCount}`
+      );
+    } catch (enhanceError) {
+      // Don't fail publish if enhancement fails
+      console.error("[Publish] Image enhancement error:", enhanceError);
+    }
 
     // Update the user record to set isPublic = true
     // Set publishedAt only if it doesn't exist (first time publishing)
