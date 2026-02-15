@@ -7,14 +7,15 @@ import { UpdateCommand, DeleteCommand, GetCommand } from "@aws-sdk/lib-dynamodb"
 import { userPK } from "@/lib/dynamodb/schema";
 import { putMusicData, getMusicData } from "@/lib/dynamodb/music-data";
 import {
-  searchArtists as searchAppleMusicArtists,
-  searchAlbums as searchAppleMusicAlbums,
-  searchTracks as searchAppleMusicTracks,
-} from "@/lib/apple-music";
+  searchArtists as searchSpotifyArtists,
+  searchAlbums as searchSpotifyAlbums,
+  searchTracks as searchSpotifyTracks,
+} from "@/lib/spotify-data";
+import { getClientCredentialsToken } from "@/lib/spotify-client-credentials";
 import type { Artist, Album, Track } from "@/types/music";
 
 /**
- * Search for artists using Apple Music catalog
+ * Search for artists using Spotify catalog (anonymous access)
  */
 export async function searchArtistsAction(query: string): Promise<{
   success: boolean;
@@ -31,7 +32,9 @@ export async function searchArtistsAction(query: string): Promise<{
       return { success: true, artists: [] };
     }
 
-    const artists = await searchAppleMusicArtists(query, 10);
+    // Get Spotify client credentials token (anonymous access)
+    const token = await getClientCredentialsToken();
+    const artists = await searchSpotifyArtists(token, query, 10);
     return { success: true, artists };
   } catch (error) {
     console.error("Failed to search artists:", error);
@@ -43,7 +46,7 @@ export async function searchArtistsAction(query: string): Promise<{
 }
 
 /**
- * Search for albums using Apple Music catalog
+ * Search for albums using Spotify catalog (anonymous access)
  */
 export async function searchAlbumsAction(query: string): Promise<{
   success: boolean;
@@ -60,7 +63,9 @@ export async function searchAlbumsAction(query: string): Promise<{
       return { success: true, albums: [] };
     }
 
-    const albums = await searchAppleMusicAlbums(query, 10);
+    // Get Spotify client credentials token (anonymous access)
+    const token = await getClientCredentialsToken();
+    const albums = await searchSpotifyAlbums(token, query, 10);
     return { success: true, albums };
   } catch (error) {
     console.error("Failed to search albums:", error);
@@ -72,7 +77,7 @@ export async function searchAlbumsAction(query: string): Promise<{
 }
 
 /**
- * Search for tracks using Apple Music catalog
+ * Search for tracks using Spotify catalog (anonymous access)
  */
 export async function searchTracksAction(query: string): Promise<{
   success: boolean;
@@ -89,7 +94,9 @@ export async function searchTracksAction(query: string): Promise<{
       return { success: true, tracks: [] };
     }
 
-    const tracks = await searchAppleMusicTracks(query, 10);
+    // Get Spotify client credentials token (anonymous access)
+    const token = await getClientCredentialsToken();
+    const tracks = await searchSpotifyTracks(token, query, 10);
     return { success: true, tracks };
   } catch (error) {
     console.error("Failed to search tracks:", error);

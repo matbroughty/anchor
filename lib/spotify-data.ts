@@ -5,6 +5,8 @@ import type {
   SpotifyTopArtistsResponse,
   SpotifyTopTracksResponse,
   SpotifySearchArtistsResponse,
+  SpotifySearchAlbumsResponse,
+  SpotifySearchTracksResponse,
 } from "@/types/music";
 
 // ---------------------------------------------------------------------------
@@ -93,7 +95,7 @@ export async function getTopTracks(
 /**
  * Searches for artists on Spotify by name.
  *
- * @param accessToken - Decrypted Spotify OAuth access token
+ * @param accessToken - Decrypted Spotify OAuth access token or client credentials token
  * @param query       - Search query string
  * @param limit       - Number of results to return (default 10)
  * @returns Normalised Artist array containing only the fields we need
@@ -112,6 +114,58 @@ export async function searchArtists(
     name: item.name,
     images: item.images,
     genres: item.genres,
+  }));
+}
+
+/**
+ * Searches for albums on Spotify by name.
+ *
+ * @param accessToken - Decrypted Spotify OAuth access token or client credentials token
+ * @param query       - Search query string
+ * @param limit       - Number of results to return (default 10)
+ * @returns Normalised Album array containing only the fields we need
+ */
+export async function searchAlbums(
+  accessToken: string,
+  query: string,
+  limit: number = 10
+): Promise<Album[]> {
+  const encodedQuery = encodeURIComponent(query);
+  const url = `https://api.spotify.com/v1/search?q=${encodedQuery}&type=album&limit=${limit}`;
+  const data = await spotifyGet<SpotifySearchAlbumsResponse>(url, accessToken);
+
+  return data.albums.items.map((item) => ({
+    id: item.id,
+    name: item.name,
+    artists: item.artists,
+    images: item.images,
+    albumType: item.album_type,
+  }));
+}
+
+/**
+ * Searches for tracks on Spotify by name.
+ *
+ * @param accessToken - Decrypted Spotify OAuth access token or client credentials token
+ * @param query       - Search query string
+ * @param limit       - Number of results to return (default 10)
+ * @returns Normalised Track array containing only the fields we need
+ */
+export async function searchTracks(
+  accessToken: string,
+  query: string,
+  limit: number = 10
+): Promise<Track[]> {
+  const encodedQuery = encodeURIComponent(query);
+  const url = `https://api.spotify.com/v1/search?q=${encodedQuery}&type=track&limit=${limit}`;
+  const data = await spotifyGet<SpotifySearchTracksResponse>(url, accessToken);
+
+  return data.tracks.items.map((item) => ({
+    id: item.id,
+    name: item.name,
+    artists: item.artists,
+    album: item.album,
+    popularity: item.popularity,
   }));
 }
 

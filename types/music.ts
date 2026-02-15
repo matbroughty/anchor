@@ -122,3 +122,32 @@ export interface SpotifySearchArtistsResponse {
     }>;
   };
 }
+
+export interface SpotifySearchAlbumsResponse {
+  albums: {
+    items: Array<{
+      id: string;
+      name: string;
+      artists: ArtistRef[];
+      images: SpotifyImage[];
+      album_type: string;
+    }>;
+  };
+}
+
+export interface SpotifySearchTracksResponse {
+  tracks: {
+    items: Array<{
+      id: string;
+      name: string;
+      artists: ArtistRef[];
+      album: {
+        id: string;
+        name: string;
+        images: SpotifyImage[];
+        album_type: string;
+      };
+      popularity: number;
+    }>;
+  };
+}
