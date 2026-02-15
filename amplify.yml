@@ -23,6 +23,7 @@ frontend:
         - echo "APPLE_MUSIC_TEAM_ID=$APPLE_MUSIC_TEAM_ID" >> .env.production
         - echo "APPLE_MUSIC_KEY_ID=$APPLE_MUSIC_KEY_ID" >> .env.production
         - echo "APPLE_MUSIC_PRIVATE_KEY=$APPLE_MUSIC_PRIVATE_KEY" >> .env.production
+        - echo "ADMIN_SECRET=$ADMIN_SECRET" >> .env.production
         # Debug: Print what variables actually contain
         - echo "DEBUG - APP_DOMAIN from env:" "$APP_DOMAIN"
         - echo "DEBUG - AUTH_URL from env:" "$AUTH_URL"

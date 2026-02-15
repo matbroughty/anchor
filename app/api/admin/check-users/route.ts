@@ -10,7 +10,7 @@ import { dynamoDocumentClient, TABLE_NAME } from "@/lib/dynamodb";
 export async function GET(request: NextRequest) {
   // Verify secret
   const secret = request.nextUrl.searchParams.get("secret");
-  if (secret !== process.env.AUTH_RESEND_KEY) {
+  if (secret !== process.env.ADMIN_SECRET) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 

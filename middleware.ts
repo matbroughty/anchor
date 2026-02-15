@@ -5,7 +5,8 @@ export default auth((req) => {
   const isLoggedIn = !!req.auth
   const isProtected =
     req.nextUrl.pathname.startsWith("/profile") ||
-    req.nextUrl.pathname.startsWith("/settings")
+    req.nextUrl.pathname.startsWith("/settings") ||
+    req.nextUrl.pathname.startsWith("/dashboard")
   const isAuthPage =
     req.nextUrl.pathname.startsWith("/signin") ||
     req.nextUrl.pathname.startsWith("/verify-email")

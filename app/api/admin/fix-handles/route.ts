@@ -7,13 +7,13 @@ import { dynamoDocumentClient, TABLE_NAME } from "@/lib/dynamodb";
  *
  * Usage: POST /api/admin/fix-handles?secret=YOUR_SECRET
  *
- * Security: Requires AUTH_RESEND_KEY env var as secret parameter
+ * Security: Requires ADMIN_SECRET env var as secret parameter
  */
 
 export async function POST(request: NextRequest) {
   // Verify secret
   const secret = request.nextUrl.searchParams.get("secret");
-  if (secret !== process.env.AUTH_RESEND_KEY) {
+  if (secret !== process.env.ADMIN_SECRET) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 

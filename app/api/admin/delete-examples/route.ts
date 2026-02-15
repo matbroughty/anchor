@@ -15,7 +15,7 @@ const EXAMPLE_HANDLES = ["beatsandrhymes", "cosmicjams", "indievibes"];
 export async function POST(request: NextRequest) {
   // Verify secret
   const secret = request.nextUrl.searchParams.get("secret");
-  if (secret !== process.env.AUTH_RESEND_KEY) {
+  if (secret !== process.env.ADMIN_SECRET) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
