@@ -1,6 +1,6 @@
 # Anchor.band Navigation Flow
 
-## Current Flow Diagram
+## Current Flow Diagram - thanks
 
 ```mermaid
 graph TD
